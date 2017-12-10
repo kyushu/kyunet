@@ -15,11 +15,18 @@ find_package(OpenCV REQUIRED)
     if (OpenCV_FOUND)
         INCLUDE_DIRECTORIES(${OpenCV_INCLUDE_DIRS})
 
+        # load_imabe_test
         add_executable(load_imabe_test load_imabe_test.cpp ${stb_SRC})
         target_link_libraries(load_imabe_test ${OpenCV_LIBS})
 
+        # tensor_test
         add_executable(tensor_test tensor_test.cpp)
         target_link_libraries(tensor_test ${OpenCV_LIBS} libkyunet)
+
+        # net_test
+        add_executable(net_test net_test.cpp)
+        target_link_libraries(net_test ${OpenCV_LIBS} libkyunet)
+
 
     else()
         message("OpenCV not found")

@@ -15,13 +15,16 @@ namespace mkt {
         int height_; // height
         int channel_; // channel / depth
 
-        float *data_;   // data
-        float *gdata_;  // gradient data
-        int data_wr_idx;
-        int gdata_wr_idx;
-
+        
         int max_size_;
         int size_;
+
+    public:
+        float *data_;   // data
+        float *gdata_;  // gradient data
+
+        int data_wr_idx;
+        int gdata_wr_idx;
 
     public:
         Tensor(int batch, int width, int height, int channel) {

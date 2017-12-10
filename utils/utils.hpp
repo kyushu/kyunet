@@ -2,6 +2,8 @@
 #define _UTILS_H_
 
 #include <iostream>
+#include <sstream>
+#include <vector>
 #include <fstream>
 #include <iomanip>
 #include <ctime>

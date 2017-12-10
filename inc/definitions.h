@@ -1,7 +1,7 @@
 #ifndef _DEFINITIONS_h_
 #define _DEFINITIONS_h_
 
-enum OP_STATUS
+enum class OP_STATUS: char
 {
     SUCCESS = 0,
     FAIL    = 1,

@@ -14,46 +14,93 @@
 
 #include "tensor.h"
 
+/*
+  To use stb you must define 
+  #define STB_IMAGE_IMPLEMENTATION         // for load image
+  #define STB_IMAGE_RESIZE_IMPLEMENTATION  // for resize image
+  to enable functions.
+  but i already define these keyword in libkyunet and linked
+  so we don't need to define again
+*/ 
+#include "stb_image.h"
+#include "stb_image_resize.h"
+
+
+unsigned char* resize_image(std::string file, int out_w, int out_h) {
+
+    // Load image from file
+    int w, h, c;
+    unsigned char *pImg = stbi_load(file.c_str(), &w, &h, &c, 0);
+
+    if (w == out_w && h == out_h)
+    {
+        return pImg;
+    }
+
+    // unsigned char *r_img = (unsigned char*) malloc(out_w*out_h*c);
+    unsigned char *r_img = new unsigned char[out_w*out_h*c];
+
+    // resize 1
+    // stbir_resize_uint8(pImg, w, h, 0, r_img, out_w, out_h, 0, c);
+
+    // resize 2
+    stbir_resize(pImg, w, h, 0, r_img, out_w, out_h, 0, STBIR_TYPE_UINT8, c, STBIR_ALPHA_CHANNEL_NONE, 0, STBIR_EDGE_CLAMP, STBIR_EDGE_CLAMP, STBIR_FILTER_DEFAULT, STBIR_FILTER_DEFAULT, STBIR_COLORSPACE_LINEAR, NULL);
+
+    return r_img;
+}
 
 int main(int argc, char const *argv[])
 {
     
     std::string img_dir = "../../example/images/";
 
+
     std::vector<std::string> file_list;
     mkt::listdir(img_dir.c_str(), file_list);
 
 
-    mkt::Tensor tensor = mkt::Tensor(3, 480, 600, file_list.size());
+    mkt::Tensor tensor = mkt::Tensor(file_list.size(), 480, 600, 3);
     printf("batch size: %d\n", tensor.getBatchSize());
     printf("width: %d\n", tensor.getWidth());
     printf("height: %d\n", tensor.getHeight());
     printf("channel: %d\n", tensor.getDepth());
 
+    assert(file_list.size() >= 3);
 
-    for (int i = 0; i < file_list.size(); ++i)
+    /*********************
+     * Add data to tensor
+     ********************/
+    // add from file
+    std::string img_file = img_dir + file_list.at(0);
+    tensor.addData(img_file.c_str());
+
+    // add from float array
+    img_file = img_dir + file_list.at(1);
+    int w, h, c;
+    unsigned char *pImg = stbi_load(img_file.c_str(), &w, &h, &c, 0);
+    float* pfImg = new float[w*h*c];
+    for (int i = 0; i < w*h*c; ++i)
     {
-        std::string img_file = img_dir + file_list.at(i);
-        int ori_w, ori_h, ori_c;
-        int out_w = 100;
-        int out_h = 100;
-        // unsigned char *img = stbi_load(img_file.c_str(), &ori_w, &ori_h, &ori_c, 0);
-        
-        tensor.addData(img_file.c_str());
-        // unsigned char *r_img = (unsigned char*) malloc(out_w*out_h*ori_c);
-
-        // resize 1
-        // stbir_resize_uint8(img, ori_w, ori_h, 0, r_img, out_w, out_h, 0, ori_c);
-
-        // resize 2
-        // stbir_resize(img, ori_w, ori_h, 0, r_img, out_w, out_h, 0, STBIR_TYPE_UINT8, ori_c, STBIR_ALPHA_CHANNEL_NONE, 0, STBIR_EDGE_CLAMP, STBIR_EDGE_CLAMP, STBIR_FILTER_DEFAULT, STBIR_FILTER_DEFAULT, STBIR_COLORSPACE_LINEAR, NULL);
-        
+        *(pfImg+i) = (float)*(pImg+i);
     }
+    tensor.addData(pfImg);
 
+    // add from vector
+    img_file = img_dir + file_list.at(2);
+    pImg = stbi_load(img_file.c_str(), &w, &h, &c, 0);
+    std::vector<float> vfImg;
+    for (int i = 0; i < w*h*c; ++i)
+    {
+        vfImg.push_back( (float)*(pImg+i) );
+    }
+    tensor.addData(vfImg);
+
+
+    /***************
+     * Verify data 
+     **************/
     const float *data = tensor.getData();
-
     unsigned char *uchar = (unsigned char *)calloc(tensor.getSize(), sizeof(unsigned char));
-
     for (int i = 0; i < file_list.size(); ++i)
     {
         // Display 
@@ -77,10 +124,5 @@ int main(int argc, char const *argv[])
 
         data += tensor.getSize();
     }
-
-
-
-    
-    
     return 0;
 }
