@@ -20,42 +20,45 @@
 * SOFTWARE.
 */
 
-/*
-    Net is main class to contain all layers
-*/
+#ifndef _LAYER_H_
+#define _LAYER_H_
 
-#include "net.h"
+#include "tensor.h"
 
 namespace mkt {
-
-    template<class DType>
-    void Net<DType>::flattenImage(unsigned char *pImg, bool bNormalize) {
-
-        int depth = this->pInput->getDepth();
-        int height = this->pInput->getHeight();
-        int width = this->pInput->getWidth();
-        int sz = width*height;
-
-        int wr_idx = this->pInput->data_wr_idx_;
-        int full_size = this->pInput->getFullSize();
-        float* ptr = this->pInput->pData_ + this->pInput->data_wr_idx_ * full_size;
-
-        for (int i = 0; i < full_size; i+=depth)
-        {
-            int idx = int(i/depth);
-            DType maxValue = 255;
-            ptr[idx]                = bNormalize ? DType(pImg[i])   / maxValue : DType(pImg[i]);
-            ptr[sz*(depth-2) + idx] = bNormalize ? DType(pImg[i+1]) / maxValue : DType(pImg[i+1]);
-            ptr[sz*(depth-1) + idx] = bNormalize ? DType(pImg[i+2]) / maxValue : DType(pImg[i+2]);
-        }
-    }
-
-    template<class DType>
-    void Net<DType>::setInput() {
-
-    }
     
+    template<class DType>
+    class Layer_abstract
+    {
+    public:
+        Tensor<DType> *pSrc_tensor;      // point to dst_tensor of previous layer
+        Tensor<DType> *pDst_tensor;      // new a destination tensor for self use
+        Tensor<DType> *pWeight_tensor;   // new a weight tensor for self use
+        DType* pBias = nullptr;                    // new a chunk of memory for self use
+        int fh; // filter height
+        int fw; // filter width
+        int ch; // filter channel
 
-    template class Net<float>;
-    // template class Net<double>;
+
+    public:
+        Layer_abstract():
+            pSrc_tensor{nullptr}, pDst_tensor{nullptr}, pWeight_tensor{nullptr}, pBias{nullptr}
+        {};
+        virtual ~Layer_abstract()
+        {
+            pSrc_tensor = nullptr;
+            delete pDst_tensor;
+            delete pWeight_tensor;
+            delete[] pBias;
+        };
+
+        static int gemm_nr(int trans_a, int trans_b, int M, int N, int K, float ALPHA, float *A, int lda, float *B, int ldb, float BETA, float *C, int ldc);
+
+        void forward();     // forward pass
+        void backward();    // back propagation 
+        
+    };
 }
+
+
+#endif

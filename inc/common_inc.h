@@ -20,16 +20,12 @@
 * SOFTWARE.
 */
 
-#ifndef _DEFINITIONS_h_
-#define _DEFINITIONS_h_
+#ifndef _COMMON_INC_H_
+#define _COMMON_INC_H_
 
-enum class OP_STATUS: char
-{
-    SUCCESS = 0,
-    FAIL    = 1,
-    OVER_MAX_SIZE = 3,
-    UNMATCHED_SIZE = 4,
+// #define NDEBUG // the assert will be disabled, if NDEBUG is defined
+#include <cassert>
 
-};
+#include <cstdio>
 
 #endif

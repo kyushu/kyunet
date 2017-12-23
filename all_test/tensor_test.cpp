@@ -54,12 +54,13 @@ void test_load_image_file(std::string img_dir) {
     std::vector<std::string> file_list;
     mkt::listdir(img_dir.c_str(), file_list);
 
-    mkt::Tensor tensor = mkt::Tensor(file_list.size(), 480, 600, 3);
+    mkt::Tensor<float> tensor = mkt::Tensor<float>(480, 600, 3);
+    tensor.initTensorWithBatchSize(file_list.size());
     printf("batch size: %d\n", tensor.getBatchSize());
     printf("width: %d\n", tensor.getWidth());
     printf("height: %d\n", tensor.getHeight());
     printf("channel: %d\n", tensor.getDepth());
-
+    
     assert(file_list.size() >= 3);
 
     /*********************
@@ -95,7 +96,7 @@ void test_load_image_file(std::string img_dir) {
      * Verify data 
      **************/
     const float *data = tensor.getData();
-    unsigned char *uchar = (unsigned char *)calloc(tensor.getSize(), sizeof(unsigned char));
+    unsigned char *uchar = (unsigned char *)calloc(tensor.getFullSize(), sizeof(unsigned char));
     for (int i = 0; i < file_list.size(); ++i)
     {
         // Display 
@@ -105,7 +106,7 @@ void test_load_image_file(std::string img_dir) {
         
         printf("read: %p\n", data);
 
-        for (int i = 0; i < tensor.getSize(); ++i)
+        for (int i = 0; i < tensor.getFullSize(); ++i)
         {
             *(uchar+i) = int(*(data+i));
         }
@@ -117,7 +118,7 @@ void test_load_image_file(std::string img_dir) {
         cv::imshow("image", img_mat);
         cv::waitKey(0);
 
-        data += tensor.getSize();
+        data += tensor.getFullSize();
     }
 }
 
@@ -127,33 +128,11 @@ int main(int argc, char const *argv[])
     
 
     /****************************************** 
-        Test load 3 image file from a directory 
+        Test load 3 image files from a directory 
     ******************************************/
-    // std::string img_dir = "../../example/images/";
-    // test_load_image_file(img_dir);
+    std::string img_dir = "../example/images/";
+    test_load_image_file(img_dir);
 
-    /**
-        Test reord RGB pixel 
-    */
-    float s[] = {1,2,3, 1,2,3, 1,2,3, 1,2,3, 1,2,3, 1,2,3, 1,2,3, 1,2,3, 1,2,3, 1,2,3, 1,2,3, 1,2,3};
-    float t[36];
-    int depth = 3;
-    int height = 4; 
-    int width = 3;
-
-    int sz = height*width;
-    for (int i = 0; i < depth*height*width; i+=depth)
-    {
-        int idx = int(i/depth);
-        t[idx] = s[i];
-        t[sz*(depth-2) + idx] = s[i+1];
-        t[sz*(depth-1) + idx] = s[i+2];
-    }
-    
-    for (int i = 0; i < 36; ++i)
-    {
-        printf("%d - %f\n", i, *(t+i));
-    }
 
     return 0;
 }
