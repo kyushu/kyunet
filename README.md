@@ -1,2 +1,4 @@
 # kyunet
-neural network framework
+neural network network framework
+
+the reference: jnbraun/bcnn, ncnn, keras, MXNet, nnabla

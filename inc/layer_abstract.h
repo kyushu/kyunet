@@ -34,7 +34,7 @@ namespace mkt {
         Tensor<DType> *pSrc_tensor;      // point to dst_tensor of previous layer
         Tensor<DType> *pDst_tensor;      // new a destination tensor for self use
         Tensor<DType> *pWeight_tensor;   // new a weight tensor for self use
-        DType* pBias = nullptr;                    // new a chunk of memory for self use
+        DType* pBias = nullptr;          // new a chunk of memory for self use
         int fh; // filter height
         int fw; // filter width
         int ch; // filter channel

@@ -23,6 +23,28 @@ void test_flatten_image() {
     /**
         Test reord RGB pixel from {rgb, rgb, ... ,rgb} to {rrrr..., gggg..., bbbb...}
     */
+    
+    /*
+      the following code will normalize each pixel of image from (0, 255)  to (-1, 1)
+      and the pixel order will be reordered
+      assume image is 3x4x3 = wxhxc
+      the original order of pixel of image is 
+      
+      0 1 2 3 4 5 6 7 8
+      R G B R G B R G B
+      R G B R G B R G B
+      R G B R G B R G B
+      R G B R G B R G B
+
+      and convert it into 
+
+      0 1 2 3 4 5 6 7 8
+      R R R R R R R R R
+      R R R G G G G G G
+      G G G G G G B B B
+      B B B B B B B B B
+
+    */ 
     unsigned char s1[] = {1,2,3, 1,2,3, 1,2,3, 1,2,3, 1,2,3, 1,2,3, 1,2,3, 1,2,3, 1,2,3, 1,2,3, 1,2,3, 1,2,3};
     unsigned char s2[] = {4,5,6, 4,5,6, 4,5,6, 4,5,6, 4,5,6, 4,5,6, 4,5,6, 4,5,6, 4,5,6, 4,5,6, 4,5,6, 4,5,6};
     unsigned char s3[] = {7,8,9, 7,8,9, 7,8,9, 7,8,9, 7,8,9, 7,8,9, 7,8,9, 7,8,9, 7,8,9, 7,8,9, 7,8,9, 7,8,9};
@@ -71,27 +93,7 @@ int main(int argc, char const *argv[])
     // int height = net.pInPutTensor->getHeight();
     // int width = net.pInPutTensor->getWidth();
 
-    /*
-      the following code will normalize each pixel of image from (0, 255)  to (-1, 1)
-      and the reording the pixel order
-      assume image is 3x4x3 = wxhxc
-      the original order of pixel of image is 
-      
-      0 1 2 3 4 5 6 7 8 
-      R G B R G B R G B
-      R G B R G B R G B
-      R G B R G B R G B
-      R G B R G B R G B
-
-      and convert it into 
-
-      0 1 2 3 4 5 6 7 8
-      R R R R R R R R R
-      R R R G G G G G G
-      G G G G G G B B B
-      B B B B B B B B B
-
-    */ 
+    
     test_flatten_image();
     
 

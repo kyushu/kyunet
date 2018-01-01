@@ -39,7 +39,7 @@ namespace mkt {
         int channel_; // channel / depth
 
         
-        int full_size_;
+        int whole_size_;
         int size_;
 
     public:
@@ -55,7 +55,6 @@ namespace mkt {
         {
 
             size_ = width_*height_*channel_;
-            // full_size_ = batchSize_ * size_;
 
             // data_ = new T[max_size_];
             // gdata_ = new T[max_size_];

@@ -31,9 +31,9 @@ namespace mkt {
     template<class DType>
     void Net<DType>::flattenImage(unsigned char *pImg, bool bNormalize) {
 
-        int depth = this->pInput->getDepth();
+        int depth  = this->pInput->getDepth();
         int height = this->pInput->getHeight();
-        int width = this->pInput->getWidth();
+        int width  = this->pInput->getWidth();
         int sz = width*height;
 
         int wr_idx = this->pInput->data_wr_idx_;

@@ -36,10 +36,10 @@ namespace mkt {
         }
 
         batchSize_ = batchSize;
-        full_size_ = batchSize_ * size_;
+        whole_size_ = batchSize_ * size_;
 
-        pData_ = new T[full_size_];
-        pGdata_ = new T[full_size_];
+        pData_ = new T[whole_size_];
+        pGdata_ = new T[whole_size_];
     }
 
     // add data from file
