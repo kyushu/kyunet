@@ -23,25 +23,33 @@
 #ifndef _NET_H_
 #define _NET_H_
 
-#include "layer_abstract.h"
+#include <cstdio>
+#include "layer.h"
+#include "inputLayer.h"
 
 
 namespace mkt {
 
     template<class DType>
-    class Net: public Layer_abstract<DType>
+    class Net
     {
+    private:
+        std::vector<Layer<DType>* > layers_;
+
     public:
-        Tensor<DType> *pInput;
-    public:
-        Net(): pInput{nullptr}
+        //==================================+
+        Net()/*: pInput{nullptr}*/
         {};
         ~Net(){
-            delete pInput;
-        }; 
+            // delete pInput;
 
-        void flattenImage(unsigned char *pImg, bool bNormalize);
-        void setInput();
+        };
+        //==================================+
+        void addLayer(Layer<DType> *newLayer);
+        void compile();
+
+
+        InputLayer<DType> *pInputLayer;
 
     };
 

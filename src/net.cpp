@@ -28,33 +28,60 @@
 
 namespace mkt {
 
+    // template<class DType>
+    // void Net<DType>::FlattenImageToTensor(unsigned char *pImg, Tensor<DType> *pTensor, bool bNormalize) {
+
+    //     int depth  = pTensor->getDepth();
+    //     int height = pTensor->getHeight();
+    //     int width  = pTensor->getWidth();
+    //     int sz = width*height;
+
+    //     int wr_idx = pTensor->data_wr_idx_;
+    //     int full_size = pTensor->getFullSize();
+    //     float* ptr = pTensor->pData_ + pTensor->data_wr_idx_ * full_size;
+
+    //     for (int i = 0; i < full_size; i+=depth)
+    //     {
+    //         int idx = int(i/depth);
+    //         DType maxValue = 255;
+    //         ptr[idx]                = bNormalize ? DType(pImg[i])   / maxValue : DType(pImg[i]);
+    //         ptr[sz*(depth-2) + idx] = bNormalize ? DType(pImg[i+1]) / maxValue : DType(pImg[i+1]);
+    //         ptr[sz*(depth-1) + idx] = bNormalize ? DType(pImg[i+2]) / maxValue : DType(pImg[i+2]);
+    //     }
+    // }
+
     template<class DType>
-    void Net<DType>::flattenImage(unsigned char *pImg, bool bNormalize) {
+    void Net<DType>::addLayer(Layer<DType> *newLayer) {
 
-        int depth  = this->pInput->getDepth();
-        int height = this->pInput->getHeight();
-        int width  = this->pInput->getWidth();
-        int sz = width*height;
+        layers_.push_back(newLayer);
+    }
 
-        int wr_idx = this->pInput->data_wr_idx_;
-        int full_size = this->pInput->getFullSize();
-        float* ptr = this->pInput->pData_ + this->pInput->data_wr_idx_ * full_size;
 
-        for (int i = 0; i < full_size; i+=depth)
+    template<class DType>
+    void Net<DType>::compile() {
+
+        if (layers_.size() == 0)
         {
-            int idx = int(i/depth);
-            DType maxValue = 255;
-            ptr[idx]                = bNormalize ? DType(pImg[i])   / maxValue : DType(pImg[i]);
-            ptr[sz*(depth-2) + idx] = bNormalize ? DType(pImg[i+1]) / maxValue : DType(pImg[i+1]);
-            ptr[sz*(depth-1) + idx] = bNormalize ? DType(pImg[i+2]) / maxValue : DType(pImg[i+2]);
+            return;
+        } else if (layers_.size() == 1)
+        {
+            if (layers_.at(0)->getType() == LayerType::Input)
+            {
+                fprintf(stderr, "the first layer is Input layer\n");
+                pInputLayer = static_cast<InputLayer<DType>*>(layers_.at(0));
+                // fprintf(stderr, "pInputLayer.batchSize_: %d\n", pInputLayer->batchSize_);
+                int h = pInputLayer->dh_;
+                int w = pInputLayer->dw_;
+                int c = pInputLayer->dc_;
+                pInputLayer->pDstTensor_->initTensor(h, w, c, pInputLayer->batchSize_);
+
+            }
+        } else {
+            fprintf(stderr, "TODO: compile layer more than 1\n");
         }
-    }
-
-    template<class DType>
-    void Net<DType>::setInput() {
 
     }
-    
+
 
     template class Net<float>;
     // template class Net<double>;

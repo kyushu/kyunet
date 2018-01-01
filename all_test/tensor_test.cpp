@@ -54,8 +54,12 @@ void test_load_image_file(std::string img_dir) {
     std::vector<std::string> file_list;
     mkt::listdir(img_dir.c_str(), file_list);
 
-    mkt::Tensor<float> tensor = mkt::Tensor<float>(480, 600, 3);
-    tensor.initTensorWithBatchSize(file_list.size());
+    // mkt::Tensor<float> tensor = mkt::Tensor<float>(480, 600, 3);
+    mkt::Tensor<float> tensor{};
+    tensor.height_ = 480;
+    tensor.width_ = 600;
+    tensor.channel_ = 3;
+    tensor.initTensor(480, 600, 3, file_list.size());
     printf("batch size: %d\n", tensor.getBatchSize());
     printf("width: %d\n", tensor.getWidth());
     printf("height: %d\n", tensor.getHeight());

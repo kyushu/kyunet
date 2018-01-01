@@ -20,9 +20,15 @@
 * SOFTWARE.
 */
 
-#include "layer_abstract.h"
+#include "layer.h"
 
 namespace mkt {
+
+    template<class DType>
+    LayerType Layer<DType>::getType() {
+        return type_;
+    }
+
 
     /* 
         C = alpha(AxB) + beta*C 
@@ -113,4 +119,9 @@ namespace mkt {
         }
         return 0;
     }
+
+
+
+
+    template class Layer<float>;
 }

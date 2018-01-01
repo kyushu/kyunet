@@ -34,8 +34,8 @@ namespace mkt {
     {
     public:
         int batchSize_; // batch size
-        int width_; // width
         int height_; // height
+        int width_; // width
         int channel_; // channel / depth
 
         
@@ -50,22 +50,37 @@ namespace mkt {
         int gdata_wr_idx_;
 
     public:
-        Tensor(int width, int height, int channel):
-            width_{width}, height_{height}, channel_{channel}, data_wr_idx_{0}, gdata_wr_idx_{0}, pData_{nullptr}, pGdata_{nullptr}
-        {
+        //============================================================================
+        // Tensor(int height, int width, int channel):
+        //     height_{height}, width_{width}, channel_{channel}, 
+        //     data_wr_idx_{0}, gdata_wr_idx_{0}, 
+        //     pData_{nullptr}, pGdata_{nullptr}
+        // {
 
-            size_ = width_*height_*channel_;
+        //     size_ = width_*height_*channel_;
 
-            // data_ = new T[max_size_];
-            // gdata_ = new T[max_size_];
-        };
+        //     // data_ = new T[max_size_];
+        //     // gdata_ = new T[max_size_];
+        // };
+        Tensor():
+            height_{0}, width_{0}, channel_{0},
+            data_wr_idx_{0}, gdata_wr_idx_{0},
+            pData_{nullptr}, pGdata_{nullptr}
+        {};
 
         ~Tensor(){
             delete[] pData_;
             delete[] pGdata_;
         };
+
+        // TODO: Tensor CopyConstructor
+        // Copy contructor
+        Tensor(const Tensor&) = delete;             // delete default copy construct
+        Tensor operator=(const Tensor&) = delete;   // delete default assign
+        //============================================================================
+
         
-        void initTensorWithBatchSize(int batchSize);
+        void initTensor(int h, int w, int c, int batchSize);
 
         // 
         OP_STATUS addData(char const *filename);

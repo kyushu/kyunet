@@ -1,10 +1,15 @@
 #include <iostream>
+#include <cstdio>
 
 #include "utils.hpp"
 #include "folder_file_utils.hpp"
 
 #include "tensor.h"
+#include "layer.h"
+#include "inputLayer.h"
 #include "net.h"
+
+using namespace mkt;
 
 /*
     To use stb you must define 
@@ -45,28 +50,30 @@ void test_flatten_image() {
       B B B B B B B B B
 
     */ 
-    unsigned char s1[] = {1,2,3, 1,2,3, 1,2,3, 1,2,3, 1,2,3, 1,2,3, 1,2,3, 1,2,3, 1,2,3, 1,2,3, 1,2,3, 1,2,3};
-    unsigned char s2[] = {4,5,6, 4,5,6, 4,5,6, 4,5,6, 4,5,6, 4,5,6, 4,5,6, 4,5,6, 4,5,6, 4,5,6, 4,5,6, 4,5,6};
-    unsigned char s3[] = {7,8,9, 7,8,9, 7,8,9, 7,8,9, 7,8,9, 7,8,9, 7,8,9, 7,8,9, 7,8,9, 7,8,9, 7,8,9, 7,8,9};
 
-    int depth = 3;
-    int height = 4; 
-    int width = 3;
 
-    mkt::Net<float> net = mkt::Net<float>();
-    net.pInput = new mkt::Tensor<float>(width, height, depth);
-    net.pInput->initTensorWithBatchSize(3);
+    // unsigned char s1[] = {1,2,3, 1,2,3, 1,2,3, 1,2,3, 1,2,3, 1,2,3, 1,2,3, 1,2,3, 1,2,3, 1,2,3, 1,2,3, 1,2,3};
+    // unsigned char s2[] = {4,5,6, 4,5,6, 4,5,6, 4,5,6, 4,5,6, 4,5,6, 4,5,6, 4,5,6, 4,5,6, 4,5,6, 4,5,6, 4,5,6};
+    // unsigned char s3[] = {7,8,9, 7,8,9, 7,8,9, 7,8,9, 7,8,9, 7,8,9, 7,8,9, 7,8,9, 7,8,9, 7,8,9, 7,8,9, 7,8,9};
 
-    net.flattenImage(s1, true);
-    net.pInput->data_wr_idx_++;
-    net.flattenImage(s2, true);
-    net.pInput->data_wr_idx_++;
-    net.flattenImage(s3, true);
-    net.pInput->data_wr_idx_++;
-    for (int i = 0; i < 36*3; ++i)
-    {
-      printf("%d - %f\n", i, net.pInput->pData_[i]);
-    }
+    // int depth = 3;
+    // int height = 4; 
+    // int width = 3;
+
+    // mkt::Net<float> net = mkt::Net<float>();
+    // net.pInput = new mkt::Tensor<float>(width, height, depth);
+    // net.pInput->initTensorWithBatchSize(3);
+
+    // net.flattenImage(s1, true);
+    // net.pInput->data_wr_idx_++;
+    // net.flattenImage(s2, true);
+    // net.pInput->data_wr_idx_++;
+    // net.flattenImage(s3, true);
+    // net.pInput->data_wr_idx_++;
+    // for (int i = 0; i < 36*3; ++i)
+    // {
+    //   printf("%d - %f\n", i, net.pInput->pData_[i]);
+    // }
 }
 
 int main(int argc, char const *argv[])
@@ -94,9 +101,24 @@ int main(int argc, char const *argv[])
     // int width = net.pInPutTensor->getWidth();
 
     
-    test_flatten_image();
+    // test_flatten_image();
+
+
+    Net<float> net = Net<float>();
     
 
+    InputLayer<float> *inputLayer = new InputLayer<float>{4, 3, 3, 3};
+    int height = inputLayer->dh_;
+    int width = inputLayer->dw_;
+    int depth = inputLayer->dc_;
+    fprintf(stderr, "height: %d\n", height);
+    fprintf(stderr, "width: %d\n", width);
+    fprintf(stderr, "depth: %d\n", depth);
+
+    net.addLayer(inputLayer);
+
+
+    net.compile();
 
 
     return 0;

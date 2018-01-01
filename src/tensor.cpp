@@ -28,7 +28,11 @@
 namespace mkt {
 
     template<class T>
-    void Tensor<T>::initTensorWithBatchSize(int batchSize) {
+    void Tensor<T>::initTensor(int h, int w, int c, int batchSize) {
+        height_ = h;
+        width_ = w;
+        channel_ = c;
+        
         if (batchSize == 0)
         {
             fprintf(stderr, "batch size = 0\n");
