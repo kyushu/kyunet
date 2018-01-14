@@ -27,38 +27,49 @@
 
 namespace mkt {
 
-    template<class T>
-    void Tensor<T>::initTensor(int h, int w, int c, int batchSize) {
-        height_ = h;
-        width_ = w;
-        channel_ = c;
-        
-        if (batchSize == 0)
+    // Init Tensor: allocate memory space of pData
+    // void Tensor::initialize(int batchSize, int h, int w, int c) {
+    void Tensor::initialize() {
+
+        // if (batchSize == 0)
+        // {
+        //     fprintf(stderr, "batch size = 0\n");
+        //     return;
+        // }
+
+        // height_ = h;
+        // width_ = w;
+        // channel_ = c;
+
+        size2D_ = height_ * width_;
+        size3D_ = size2D_ * channel_;
+        // fprintf(stderr, "channel_: %d\n", channel_);
+        // fprintf(stderr, "size2D_: %d\n", size2D_);
+        // fprintf(stderr, "init tensor size3D: %d\n", size3D_);
+        wholeSize_ = batchSize_ * size3D_;
+
+        if (wholeSize_ == 0)
         {
-            fprintf(stderr, "batch size = 0\n");
+            fprintf(stderr, "wholeSize == 0\n");
             return;
         }
 
-        batchSize_ = batchSize;
-        whole_size_ = batchSize_ * size_;
 
-        pData_ = new T[whole_size_];
-        pGdata_ = new T[whole_size_];
+        pData_ = new float[wholeSize_];
     }
 
     // add data from file
-    template<class T>
-    OP_STATUS Tensor<T>::addData(char const *filename) {
+    OP_STATUS Tensor::addData(char const *filename) {
 
         // Safety Check
-        if (data_wr_idx_ >= batchSize_)
+        if (wrIdx_ >= batchSize_)
         {
-            fprintf(stderr, "cur = %d > %d\n", data_wr_idx_, batchSize_);
+            fprintf(stderr, "cur = %d > %d\n", wrIdx_, batchSize_);
             return OP_STATUS::OVER_MAX_SIZE;
         }
-        
+
         // Get current write address
-        float* ptr = pData_ + data_wr_idx_ * size_;
+        float* ptr = pData_ + wrIdx_ * size3D_;
 
         // Load image from file
         int w, h, c;
@@ -71,67 +82,65 @@ namespace mkt {
 
         // Conver unsigned char to float
         fprintf(stderr, "w: %d, h: %d, c: %d\n", w, h, c);
-        for (int i = 0; i < size_; ++i)
+        for (int i = 0; i < size3D_; ++i)
         {
-            *(ptr+i) = (T)*(pImg+i);
+            *(ptr+i) = (float)*(pImg+i);
         }
 
-        ++data_wr_idx_;
+        ++wrIdx_;
 
         return OP_STATUS::SUCCESS;
     }
 
     // add data from array
-    template<class T>
-    OP_STATUS Tensor<T>::addData(const T *pImg) {
+    OP_STATUS Tensor::addData(const float *pImg) {
 
         assert(pImg);
 
         // Safety Check
-        if (data_wr_idx_ >= batchSize_)
+        if (wrIdx_ >= batchSize_)
         {
-            fprintf(stderr, "cur = %d > %d\n", data_wr_idx_, batchSize_);
+            fprintf(stderr, "cur = %d > %d\n", wrIdx_, batchSize_);
             return OP_STATUS::OVER_MAX_SIZE;
         }
 
         // Get current write address
-        float* ptr = pData_ + data_wr_idx_ * size_;
+        float* ptr = pData_ + wrIdx_ * size3D_;
 
-        for (int i = 0; i < size_; ++i)
+        for (int i = 0; i < size3D_; ++i)
         {
             *(ptr+i) = *(pImg+i);
         }
 
-        ++data_wr_idx_;
+        ++wrIdx_;
 
         return OP_STATUS::SUCCESS;
     }
 
-    // add data from array
-    template<class T>
-    OP_STATUS Tensor<T>::addData(std::vector<T> vImg) {
+    // add data from vector
+    OP_STATUS Tensor::addData(std::vector<float> vImg) {
 
         // Safety Check
-        if (data_wr_idx_ >= batchSize_)
+        if (wrIdx_ >= batchSize_)
         {
-            fprintf(stderr, "cur = %d > %d\n", data_wr_idx_, batchSize_);
+            fprintf(stderr, "cur = %d > %d\n", wrIdx_, batchSize_);
             return OP_STATUS::OVER_MAX_SIZE;
         }
 
-        if (vImg.size() != size_)
+        if (vImg.size() != size3D_)
         {
-            return OP_STATUS::UNMATCHED_SIZE; 
+            return OP_STATUS::UNMATCHED_SIZE;
         }
 
         // Get current write address
-        float* ptr = pData_ + data_wr_idx_ * size_;
+        float* ptr = pData_ + wrIdx_ * size3D_;
 
-        for (int i = 0; i < size_; ++i)
+        for (int i = 0; i < size3D_; ++i)
         {
             *(ptr+i) = vImg.at(i);
         }
 
-        ++data_wr_idx_;
+        ++wrIdx_;
 
         return OP_STATUS::SUCCESS;
     }
@@ -140,43 +149,36 @@ namespace mkt {
     /********************************
     ** Get functions
     ********************************/
-    template<class T>
-    const T* Tensor<T>::getData() {
+    const float* Tensor::getData() {
         return pData_;
     }
 
-    template<class T>
-    const T* Tensor<T>::getGData() {
-        return pGdata_;
-    }
-
-    template<class T>
-    int Tensor<T>::getFullSize() {
-        return size_;
-    }
-
-    template<class T>
-    int Tensor<T>::getBatchSize() {
+    int Tensor::getBatchSize() {
         return batchSize_;
     }
 
-    template<class T>
-    int Tensor<T>::getWidth() {
+    int Tensor::getWidth() {
         return width_;
     }
 
-    template<class T>
-    int Tensor<T>::getHeight() {
+    int Tensor::getHeight() {
         return height_;
     }
 
-    template<class T>
-    int Tensor<T>::getDepth() {
+    int Tensor::getDepth() {
         return channel_;
     }
 
-    template class Tensor<float>;
-    // template class Tensor<double>;
+    int Tensor::getSize2D() {
+        return size2D_;
+    }
 
+    int Tensor::getSize3D() {
+        return size3D_;
+    }
+
+    int Tensor::getWholdSize() {
+        return wholeSize_;
+    }
 }
 

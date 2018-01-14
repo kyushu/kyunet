@@ -139,14 +139,16 @@ void test_add_batch_image() {
     Net net;
     /***********************************************
      *  Step 1. Configure Network
-     *  Add layer by parameters
+     *  1. Add Layer with parameters
+     *  2. Define cost function
      **********************************************/
     net.addInputLayer("input", batchSize, height, width, channel);
 
 
     /***********************************************
      *  Step 2. Initialize Network
-     *  Initialize Tensor by updated parameters
+     *  1. Update parameter of Layer, Tensor
+     *  2. Allocate memory space of Tensor
      **********************************************/
     net.initialize();
 

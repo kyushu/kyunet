@@ -23,33 +23,43 @@
 #ifndef _NET_H_
 #define _NET_H_
 
-#include <cstdio>
+// #include <cstdio>
+
+#include "stb_image.h"
+
 #include "layer.h"
 #include "inputLayer.h"
 
 
 namespace mkt {
 
-    template<class DType>
     class Net
     {
     private:
-        std::vector<Layer<DType>* > layers_;
+        std::vector<Layer* > layers_;
+        InputLayer* pInputLayer;
 
     public:
         //==================================+
-        Net()/*: pInput{nullptr}*/
+        Net(): pInputLayer{nullptr}
         {};
         ~Net(){
             // delete pInput;
 
         };
-        //==================================+
-        void addLayer(Layer<DType> *newLayer);
-        void compile();
+        //==================================
 
+        // Configuration Function
+        void addInputLayer(std::string id, int batchSize, int h, int w, int c);
 
-        InputLayer<DType> *pInputLayer;
+        // Initialize Function
+        void initialize();
+
+        // Add Data Function
+        OP_STATUS add_data_from_file_list(std::vector<std::string> fileList);
+
+        // Getter
+        InputLayer* getInputLayer();
 
     };
 

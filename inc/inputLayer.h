@@ -7,27 +7,34 @@
 
 namespace mkt {
 
-    template<class DType>
-    class InputLayer : public Layer<DType> 
+
+    class InputLayer: public Layer
     {
     // private:
     //     LayerType type;
     public:
-        InputLayer(int h, int w, int c, int bSize): Layer<DType>(LayerType::Input), batchSize_{bSize} {
-            this->dh_ = h;
-            this->dw_ = w;
-            this->dc_ = c;
+        InputLayer(std::string id, int bSize, int h, int w, int c): Layer(LayerType::Input) {
+            this->id_ = id;
+            // this->dh_ = h;
+            // this->dw_ = w;
+            // this->dc_ = c;
+            this->pDst_ = new Tensor{bSize, h, w, c};
+            this->pW_ = new Tensor(); // empty Tensor
+            this->pB_ = new Tensor(); // empty Tensor
+
         };
-        
+
         ~InputLayer(){};
 
         // Method
+        void initialize();
         void FlattenImageToTensor(unsigned char *pImg, bool bNormalize);
+        void DeFlattenImage(const float* pData, int height, int width, int channel, unsigned char *pImg);
 
-        
+
 
         // Member
-        int batchSize_;
+        // int batchSize_;
     };
 }
 

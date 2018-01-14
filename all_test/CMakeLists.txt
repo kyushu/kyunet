@@ -24,8 +24,8 @@ find_package(OpenCV REQUIRED)
         target_link_libraries(tensor_test ${OpenCV_LIBS} libkyunet)
 
         # net_test
-        add_executable(net_test net_test.cpp)
-        target_link_libraries(net_test ${OpenCV_LIBS} libkyunet)
+        add_executable(test_add_data_flatten test_add_data_flatten.cpp)
+        target_link_libraries(test_add_data_flatten ${OpenCV_LIBS} libkyunet)
 
 
     else()

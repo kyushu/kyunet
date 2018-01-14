@@ -28,61 +28,86 @@
 
 namespace mkt {
 
-    // template<class DType>
-    // void Net<DType>::FlattenImageToTensor(unsigned char *pImg, Tensor<DType> *pTensor, bool bNormalize) {
+    // Configuration Function
+    void Net::addInputLayer(std::string id, int batchSize, int h, int w, int c) {
 
-    //     int depth  = pTensor->getDepth();
-    //     int height = pTensor->getHeight();
-    //     int width  = pTensor->getWidth();
-    //     int sz = width*height;
+        pInputLayer = new InputLayer{id, batchSize, h, w, c};
+        layers_.push_back(pInputLayer);
 
-    //     int wr_idx = pTensor->data_wr_idx_;
-    //     int full_size = pTensor->getFullSize();
-    //     float* ptr = pTensor->pData_ + pTensor->data_wr_idx_ * full_size;
-
-    //     for (int i = 0; i < full_size; i+=depth)
-    //     {
-    //         int idx = int(i/depth);
-    //         DType maxValue = 255;
-    //         ptr[idx]                = bNormalize ? DType(pImg[i])   / maxValue : DType(pImg[i]);
-    //         ptr[sz*(depth-2) + idx] = bNormalize ? DType(pImg[i+1]) / maxValue : DType(pImg[i+1]);
-    //         ptr[sz*(depth-1) + idx] = bNormalize ? DType(pImg[i+2]) / maxValue : DType(pImg[i+2]);
-    //     }
-    // }
-
-    template<class DType>
-    void Net<DType>::addLayer(Layer<DType> *newLayer) {
-
-        layers_.push_back(newLayer);
     }
 
-
-    template<class DType>
-    void Net<DType>::compile() {
+    // Initializtion Function
+    void Net::initialize() {
 
         if (layers_.size() == 0)
         {
             return;
-        } else if (layers_.size() == 1)
-        {
-            if (layers_.at(0)->getType() == LayerType::Input)
-            {
-                fprintf(stderr, "the first layer is Input layer\n");
-                pInputLayer = static_cast<InputLayer<DType>*>(layers_.at(0));
-                // fprintf(stderr, "pInputLayer.batchSize_: %d\n", pInputLayer->batchSize_);
-                int h = pInputLayer->dh_;
-                int w = pInputLayer->dw_;
-                int c = pInputLayer->dc_;
-                pInputLayer->pDstTensor_->initTensor(h, w, c, pInputLayer->batchSize_);
 
-            }
         } else {
-            fprintf(stderr, "TODO: compile layer more than 1\n");
+            for (int i = 0; i < layers_.size(); ++i)
+            {
+                Layer* layer = layers_.at(i);
+                if (i == 0 && layer->getType() == LayerType::Input)
+                {
+                    layer->initialize();
+                }
+            }
         }
+    }
+
+    // Add data Function
+    OP_STATUS Net::add_data_from_file_list(std::vector<std::string> fileList) {
+
+        int inSize = fileList.size();
+        int batchSize = pInputLayer->pDst_->getBatchSize();
+        int tensor_h = pInputLayer->pDst_->getHeight();
+        int tensor_w = pInputLayer->pDst_->getWidth();
+        int tensor_c = pInputLayer->pDst_->getDepth();
+
+        if (inSize != batchSize)
+        {
+            fprintf(stderr, "number of batchSize is not matched\n");
+            return OP_STATUS::UNMATCHED_SIZE;
+        }
+
+        for (int i = 0; i < fileList.size(); ++i)
+        {
+            std::string file = fileList.at(i);
+            int w, h, c;
+            unsigned char *pImg = stbi_load(file.c_str(), &w, &h, &c, 0);
+
+            if (pImg == nullptr)
+            {
+                fprintf(stderr, "no image\n");
+                return OP_STATUS::FAIL;
+            }
+            if (tensor_h != h)
+            {
+                fprintf(stderr, "tensor_h:%d != input_h:%d\n", tensor_h, h);
+                return OP_STATUS::UNMATCHED_SIZE;
+            }
+            if (tensor_w != w)
+            {
+                fprintf(stderr, "tensor_w: %d != input_w: %d\n", tensor_w, w);
+                return OP_STATUS::UNMATCHED_SIZE;
+            }
+            if (tensor_c != c)
+            {
+                fprintf(stderr, "tensor_c: %d != input_c: %d\n", tensor_c, c);
+                return OP_STATUS::UNMATCHED_SIZE;
+            }
+
+            pInputLayer->FlattenImageToTensor(pImg, true);
+        }
+
 
     }
 
 
-    template class Net<float>;
+    InputLayer* Net::getInputLayer() {
+        return pInputLayer;
+    }
+
+    // template class Net<float>;
     // template class Net<double>;
 }

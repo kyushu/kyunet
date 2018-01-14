@@ -15,13 +15,13 @@
 #include "tensor.h"
 
 /*
-  To use stb you must define 
+  To use stb you must define
   #define STB_IMAGE_IMPLEMENTATION         // for load image
   #define STB_IMAGE_RESIZE_IMPLEMENTATION  // for resize image
   to enable functions.
   but i already define these keyword in libkyunet and linked
   so we don't need to define again
-*/ 
+*/
 #include "stb_image.h"
 #include "stb_image_resize.h"
 
@@ -54,27 +54,28 @@ void test_load_image_file(std::string img_dir) {
     std::vector<std::string> file_list;
     mkt::listdir(img_dir.c_str(), file_list);
 
-    // mkt::Tensor<float> tensor = mkt::Tensor<float>(480, 600, 3);
-    mkt::Tensor<float> tensor{};
-    tensor.height_ = 480;
-    tensor.width_ = 600;
-    tensor.channel_ = 3;
-    tensor.initTensor(480, 600, 3, file_list.size());
+    mkt::Tensor tensor(file_list.size(), 480, 600, 3);
+    // mkt::Tensor tensor;
+    // tensor.height_ = 480;
+    // tensor.width_ = 600;
+    // tensor.channel_ = 3;
+    tensor.initialize(/*480, 600, 3, file_list.size()*/);
     printf("batch size: %d\n", tensor.getBatchSize());
     printf("width: %d\n", tensor.getWidth());
     printf("height: %d\n", tensor.getHeight());
     printf("channel: %d\n", tensor.getDepth());
-    
+
     assert(file_list.size() >= 3);
 
     /*********************
      * Add data to tensor
      ********************/
-    // add from file
+    // There are 3 image file in the folder, we load each image in 3 ways
+    // 1. add from file
     std::string img_file = img_dir + file_list.at(0);
     tensor.addData(img_file.c_str());
 
-    // add from float array
+    // 2. add from float array
     img_file = img_dir + file_list.at(1);
     int w, h, c;
     unsigned char *pImg = stbi_load(img_file.c_str(), &w, &h, &c, 0);
@@ -85,7 +86,7 @@ void test_load_image_file(std::string img_dir) {
     }
     tensor.addData(pfImg);
 
-    // add from vector
+    // 3. add from vector
     img_file = img_dir + file_list.at(2);
     pImg = stbi_load(img_file.c_str(), &w, &h, &c, 0);
     std::vector<float> vfImg;
@@ -97,20 +98,20 @@ void test_load_image_file(std::string img_dir) {
 
 
     /***************
-     * Verify data 
+     * Verify data
      **************/
     const float *data = tensor.getData();
-    unsigned char *uchar = (unsigned char *)calloc(tensor.getFullSize(), sizeof(unsigned char));
+    unsigned char *uchar = (unsigned char *)calloc(tensor.getSize3D(), sizeof(unsigned char));
     for (int i = 0; i < file_list.size(); ++i)
     {
-        // Display 
+        // Display
         // BGR: CV_8UV3
         // Gray-scale: CV_8UC1
-        
-        
+
+
         printf("read: %p\n", data);
 
-        for (int i = 0; i < tensor.getFullSize(); ++i)
+        for (int i = 0; i < tensor.getSize3D(); ++i)
         {
             *(uchar+i) = int(*(data+i));
         }
@@ -122,17 +123,18 @@ void test_load_image_file(std::string img_dir) {
         cv::imshow("image", img_mat);
         cv::waitKey(0);
 
-        data += tensor.getFullSize();
+        data += tensor.getSize3D();
     }
+
 }
 
 int main(int argc, char const *argv[])
 {
-    
-    
 
-    /****************************************** 
-        Test load 3 image files from a directory 
+
+
+    /******************************************
+        Test load 3 image files from a directory
     ******************************************/
     std::string img_dir = "../example/images/";
     test_load_image_file(img_dir);

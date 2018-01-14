@@ -23,58 +23,73 @@
 #ifndef _LAYER_H_
 #define _LAYER_H_
 
+#include <iostream>
+#include <string>
 #include "tensor.h"
 
 namespace mkt {
 
-    template<class DType>
+
     class Layer
     {
     protected:
         LayerType type_;
 
     public:
-        Tensor<DType> *pSrcTensor_;      // point to dst_tensor of previous layer
-        Tensor<DType> *pDstTensor_;      // new a destination tensor for self use
-        Tensor<DType> *pWTensor_;   // new a weight tensor for self use
-        DType* pBias_;          // new a chunk of memory for self use
+        std::string id_;
+        Tensor *pSrc_;    // point to dst_tensor of previous layer
+        Tensor *pDst_;    // new a destination tensor for self use
+        Tensor *pW_;            // new a weight tensor for self use
+        Tensor* pB_;            // new a chunk of memory for self use
+
+        int batchSize;
+
         int dh_; // DstTensor height
         int dw_; // DstTensor widht
         int dc_; // DstTensor depth (channel)
-        
+
         int fh_; // filter height
         int fw_; // filter width
-        int fc_; // filter channel
+        int fc_; // filter channel = number of Filter(kernel)
 
 
     public:
         Layer(LayerType type):
-            type_{type}, 
+            type_{type},
+            batchSize{0},
             dh_{0}, dw_{0}, dc_{0},
             fh_{0}, fw_{0}, fc_{0},
-            pSrcTensor_{nullptr}, pDstTensor_{nullptr}, pWTensor_{nullptr}, pBias_{nullptr}
+            pSrc_{nullptr},
+            pDst_{nullptr},
+            pW_{nullptr},
+            pB_{nullptr}
         {};
 
-        virtual ~Layer()
-        {
-            pSrcTensor_ = nullptr;
-            delete pDstTensor_;
-            delete pWTensor_;
-            delete[] pBias_;
+        virtual ~Layer() {
+            pSrc_ = nullptr;
+            delete pDst_;
+            delete pW_;
+            delete pB_;
         };
 
         // TODO: copy constructor
 
-        // Getter
-        LayerType getType();
+        // Initialize Function
+        virtual void initialize()=0;
+        void initOutputTensor();
+        void initWeightTensor();
+        void initBiasTenosr();
 
+        // Computation Function
         void forward();     // forward pass
         void backward();    // back propagation
 
+        // Getter function
+        LayerType getType();
 
 
-        static int gemm_nr(int trans_a, int trans_b, int M, int N, int K, float ALPHA, float *A, int lda, float *B, int ldb, float BETA, float *C, int ldc);
-        
+        // Data
+
     };
 }
 
