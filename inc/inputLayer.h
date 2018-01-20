@@ -1,5 +1,3 @@
-
-
 #ifndef _INPUTLAYER_H_
 #define _INPUTLAYER_H_
 
@@ -7,20 +5,19 @@
 
 namespace mkt {
 
-
     class InputLayer: public Layer
     {
     // private:
     //     LayerType type;
     public:
-        InputLayer(std::string id, int bSize, int h, int w, int c): Layer(LayerType::Input) {
-            this->id_ = id;
+        InputLayer(std::string id_, int bSize, int h, int w, int c): Layer(LayerType::Input) {
+            id = id_;
             // this->dh_ = h;
             // this->dw_ = w;
             // this->dc_ = c;
-            this->pDst_ = new Tensor{bSize, h, w, c};
-            this->pW_ = new Tensor(); // empty Tensor
-            this->pB_ = new Tensor(); // empty Tensor
+            pDst = new Tensor{bSize, h, w, c};
+            pW = new Tensor(); // empty Tensor
+            pB = new Tensor(); // empty Tensor
 
         };
 
@@ -31,10 +28,9 @@ namespace mkt {
         void FlattenImageToTensor(unsigned char *pImg, bool bNormalize);
         void DeFlattenImage(const float* pData, int height, int width, int channel, unsigned char *pImg);
 
+        void forward(){};
+        void backward(){};
 
-
-        // Member
-        // int batchSize_;
     };
 }
 

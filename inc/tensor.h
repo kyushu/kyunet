@@ -25,47 +25,50 @@
 #define _TENSOR_H_
 
 #include <stdio.h>
-
 #include <vector>
 #include <cstdlib>
+#include <cstring>
+
 #include "definitions.h"
 
 namespace mkt {
     class Tensor
     {
     public:
-        int batchSize_; // batch size
-        int channel_; // channel / depth
-        int height_; // height
-        int width_; // width
+        int batchSize; // batch size
+        int channel; // channel / depth
+        int height; // height
+        int width; // width
 
-        int size2D_;
-        int size3D_;
-        int wholeSize_;
+        int size2D;
+        int size3D;
+        int wholeSize;
     public:
-        int wrIdx_;
-        float *pData_;   // data
+        int wrIdx;
+        float *pData;   // data
 
 
     public:
         Tensor():
-            batchSize_{0},
-            channel_{0},
-            height_{0},
-            width_{0},
-            wrIdx_{0},
-            size2D_{0},
-            size3D_{0},
-            wholeSize_{0},
-            pData_{nullptr}
+            batchSize{0},
+            channel{0},
+            height{0},
+            width{0},
+            wrIdx{0},
+            size2D{0},
+            size3D{0},
+            wholeSize{0},
+            pData{nullptr}
         {};
 
-        Tensor(int batchSize, int height, int width, int ch):
-            batchSize_{batchSize},
-            height_{height},
-            width_{width},
-            channel_{ch}
+        Tensor(int batchSize_, int height_, int width_, int ch_):
+            batchSize{batchSize_},
+            height{height_},
+            width{width_},
+            channel{ch_}
         {
+            size2D = height * width;
+            size3D = size2D * channel;
             // fprintf(stderr, "tensor construct batchSize_: %d\n", batchSize_);
             // fprintf(stderr, "tensor construct height_: %d\n", height);
             // fprintf(stderr, "tensor construct width_: %d\n", width_);
@@ -73,7 +76,7 @@ namespace mkt {
         };
 
         ~Tensor(){
-            delete[] pData_;
+            delete[] pData;
         };
 
         // TODO: Tensor CopyConstructor
@@ -85,13 +88,15 @@ namespace mkt {
 
         // Initialize Function
         // void initialize(int batchSize, int h, int w, int c);
-        void initialize();
+        void initialize(Initializer_Type init_type=Initializer_Type::NONE);
 
         // Add Data Function
         OP_STATUS addData(char const *filename);
         OP_STATUS addData(const float *pImg);
         OP_STATUS addData(std::vector<float> vImg);
 
+        //
+        void cleanData();
 
         // Getter
         const float* getData();
@@ -101,7 +106,7 @@ namespace mkt {
         int getHeight();
         int getSize2D();
         int getSize3D();
-        int getWholdSize();
+        int getWholeSize();
 
 
     };

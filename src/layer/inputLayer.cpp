@@ -33,17 +33,17 @@ namespace mkt {
     */
     void InputLayer::FlattenImageToTensor(unsigned char *pImg, bool bNormalize) {
 
-        if (this->pDst_)
+        if (pDst)
         {
-            int depth  = this->pDst_->getDepth();
-            int height = this->pDst_->getHeight();
-            int width  = this->pDst_->getWidth();
+            int depth  = pDst->getDepth();
+            int height = pDst->getHeight();
+            int width  = pDst->getWidth();
             int sz = width*height;
 
-            int size2D = this->pDst_->getSize2D();
-            int size3D = this->pDst_->getSize3D();
-            float* ptr = this->pDst_->pData_ + this->pDst_->wrIdx_ * size3D;
-            fprintf(stdout, "size2D: %d\n", size2D);
+            int size2D = pDst->getSize2D();
+            int size3D = pDst->getSize3D();
+            float* ptr = pDst->pData + pDst->wrIdx * size3D;
+            // fprintf(stdout, "size2D: %d\n", size2D);
             for (int i = 0; i < size3D; i+=depth)
             {
                 int idx = int(i/depth);
@@ -54,9 +54,9 @@ namespace mkt {
                 }
             }
 
-            this->pDst_->wrIdx_++;
+            pDst->wrIdx++;
         } else {
-            // assert(this->pDst_);
+            // assert(this->pDst);
         }
     }
 

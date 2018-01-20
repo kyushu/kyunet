@@ -32,17 +32,17 @@ namespace mkt {
     //     };
 
     LayerType Layer::getType() {
-        return type_;
+        return type;
     }
 
     void Layer::initOutputTensor() {
-        pDst_->initialize();
+        pDst->initialize();
     }
-    void Layer::initWeightTensor() {
-        pW_->initialize();
+    void Layer::initWeightTensor(Initializer_Type initType) {
+        pW->initialize(initType);
     }
-    void Layer::initBiasTenosr() {
-        pB_-> initialize();
+    void Layer::initBiasTensor(Initializer_Type initType) {
+        pB-> initialize(initType);
     }
 
 

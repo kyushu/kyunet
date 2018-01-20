@@ -29,26 +29,50 @@
 namespace mkt {
 
     // Configuration Function
-    void Net::addInputLayer(std::string id, int batchSize, int h, int w, int c) {
+    Layer* Net::addInputLayer(std::string id, int batchSize, int h, int w, int c) {
 
         pInputLayer = new InputLayer{id, batchSize, h, w, c};
-        layers_.push_back(pInputLayer);
+        layers.push_back(pInputLayer);
 
+        return pInputLayer;
+
+    }
+
+    Layer* Net::addDenseLayer(std::string id, int unit, ActivationType activationType) {
+
+        if (layers.size() == 0)
+        {
+            fprintf(stderr, "please add input layer first\n");
+            return nullptr;
+        }
+
+        // Get Previous Layer
+        Layer* prevLayer = layers.back();
+
+        // Instantiate Dense Layer
+        DenseLayer* pDenseLayer = new DenseLayer{id, activationType, prevLayer, unit};
+
+        // Add layer
+        layers.push_back(pDenseLayer);
+
+        return pDenseLayer;
     }
 
     // Initializtion Function
     void Net::initialize() {
 
-        if (layers_.size() == 0)
+        if (layers.size() == 0)
         {
             return;
 
         } else {
-            for (int i = 0; i < layers_.size(); ++i)
+            for (int i = 0; i < layers.size(); ++i)
             {
-                Layer* layer = layers_.at(i);
+                Layer* layer = layers.at(i);
                 if (i == 0 && layer->getType() == LayerType::Input)
                 {
+                    layer->initialize();
+                } else {
                     layer->initialize();
                 }
             }
@@ -59,10 +83,10 @@ namespace mkt {
     OP_STATUS Net::add_data_from_file_list(std::vector<std::string> fileList) {
 
         int inSize = fileList.size();
-        int batchSize = pInputLayer->pDst_->getBatchSize();
-        int tensor_h = pInputLayer->pDst_->getHeight();
-        int tensor_w = pInputLayer->pDst_->getWidth();
-        int tensor_c = pInputLayer->pDst_->getDepth();
+        int batchSize = pInputLayer->pDst->getBatchSize();
+        int tensor_h = pInputLayer->pDst->getHeight();
+        int tensor_w = pInputLayer->pDst->getWidth();
+        int tensor_c = pInputLayer->pDst->getDepth();
 
         if (inSize != batchSize)
         {

@@ -25,6 +25,8 @@
 
 #include <iostream>
 #include <string>
+
+#include "operation.h"
 #include "tensor.h"
 
 namespace mkt {
@@ -33,43 +35,44 @@ namespace mkt {
     class Layer
     {
     protected:
-        LayerType type_;
+        LayerType type;
+        std::string activationType;
 
     public:
-        std::string id_;
-        Tensor *pSrc_;    // point to dst_tensor of previous layer
-        Tensor *pDst_;    // new a destination tensor for self use
-        Tensor *pW_;            // new a weight tensor for self use
-        Tensor* pB_;            // new a chunk of memory for self use
+        std::string id;
+        Tensor *pSrc;    // point to dst_tensor of previous layer
+        Tensor *pDst;    // new a destination tensor for self use
+        Tensor *pW;            // new a weight tensor for self use
+        Tensor* pB;            // new a chunk of memory for self use
 
         int batchSize;
 
-        int dh_; // DstTensor height
-        int dw_; // DstTensor widht
-        int dc_; // DstTensor depth (channel)
+        int dh; // DstTensor height
+        int dw; // DstTensor widht
+        int dc; // DstTensor depth (channel)
 
-        int fh_; // filter height
-        int fw_; // filter width
-        int fc_; // filter channel = number of Filter(kernel)
+        int fh; // filter height
+        int fw; // filter width
+        int fc; // filter channel = number of Filter(kernel)
 
 
     public:
         Layer(LayerType type):
-            type_{type},
+            type{type},
             batchSize{0},
-            dh_{0}, dw_{0}, dc_{0},
-            fh_{0}, fw_{0}, fc_{0},
-            pSrc_{nullptr},
-            pDst_{nullptr},
-            pW_{nullptr},
-            pB_{nullptr}
+            dh{0}, dw{0}, dc{0},
+            fh{0}, fw{0}, fc{0},
+            pSrc{nullptr},
+            pDst{nullptr},
+            pW{nullptr},
+            pB{nullptr}
         {};
 
         virtual ~Layer() {
-            pSrc_ = nullptr;
-            delete pDst_;
-            delete pW_;
-            delete pB_;
+            pSrc = nullptr;
+            delete pDst;
+            delete pW;
+            delete pB;
         };
 
         // TODO: copy constructor
@@ -77,12 +80,12 @@ namespace mkt {
         // Initialize Function
         virtual void initialize()=0;
         void initOutputTensor();
-        void initWeightTensor();
-        void initBiasTenosr();
+        void initWeightTensor(Initializer_Type initType=Initializer_Type::NONE);
+        void initBiasTensor(Initializer_Type initType=Initializer_Type::NONE);
 
         // Computation Function
-        void forward();     // forward pass
-        void backward();    // back propagation
+        virtual void forward()=0;     // forward pass
+        virtual void backward()=0;    // back propagation
 
         // Getter function
         LayerType getType();

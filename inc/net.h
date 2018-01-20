@@ -29,6 +29,7 @@
 
 #include "layer.h"
 #include "inputLayer.h"
+#include "denseLayer.h"
 
 
 namespace mkt {
@@ -36,7 +37,7 @@ namespace mkt {
     class Net
     {
     private:
-        std::vector<Layer* > layers_;
+        std::vector<Layer* > layers;
         InputLayer* pInputLayer;
 
     public:
@@ -50,7 +51,8 @@ namespace mkt {
         //==================================
 
         // Configuration Function
-        void addInputLayer(std::string id, int batchSize, int h, int w, int c);
+        Layer* addInputLayer(std::string id, int batchSize, int h, int w, int c);
+        Layer* addDenseLayer(std::string id, int unit, ActivationType activationType=ActivationType::None);
 
         // Initialize Function
         void initialize();

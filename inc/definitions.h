@@ -25,6 +25,28 @@
 
 namespace mkt {
 
+
+    enum class ActivationType: int
+    {
+        None=0,
+        Sigmoid,
+        Tanh,
+        Relu,
+        LRelu,
+        Selu
+
+    };
+
+    enum class Initializer_Type: int
+    {
+        NONE=0,
+        ZERO,
+        RANDOM,
+        XAVIER,
+        HE_INIT
+
+    };
+
     enum class OP_STATUS: char
     {
         SUCCESS = 0,
@@ -37,8 +59,8 @@ namespace mkt {
     enum class LayerType:int
     {
         Input = 0,
-        FullyCon,
-        Conv
+        FullConnected,
+        Convolution
     };
 
 

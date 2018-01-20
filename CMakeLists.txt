@@ -39,7 +39,7 @@ include_directories(
 
 
 
-file(GLOB LIB_KYUNET_SRC src/*.cpp)
+file(GLOB_RECURSE LIB_KYUNET_SRC src/*.cpp)
 add_library(libkyunet STATIC ${LIB_KYUNET_SRC} ${stb_SRC})
 target_link_libraries(libkyunet)
 
