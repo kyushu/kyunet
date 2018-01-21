@@ -57,7 +57,6 @@ namespace mkt {
 
     };
 
-
     enum class LayerType:int
     {
         Input = 0,
@@ -65,6 +64,15 @@ namespace mkt {
         Convolution
     };
 
+    /*
+        "causal" results in causal (dilated) convolutions, e.g. output[t] does not depend on input[t+1:]. Useful when modeling temporal data where the model should not violate the temporal order. See WaveNet: A Generative Model for Raw Audio, section 2.1.
+     */
+    enum class PaddingType:int
+    {
+        valid=0, /*No padding*/
+        same     /*padding the input such that the output has the same length as the original input*/
+        // causal
+    }
 
 }
 

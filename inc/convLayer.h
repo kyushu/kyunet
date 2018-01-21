@@ -7,13 +7,21 @@ namespace mkt {
     class ConvLayer
     {
     public:
+        int nfilter;
+        int kernelSize;
+        int stride;
+        PaddingType padding;
+
         ConvLayer(
             Layer* prevLayer,
             std::string id_,
-            int filters_, int kernelSize_, int stride_, int padding_, ,
+            int nfilter_, int kernelSize_, int stride_, int padding_, ,
             ActivationType actType_,
-            InitializerType initType_):
-        Layer(LayerType::FullConnected, actType_, initType_);
+            InitializerType weightInitType_,
+            InitializerType biasInitType_,
+            PaddingType padding_
+        );
+
         ~ConvLayer();
 
     };
