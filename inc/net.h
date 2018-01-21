@@ -41,7 +41,7 @@ namespace mkt {
         InputLayer* pInputLayer;
 
     public:
-        //==================================+
+        //==================================
         Net(): pInputLayer{nullptr}
         {};
         ~Net(){
@@ -52,7 +52,7 @@ namespace mkt {
 
         // Configuration Function
         Layer* addInputLayer(std::string id, int batchSize, int h, int w, int c);
-        Layer* addDenseLayer(std::string id, int unit, ActivationType activationType, InitializerType initType);
+        Layer* addDenseLayer(Layer* prevLayer, std::string id, int unit, ActivationType activationType, InitializerType weightInitType, InitializerType biasInitType);
 
         // Initialize Function
         void initialize();

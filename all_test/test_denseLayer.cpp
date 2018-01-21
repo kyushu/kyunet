@@ -20,31 +20,40 @@ int main(int argc, char const *argv[])
 
     // Preset test data
     unsigned char s0[] = {1,2, 4,5, 7,8, 10,11};
+    unsigned char s1[] = {3,5, 7,9, 6,8, 4,6};
+    unsigned char s2[] = {7,2, 6,9, 3,4, 9,1};
+
         /*13,14,15, 16,17,18, 19,20,21, 22,23,24, 25,26,27, 28,29,30, 31,32,33, 34,35,36};*/
 
-    unsigned char s1[] = {1,2,3, 1,2,3, 1,2,3, 1,2,3, 1,2,3, 1,2,3, 1,2,3, 1,2,3, 1,2,3, 1,2,3, 1,2,3, 1,2,3};
-    unsigned char s2[] = {4,5,6, 4,5,6, 4,5,6, 4,5,6, 4,5,6, 4,5,6, 4,5,6, 4,5,6, 4,5,6, 4,5,6, 4,5,6, 4,5,6};
-    unsigned char s3[] = {7,8,9, 7,8,9, 7,8,9, 7,8,9, 7,8,9, 7,8,9, 7,8,9, 7,8,9, 7,8,9, 7,8,9, 7,8,9, 7,8,9};
+    // unsigned char s1[] = {1,2,3, 1,2,3, 1,2,3, 1,2,3, 1,2,3, 1,2,3, 1,2,3, 1,2,3, 1,2,3, 1,2,3, 1,2,3, 1,2,3};
+    // unsigned char s2[] = {4,5,6, 4,5,6, 4,5,6, 4,5,6, 4,5,6, 4,5,6, 4,5,6, 4,5,6, 4,5,6, 4,5,6, 4,5,6, 4,5,6};
+    // unsigned char s3[] = {7,8,9, 7,8,9, 7,8,9, 7,8,9, 7,8,9, 7,8,9, 7,8,9, 7,8,9, 7,8,9, 7,8,9, 7,8,9, 7,8,9};
 
     int channel = 2/*3*/;
     int height = 2/*4*/;
     int width = 2/*3*/;
-    int batchSize = 1;
+    int batchSize = 3;
 
     // Configure, initialize network
     Net net;
-    net.addInputLayer("input", batchSize, height, width, channel);
-    Layer* pDenseLayer = net.addDenseLayer("Layer1", 4, ActivationType::NONE, InitializerType::TEST);
+    InputLayer* pInputLyaer = (InputLayer *)net.addInputLayer("input", batchSize, height, width, channel);
+
+    InitializerType weightInitType = InitializerType::TEST;
+    InitializerType biasInitType = InitializerType::ZERO;
+    Layer* pDenseLayer = net.addDenseLayer(pInputLyaer, "Layer1", 4, ActivationType::NONE, weightInitType, biasInitType);
     net.initialize();
 
     // Get InputLayer
-    InputLayer* pInput = net.getInputLayer();
-    const float *pdata = pInput->pDst->getData();
-    int size3D = pInput->pDst->getSize3D();
-    fprintf(stderr, "input size3D: %d\n", size3D);
+    // InputLayer* pInput = net.getInputLayer();
+    // const float *pdata = pInput->pDst->getData();
+    int denseLayerSrcSize = pDenseLayer->pSrc->getSize3D();
+    fprintf(stderr, "denseLayerSrcSize: %d\n", denseLayerSrcSize);
 
     // Add data
-    pInput->FlattenImageToTensor(s0, false);
+    pInputLyaer->FlattenImageToTensor(s0, false);
+    pInputLyaer->FlattenImageToTensor(s1, false);
+    pInputLyaer->FlattenImageToTensor(s2, false);
+
     // pInput->FlattenImageToTensor(s1, false);
     // pInput->FlattenImageToTensor(s2, true);
     // pInput->FlattenImageToTensor(s3, true);
@@ -55,11 +64,15 @@ int main(int argc, char const *argv[])
     {
         fprintf(stderr, "Dense Layer type is correct\n");
     }
-    fprintf(stderr, "Dense Layer init type: \n");
-    switch (pDenseLayer->getInitType())
+
+    fprintf(stderr, "Dense Layer weight init type: \n");
+    switch (pDenseLayer->getWeightInitType())
     {
         case InitializerType::NONE:
             fprintf(stderr, "NONE\n");
+            break;
+        case InitializerType::ZERO:
+            fprintf(stderr, "ZERO\n");
             break;
         case InitializerType::TEST:
             fprintf(stderr, "TEST\n");
@@ -70,9 +83,27 @@ int main(int argc, char const *argv[])
         default:
             fprintf(stderr, "Default !!!\n");
             break;
-
-
     }
+    fprintf(stderr, "Dense Layer bias init type: \n");
+    switch (pDenseLayer->getBiasInitType())
+    {
+        case InitializerType::NONE:
+            fprintf(stderr, "NONE\n");
+            break;
+        case InitializerType::ZERO:
+            fprintf(stderr, "ZERO\n");
+            break;
+        case InitializerType::TEST:
+            fprintf(stderr, "TEST\n");
+            break;
+        case InitializerType::XAVIER:
+            fprintf(stderr, "XAVIER\n");
+            break;
+        default:
+            fprintf(stderr, "Default !!!\n");
+            break;
+    }
+
     fprintf(stderr, "Dense Layer activation type: \n");
     switch (pDenseLayer->getActivationType()) {
         case ActivationType::NONE:
@@ -98,13 +129,13 @@ int main(int argc, char const *argv[])
 
     // PRINT TEST RESULT
     fprintf(stderr, "Source of Dense Layer\n");
-    for (int i = 0; i < pInput->pDst->getWholeSize(); ++i)
+    for (int i = 0; i < pDenseLayer->pSrc->getWholeSize(); ++i)
     {
-        if (i > 0 && (i % pInput->pDst->getSize3D() == 0))
+        if (i > 0 && (i % pDenseLayer->pSrc->getSize3D() == 0))
         {
             fprintf(stderr, "\n");
         }
-        fprintf(stderr, "%.1f ", pInput->pDst->pData[i]);
+        fprintf(stderr, "%.1f ", pDenseLayer->pSrc->pData[i]);
     }
 
     fprintf(stderr, "\n\n");
@@ -130,13 +161,18 @@ int main(int argc, char const *argv[])
     fprintf(stderr, "\n\n");
 
 
-
     pDenseLayer->forward();
-
+    fprintf(stderr, "Dense Layer Forward Result: \n");
+    int denseLayer_output_size = pDenseLayer->pDst->getSize3D();
     for (int i = 0; i < pDenseLayer->pDst->wholeSize; ++i)
     {
-        fprintf(stderr, "%d- %.1f\n", i, pDenseLayer->pDst->pData[i]);
+        if (i > 0 && (i % denseLayer_output_size == 0))
+        {
+            fprintf(stderr, "\n");
+        }
+        fprintf(stderr, "%.1f\t", pDenseLayer->pDst->pData[i]);
     }
+    fprintf(stderr, "\n\n");
 
     // int tt = 4*4 + 7*8 + 10*12 + 2*16 + 5*20 + 8*24 + 11*28;
     // fprintf(stderr, "%d\n", tt);

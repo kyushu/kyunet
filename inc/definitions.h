@@ -38,6 +38,7 @@ namespace mkt {
     {
         NONE=0,
         TEST, /*TEST*/
+        ZERO,
         RANDOM,
         XAVIER,
         HE_INIT

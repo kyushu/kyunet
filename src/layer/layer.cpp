@@ -45,18 +45,80 @@ namespace mkt {
         }
     }
 
+    void Layer::applyActivation() {
+
+        switch (activationType) {
+            case ActivationType::Sigmoid:
+            {
+                fprintf(stderr, "TODO: Sigmoid\n");
+                break;
+            }
+            case ActivationType::Tanh:
+            {
+                fprintf(stderr, "TODO: Tanh\n");
+                break;
+            }
+            case ActivationType::Relu:
+            {
+                fprintf(stderr, "TODO: Relu\n");
+                break;
+            }
+            case ActivationType::LRelu:
+            {
+                fprintf(stderr, "TODO: LRelu\n");
+                break;
+            }
+            case ActivationType::Selu:
+            {
+                fprintf(stderr, "TODO: Selu\n");
+                break;
+            }
+            default:
+                fprintf(stderr, "Default: No Activation is applied\n");
+                break;
+        }
+
+    }
 
     //##################################
     // Getter Function
     LayerType Layer::getType() {
         return type;
     }
-    InitializerType Layer::getInitType(){
-        return initType;
+    InitializerType Layer::getWeightInitType(){
+        return weightInitType;
+    }
+    InitializerType Layer::getBiasInitType(){
+        return biasInitType;
     }
     ActivationType Layer::getActivationType() {
         return activationType;
     }
 
+    int Layer::getBatchSize() {
+        return batchSize;
+    }
+
+    int Layer::getOutputHeight() {
+        return dh;
+    }
+    int Layer::getOutputWidth() {
+        return dw;
+    }
+    int Layer::getOutputChannel() {
+        return dc;
+    }
+
+    int Layer::getFilterHeight() {
+        return fh;
+    }
+
+    int Layer::getFilterWidth() {
+        return fw;
+    }
+
+    int Layer::getFilterChannel() {
+        return fc;
+    }
     // template class Layer<float>;
 }

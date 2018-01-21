@@ -36,7 +36,8 @@ namespace mkt {
     {
     protected:
         LayerType type;
-        InitializerType initType;
+        InitializerType weightInitType;
+        InitializerType biasInitType;
         ActivationType activationType;
 
     public:
@@ -58,8 +59,16 @@ namespace mkt {
 
 
     public:
-        Layer(LayerType type):
+        Layer(
+            LayerType type,
+            ActivationType activationType_ = ActivationType::NONE,
+            InitializerType weightInitType_ = InitializerType::NONE,
+            InitializerType biasInitType_ = InitializerType::ZERO
+        ):
             type{type},
+            activationType{activationType_},
+            weightInitType{weightInitType_},
+            biasInitType{biasInitType_},
             batchSize{0},
             dh{0}, dw{0}, dc{0},
             fh{0}, fw{0}, fc{0},
@@ -88,11 +97,21 @@ namespace mkt {
         virtual void forward()=0;     // forward pass
         virtual void backward()=0;    // back propagation
         void addBias();
+        void applyActivation();
 
         // Getter function
         LayerType getType();
-        InitializerType getInitType();
+        InitializerType getWeightInitType();
+        InitializerType getBiasInitType();
         ActivationType getActivationType();
+        int getBatchSize();
+        int getOutputHeight();
+        int getOutputWidth();
+        int getOutputChannel();
+        int getFilterHeight();
+        int getFilterWidth();
+        int getFilterChannel();
+
 
 
 

@@ -34,7 +34,7 @@ namespace mkt {
      *************/
     void Tensor::initialize(InitializerType init_type) {
 
-        fprintf(stderr, "init_type: %d\n", init_type);
+        // fprintf(stderr, "init_type: %d\n", init_type);
 
         wholeSize = batchSize * size3D;
 
@@ -46,26 +46,37 @@ namespace mkt {
 
         pData = new float[wholeSize];
 
-        //MT:TEST
-        if (init_type == InitializerType::TEST)
-        {
-            // fprintf(stderr, "size2D_: %d\n", size2D);
-            // fprintf(stderr, "size3D_: %d\n", size3D);
-            // std::fill_n(pData, wholeSize, 10);
-            for (int i = 0; i < wholeSize; ++i)
+        switch (init_type) {
+            case InitializerType::ZERO:
             {
-                pData[i] = i;
+                std::fill_n(pData, wholeSize, 0);
+                break;
             }
-        }
-        else if (init_type == InitializerType::RANDOM)
-        {
-
-        }
-        else if(init_type == InitializerType::XAVIER) {
-
-        }
-        else if(init_type == InitializerType::HE_INIT) {
-
+            case InitializerType::TEST:
+            {
+                for (int i = 0; i < wholeSize; ++i)
+                {
+                    pData[i] = i;
+                }
+                break;
+            }
+            case InitializerType::RANDOM:
+            {
+                fprintf(stderr, "TODO: RANDOM\n");
+                break;
+            }
+            case InitializerType::XAVIER:
+            {
+                fprintf(stderr, "TODO: XAVIER\n");
+                break;
+            }
+            case InitializerType::HE_INIT:
+            {
+                fprintf(stderr, "TODO: HE_INIT\n");
+                break;
+            }
+            default:
+                fprintf(stderr, "Default: NO Initialize\n");
         }
 
     }
