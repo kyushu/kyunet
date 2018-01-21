@@ -7,8 +7,10 @@ project(all_test)
 
 # kyunet header file
 INCLUDE_DIRECTORIES (
-	${PROJECT_SOURCE_DIR}/../../inc
+	${PROJECT_SOURCE_DIR}/../inc
 	)
+
+message(STATUS ${PROJECT_SOURCE_DIR}/../inc/)
 
 file(GLOB SRC *.cpp)
 find_package(OpenCV REQUIRED)
@@ -27,8 +29,11 @@ find_package(OpenCV REQUIRED)
         add_executable(test_add_data_flatten test_add_data_flatten.cpp)
         target_link_libraries(test_add_data_flatten ${OpenCV_LIBS} libkyunet)
 
-        # add_executable(test_denseLayer test_denseLayer.cpp)
-        # target_link_libraries(test_denseLayer ${OpenCV_LIBS} libkyunet)
+        add_executable(test_denseLayer test_denseLayer.cpp)
+        target_link_libraries(test_denseLayer ${OpenCV_LIBS} libkyunet)
+
+        add_executable(test_operation test_operation.cpp)
+        target_link_libraries(test_operation ${OpenCV_LIBS} libkyunet)
 
 
     else()

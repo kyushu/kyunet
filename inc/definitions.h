@@ -25,28 +25,6 @@
 
 namespace mkt {
 
-
-    enum class ActivationType: int
-    {
-        None=0,
-        Sigmoid,
-        Tanh,
-        Relu,
-        LRelu,
-        Selu
-
-    };
-
-    enum class Initializer_Type: int
-    {
-        NONE=0,
-        ZERO,
-        RANDOM,
-        XAVIER,
-        HE_INIT
-
-    };
-
     enum class OP_STATUS: char
     {
         SUCCESS = 0,
@@ -55,6 +33,29 @@ namespace mkt {
         UNMATCHED_SIZE = 4,
 
     };
+
+    enum class InitializerType: int
+    {
+        NONE=0,
+        TEST, /*TEST*/
+        RANDOM,
+        XAVIER,
+        HE_INIT
+
+    };
+
+
+    enum class ActivationType: int
+    {
+        NONE=0,
+        Sigmoid,
+        Tanh,
+        Relu,
+        LRelu,
+        Selu
+
+    };
+
 
     enum class LayerType:int
     {

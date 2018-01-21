@@ -20,19 +20,24 @@ namespace mkt {
     ldc = Leading dimension of matrix C. It cannot be less than N when the order parameter
         is set to RowMajor, or less than M when it is set to ColumnMajorOrder.
 
-    // General Matrix-Matrix multiplication
+    // General Matrix-Matrix multiplication (Row major)
     //
-    //                                     ldb = N
-    //                               ___________________
-    //                               |                 |
-    //                               |        B        | K
-    //               lda = K = h*w*c |                 |
-    //              _________________|_________________|
-    //              |                |                 |
-    // M(batch size)|                |                 | M
-    //              |        A       |        C        |
-    //              |________________|_________________|
-    //                                     ldc = N
+    //
+    //                ________________     _________________
+    //               |lda = K = h*w*c |   |     ldb = N     |
+    //               |                |   |                 |
+    // M(batch size) |       A        | X |        B        | K
+    //               |                |   |                 |
+    //               |________________|   |_________________|
+    //
+    //                                            ||
+    //                                     _________________
+    //                                    |     ldc = N     |
+    //                                    |                 |
+    //                                    |        C        | M
+    //                                    |                 |
+    //                                    |_________________|
+    //
     //
 */
 
@@ -45,10 +50,10 @@ namespace mkt {
 
     int gemm_nr(
         int trans_a, int trans_b,
-        int M, int N, int K, float ALPHA,
+        int M, int N, int K,
+        float ALPHA, float BETA,
         float *A, int lda,
         float *B, int ldb,
-        float BETA,
         float *C, int ldc)
     {
         int i, j, k;
@@ -67,7 +72,7 @@ namespace mkt {
                     float tmp = ALPHA * A[i * lda + k];
                     for (j = 0; j < N; ++j) {
                         C[i * ldc + j] += tmp * B[k * ldb + j];
-                        fprintf(stderr, "c[%d] = A[%d](%f)B[%d](%f)\n", i*ldc+j, i * lda + k, tmp, k * ldb + j, B[k * ldb + j]);
+                        // fprintf(stderr, "c[%d] = A[%d](%f)B[%d](%f)\n", i*ldc+j, i * lda + k, tmp, k * ldb + j, B[k * ldb + j]);
                     }
                 }
             }
@@ -77,7 +82,7 @@ namespace mkt {
                 for (k = 0; k < K; ++k){
                     float tmp = ALPHA * A[k * lda + i];
                     for (j = 0; j < N; ++j) {
-                        fprintf(stderr, "c[%d] = A[%d]B[%d]\n", i*ldc+j, k * lda + i, i * ldc + j);
+                        // fprintf(stderr, "c[%d] = A[%d]B[%d]\n", i*ldc+j, k * lda + i, i * ldc + j);
                         C[i * ldc + j] += tmp * B[k * ldb + j];
                     }
                 }
@@ -90,7 +95,7 @@ namespace mkt {
                     sum = 0;
                     for (k = 0; k < K; ++k){
                         sum += ALPHA * A[i * lda + k] * B[j * ldb + k];
-                        fprintf(stderr, "c[%d] = A[%d]B[%d]\n", i*ldc+j, i*lda+k, j*ldb+k);
+                        // fprintf(stderr, "c[%d] = A[%d]B[%d]\n", i*ldc+j, i*lda+k, j*ldb+k);
                     }
                     C[i * ldc + j] += sum;
                 }
@@ -102,7 +107,7 @@ namespace mkt {
                 for (k = 0; k < K; ++k){
                     float tmp = ALPHA * A[i * lda + k];
                     for (j = 0; j < N; ++j) {
-                        fprintf(stderr, "c[%d] = A[%d]B[%d]\n", i*ldc+j, i *lda+k, k*ldb+j);
+                        // fprintf(stderr, "c[%d] = A[%d]B[%d]\n", i*ldc+j, i *lda+k, k*ldb+j);
                         C[i * ldc + j] += tmp * B[k * ldb + j];
                     }
                 }
@@ -111,14 +116,19 @@ namespace mkt {
         return 0;
     }
 
+    // Result = aX + Y
+    int axpy(int n, float a, float *x, float *y)
+    {
+        for (int i = 0; i < n; ++i)
+        {
+            y[i] += a * x[i];
+        }
+    }
+
+
 }
 
 
 
 
-int bcnn_axpy(int n, float a, float *x, float *y)
-{
-    for (int i = 0; i < n; ++i)
-    {
-        y[i] += a * x[i];
-    }
+

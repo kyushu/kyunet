@@ -4,28 +4,32 @@ namespace mkt {
 
     void DenseLayer::initialize() {
         initOutputTensor();
-        initWeightTensor(Initializer_Type::NONE);
-        initBiasTensor(Initializer_Type::NONE);
+        initWeightTensor(initType);
+        initBiasTensor(initType);
 
     }
 
     void DenseLayer::forward() {
-        fprintf(stderr, "DenseLayer forward not yet finished\n");
+        fprintf(stderr, "##########################################\n");
+        fprintf(stderr, "TODO: DenseLayer forward not yet finished\n");
+        fprintf(stderr, "##########################################\n");
 
         // Rest data
         pDst->cleanData();
 
         // Z = X * Weight
         gemm_nr(0, 0,
-            pDst->batchSize, unit, pSrc->size3D, 1.0f,
-            pSrc->pData, pSrc->size3D,
-            pW->pData, unit,
-            1.0f,
-            pDst->pData, pDst->size3D);
+            pDst->batchSize, pDst->size3D, pSrc->size3D,    /*M,N,K*/
+            1.0f, 1.0f,                                     /*ALPHA, BETA*/
+            pSrc->pData, pSrc->size3D,                      /*A, lda(K)*/
+            pW->pData, pDst->size3D,                        /*B, ldb(N)*/
+            pDst->pData, pDst->size3D);                     /*C, ldc(N)*/
 
 
         // Z + bias
-        axpy(pDst->size3D, 1, pB->pData, pDst->pData);
+        addBias();
+
+        // A = activation(Z)
 
     }
 

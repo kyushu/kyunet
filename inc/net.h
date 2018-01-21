@@ -52,7 +52,7 @@ namespace mkt {
 
         // Configuration Function
         Layer* addInputLayer(std::string id, int batchSize, int h, int w, int c);
-        Layer* addDenseLayer(std::string id, int unit, ActivationType activationType=ActivationType::None);
+        Layer* addDenseLayer(std::string id, int unit, ActivationType activationType, InitializerType initType);
 
         // Initialize Function
         void initialize();

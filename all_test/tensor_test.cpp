@@ -26,6 +26,8 @@
 #include "stb_image_resize.h"
 
 
+using namespace mkt;
+
 unsigned char* resize_image(std::string file, int out_w, int out_h) {
 
     // Load image from file
@@ -59,7 +61,7 @@ void test_load_image_file(std::string img_dir) {
     // tensor.height_ = 480;
     // tensor.width_ = 600;
     // tensor.channel_ = 3;
-    tensor.initialize(/*480, 600, 3, file_list.size()*/);
+    tensor.initialize(InitializerType::NONE);
     printf("batch size: %d\n", tensor.getBatchSize());
     printf("width: %d\n", tensor.getWidth());
     printf("height: %d\n", tensor.getHeight());

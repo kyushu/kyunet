@@ -28,12 +28,11 @@
 namespace mkt {
 
     // Init Tensor: allocate memory space of pData
-    // void Tensor::initialize(int batchSize, int h, int w, int c) {
 
     /*************
      * Initialize
      *************/
-    void Tensor::initialize(Initializer_Type init_type) {
+    void Tensor::initialize(InitializerType init_type) {
 
         fprintf(stderr, "init_type: %d\n", init_type);
 
@@ -48,20 +47,24 @@ namespace mkt {
         pData = new float[wholeSize];
 
         //MT:TEST
-        if (init_type == Initializer_Type::ZERO)
+        if (init_type == InitializerType::TEST)
         {
             // fprintf(stderr, "size2D_: %d\n", size2D);
             // fprintf(stderr, "size3D_: %d\n", size3D);
-            std::fill_n(pData, wholeSize, 0);
+            // std::fill_n(pData, wholeSize, 10);
+            for (int i = 0; i < wholeSize; ++i)
+            {
+                pData[i] = i;
+            }
         }
-        else if (init_type == Initializer_Type::RANDOM)
+        else if (init_type == InitializerType::RANDOM)
         {
 
         }
-        else if(init_type == Initializer_Type::XAVIER) {
+        else if(init_type == InitializerType::XAVIER) {
 
         }
-        else if(init_type == Initializer_Type::HE_INIT) {
+        else if(init_type == InitializerType::HE_INIT) {
 
         }
 

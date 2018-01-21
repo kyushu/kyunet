@@ -36,14 +36,15 @@ namespace mkt {
     {
     protected:
         LayerType type;
-        std::string activationType;
+        InitializerType initType;
+        ActivationType activationType;
 
     public:
         std::string id;
         Tensor *pSrc;    // point to dst_tensor of previous layer
-        Tensor *pDst;    // new a destination tensor for self use
-        Tensor *pW;            // new a weight tensor for self use
-        Tensor* pB;            // new a chunk of memory for self use
+        Tensor *pDst;    // new a destination tensor
+        Tensor *pW;      // new a weight tensor
+        Tensor* pB;      // new a bias tensor
 
         int batchSize;
 
@@ -80,15 +81,19 @@ namespace mkt {
         // Initialize Function
         virtual void initialize()=0;
         void initOutputTensor();
-        void initWeightTensor(Initializer_Type initType=Initializer_Type::NONE);
-        void initBiasTensor(Initializer_Type initType=Initializer_Type::NONE);
+        void initWeightTensor(InitializerType initType);
+        void initBiasTensor(InitializerType initType);
 
         // Computation Function
         virtual void forward()=0;     // forward pass
         virtual void backward()=0;    // back propagation
+        void addBias();
 
         // Getter function
         LayerType getType();
+        InitializerType getInitType();
+        ActivationType getActivationType();
+
 
 
         // Data

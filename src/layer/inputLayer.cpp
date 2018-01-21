@@ -3,10 +3,11 @@
 
 namespace mkt {
 
+    static int MAX_PIXEL_VALUE = 255;
+
     void InputLayer::initialize() {
         initOutputTensor();
     }
-
 
     /*
       the "FlattenImageToTensor" will normalize each pixel of image from (0, 255)  to (-1, 1)
@@ -47,10 +48,9 @@ namespace mkt {
             for (int i = 0; i < size3D; i+=depth)
             {
                 int idx = int(i/depth);
-                float maxValue = 255;
                 for (int m = 0; m < depth; ++m)
                 {
-                    ptr[idx + size2D*m] = bNormalize ? float(pImg[i+m]) / maxValue : float(pImg[i+m]);
+                    ptr[idx + size2D*m] = bNormalize ? (float(pImg[i+m]) / MAX_PIXEL_VALUE - 0.5f) * 2.0f : float(pImg[i+m]);
                 }
             }
 

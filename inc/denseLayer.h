@@ -10,8 +10,13 @@ namespace mkt {
 
     public:
         int unit;
-        DenseLayer(std::string id_, ActivationType actType, Layer* prevLayer, int unit_): unit{unit_}, Layer(LayerType::Input) {
+
+
+        DenseLayer(std::string id_, int unit_, Layer* prevLayer, ActivationType actType_, InitializerType initType_): unit{unit_}, /*actType{actType_}, initType{initType_},*/ Layer(LayerType::FullConnected) {
             id = id_;
+
+            activationType = actType_;
+            initType = initType_;
 
             int batchSize = prevLayer->pDst->getBatchSize();
             int h = prevLayer->pDst->getHeight();
@@ -19,12 +24,12 @@ namespace mkt {
             int c = prevLayer->pDst->getDepth();
             int size3D = prevLayer->pDst->getSize3D();
 
-            fprintf(stderr, "dense const\n");
-            fprintf(stderr, "batchSize: %d\n", batchSize);
-            fprintf(stderr, "h: %d\n", h);
-            fprintf(stderr, "w: %d\n", w);
-            fprintf(stderr, "c: %d\n", c);
-            fprintf(stderr, "size3D: %d\n", size3D);
+            // fprintf(stderr, "dense const\n");
+            // fprintf(stderr, "batchSize: %d\n", batchSize);
+            // fprintf(stderr, "h: %d\n", h);
+            // fprintf(stderr, "w: %d\n", w);
+            // fprintf(stderr, "c: %d\n", c);
+            // fprintf(stderr, "size3D: %d\n", size3D);
 
             // pSrc_ point to pDst_ of previous layer
             pSrc = prevLayer->pDst;

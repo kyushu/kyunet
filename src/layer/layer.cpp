@@ -24,31 +24,39 @@
 
 namespace mkt {
 
-    // Layer::~Layer() {
-    //         pSrc_ = nullptr;
-    //         delete pDst_;
-    //         delete pW_;
-    //         delete pB_;
-    //     };
-
-    LayerType Layer::getType() {
-        return type;
-    }
-
+    // ##################################
+    // Init Function
     void Layer::initOutputTensor() {
-        pDst->initialize();
+        pDst->initialize(InitializerType::NONE);
     }
-    void Layer::initWeightTensor(Initializer_Type initType) {
+    void Layer::initWeightTensor(InitializerType initType) {
         pW->initialize(initType);
     }
-    void Layer::initBiasTensor(Initializer_Type initType) {
+    void Layer::initBiasTensor(InitializerType initType) {
         pB-> initialize(initType);
     }
 
+    // ##################################
+    void Layer::addBias() {
+        for (int i = 0; i < pDst->getBatchSize(); ++i)
+        {
+            int batch = i * pDst->getSize3D();
+            axpy(pDst->getSize3D(), 1.0, pB->pData, pDst->pData+batch);
+        }
+    }
 
 
-
-
+    //##################################
+    // Getter Function
+    LayerType Layer::getType() {
+        return type;
+    }
+    InitializerType Layer::getInitType(){
+        return initType;
+    }
+    ActivationType Layer::getActivationType() {
+        return activationType;
+    }
 
     // template class Layer<float>;
 }

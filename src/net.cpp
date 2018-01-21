@@ -38,7 +38,7 @@ namespace mkt {
 
     }
 
-    Layer* Net::addDenseLayer(std::string id, int unit, ActivationType activationType) {
+    Layer* Net::addDenseLayer(std::string id, int unit, ActivationType activationType,  InitializerType initType) {
 
         if (layers.size() == 0)
         {
@@ -50,7 +50,7 @@ namespace mkt {
         Layer* prevLayer = layers.back();
 
         // Instantiate Dense Layer
-        DenseLayer* pDenseLayer = new DenseLayer{id, activationType, prevLayer, unit};
+        DenseLayer* pDenseLayer = new DenseLayer{id, unit, prevLayer, activationType, initType};
 
         // Add layer
         layers.push_back(pDenseLayer);

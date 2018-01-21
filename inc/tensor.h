@@ -88,7 +88,7 @@ namespace mkt {
 
         // Initialize Function
         // void initialize(int batchSize, int h, int w, int c);
-        void initialize(Initializer_Type init_type=Initializer_Type::NONE);
+        void initialize(InitializerType init_type);
 
         // Add Data Function
         OP_STATUS addData(char const *filename);
