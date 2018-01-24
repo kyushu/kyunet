@@ -72,7 +72,7 @@ namespace mkt {
         valid=0, /*No padding*/
         same     /*padding the input such that the output has the same length as the original input*/
         // causal
-    }
+    };
 
 }
 

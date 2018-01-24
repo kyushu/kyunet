@@ -4,8 +4,8 @@ namespace mkt {
 
     void DenseLayer::initialize() {
         initOutputTensor();
-        initWeightTensor(weightInitType);
-        initBiasTensor(biasInitType);
+        initWeightTensor(weightInitType_);
+        initBiasTensor(biasInitType_);
 
     }
 
@@ -15,15 +15,15 @@ namespace mkt {
         fprintf(stderr, "##########################################\n");
 
         // 1. Rest data
-        pDst->cleanData();
+        pDst_->cleanData();
 
         // 2. Z = X * Weight
-        gemm_nr(0, 0,                                       /*trans_A, trans_B*/
-            pDst->batchSize, pDst->size3D, pSrc->size3D,    /*M,       N,K*/
-            1.0f, 1.0f,                                     /*ALPHA,   BETA*/
-            pSrc->pData, pSrc->size3D,                      /*A,       lda(K)*/
-            pW->pData,   pDst->size3D,                      /*B,       ldb(N)*/
-            pDst->pData, pDst->size3D);                     /*C,       ldc(N)*/
+        gemm_nr(0, 0,                                           /*trans_A, trans_B*/
+            pDst_->batchSize_, pDst_->size3D_, pSrc_->size3D_,  /*M,       N,K*/
+            1.0f, 1.0f,                                         /*ALPHA,   BETA*/
+            pSrc_->pData_, pSrc_->size3D_,                      /*A,       lda(K)*/
+            pW_->pData_,   pDst_->size3D_,                      /*B,       ldb(N)*/
+            pDst_->pData_, pDst_->size3D_);                     /*C,       ldc(N)*/
 
 
         // 3. Z + bias

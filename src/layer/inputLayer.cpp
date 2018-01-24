@@ -34,16 +34,16 @@ namespace mkt {
     */
     void InputLayer::FlattenImageToTensor(unsigned char *pImg, bool bNormalize) {
 
-        if (pDst)
+        if (pDst_)
         {
-            int depth  = pDst->getDepth();
-            int height = pDst->getHeight();
-            int width  = pDst->getWidth();
+            int depth  = pDst_->getDepth();
+            int height = pDst_->getHeight();
+            int width  = pDst_->getWidth();
             int sz = width*height;
 
-            int size2D = pDst->getSize2D();
-            int size3D = pDst->getSize3D();
-            float* ptr = pDst->pData + pDst->wrIdx * size3D;
+            int size2D = pDst_->getSize2D();
+            int size3D = pDst_->getSize3D();
+            float* ptr = pDst_->pData_ + pDst_->wrIdx_ * size3D;
             // fprintf(stdout, "size2D: %d\n", size2D);
             for (int i = 0; i < size3D; i+=depth)
             {
@@ -54,7 +54,7 @@ namespace mkt {
                 }
             }
 
-            pDst->wrIdx++;
+            pDst_->wrIdx_++;
         } else {
             // assert(this->pDst);
         }
@@ -69,10 +69,10 @@ namespace mkt {
         for (int i = 0; i < size3D; i+=channel)
         {
             int idx = int(i/channel);
-            float maxValue = 255;
+            // float maxValue = 255;
             for (int m = 0; m < channel; ++m)
             {
-                int pixel = int(pData[idx + size2D*m] * maxValue);
+                int pixel = int(pData[idx + size2D*m] * MAX_PIXEL_VALUE);
                  pImg[i+m] = (unsigned char)pixel;
                  // fprintf(stdout, "%d\n", i+m);
             }

@@ -81,10 +81,10 @@ namespace mkt {
     OP_STATUS Net::add_data_from_file_list(std::vector<std::string> fileList) {
 
         int inSize = fileList.size();
-        int batchSize = pInputLayer->pDst->getBatchSize();
-        int tensor_h = pInputLayer->pDst->getHeight();
-        int tensor_w = pInputLayer->pDst->getWidth();
-        int tensor_c = pInputLayer->pDst->getDepth();
+        int batchSize = pInputLayer->pDst_->getBatchSize();
+        int tensor_h = pInputLayer->pDst_->getHeight();
+        int tensor_w = pInputLayer->pDst_->getWidth();
+        int tensor_c = pInputLayer->pDst_->getDepth();
 
         if (inSize != batchSize)
         {

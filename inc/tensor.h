@@ -35,40 +35,40 @@ namespace mkt {
     class Tensor
     {
     public:
-        int batchSize; // batch size
-        int channel; // channel / depth
-        int height; // height
-        int width; // width
+        int batchSize_; // batch size
+        int channel_; // channel / depth
+        int height_; // height
+        int width_; // width
 
-        int size2D;
-        int size3D;
-        int wholeSize;
+        int size2D_;
+        int size3D_;
+        int wholeSize_;
     public:
-        int wrIdx;
-        float *pData;   // data
+        int wrIdx_;
+        float *pData_;   // data
 
 
     public:
         Tensor():
-            batchSize{0},
-            channel{0},
-            height{0},
-            width{0},
-            wrIdx{0},
-            size2D{0},
-            size3D{0},
-            wholeSize{0},
-            pData{nullptr}
+            batchSize_{0},
+            channel_{0},
+            height_{0},
+            width_{0},
+            wrIdx_{0},
+            size2D_{0},
+            size3D_{0},
+            wholeSize_{0},
+            pData_{nullptr}
         {};
 
-        Tensor(int batchSize_, int height_, int width_, int ch_):
-            batchSize{batchSize_},
-            height{height_},
-            width{width_},
-            channel{ch_}
+        Tensor(int batchSize, int height, int width, int ch):
+            batchSize_{batchSize},
+            height_{height},
+            width_{width},
+            channel_{ch}
         {
-            size2D = height * width;
-            size3D = size2D * channel;
+            size2D_ = height_ * width_;
+            size3D_ = size2D_ * channel_;
             // fprintf(stderr, "tensor construct batchSize_: %d\n", batchSize_);
             // fprintf(stderr, "tensor construct height_: %d\n", height);
             // fprintf(stderr, "tensor construct width_: %d\n", width_);
@@ -76,7 +76,7 @@ namespace mkt {
         };
 
         ~Tensor(){
-            delete[] pData;
+            delete[] pData_;
         };
 
         // TODO: Tensor CopyConstructor

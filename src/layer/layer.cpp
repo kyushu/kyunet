@@ -27,27 +27,27 @@ namespace mkt {
     // ##################################
     // Init Function
     void Layer::initOutputTensor() {
-        pDst->initialize(InitializerType::NONE);
+        pDst_->initialize(InitializerType::NONE);
     }
     void Layer::initWeightTensor(InitializerType initType) {
-        pW->initialize(initType);
+        pW_->initialize(initType);
     }
     void Layer::initBiasTensor(InitializerType initType) {
-        pB-> initialize(initType);
+        pB_-> initialize(initType);
     }
 
     // ##################################
     void Layer::addBias() {
-        for (int i = 0; i < pDst->getBatchSize(); ++i)
+        for (int i = 0; i < pDst_->getBatchSize(); ++i)
         {
-            int batch = i * pDst->getSize3D();
-            axpy(pDst->getSize3D(), 1.0, pB->pData, pDst->pData+batch);
+            int numData = i * pDst_->getSize3D();
+            axpy(pDst_->getSize3D(), 1.0, pB_->pData_, pDst_->pData_+numData);
         }
     }
 
     void Layer::applyActivation() {
 
-        switch (activationType) {
+        switch (activationType_) {
             case ActivationType::Sigmoid:
             {
                 fprintf(stderr, "TODO: Sigmoid\n");
@@ -83,42 +83,42 @@ namespace mkt {
     //##################################
     // Getter Function
     LayerType Layer::getType() {
-        return type;
+        return type_;
     }
     InitializerType Layer::getWeightInitType(){
-        return weightInitType;
+        return weightInitType_;
     }
     InitializerType Layer::getBiasInitType(){
-        return biasInitType;
+        return biasInitType_;
     }
     ActivationType Layer::getActivationType() {
-        return activationType;
+        return activationType_;
     }
 
     int Layer::getBatchSize() {
-        return batchSize;
+        return batchSize_;
     }
 
     int Layer::getOutputHeight() {
-        return dh;
+        return dh_;
     }
     int Layer::getOutputWidth() {
-        return dw;
+        return dw_;
     }
     int Layer::getOutputChannel() {
-        return dc;
+        return dc_;
     }
 
     int Layer::getFilterHeight() {
-        return fh;
+        return fh_;
     }
 
     int Layer::getFilterWidth() {
-        return fw;
+        return fw_;
     }
 
     int Layer::getFilterChannel() {
-        return fc;
+        return fc_;
     }
     // template class Layer<float>;
 }

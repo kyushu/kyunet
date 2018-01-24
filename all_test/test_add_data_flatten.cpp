@@ -94,8 +94,8 @@ void test_flatten_image() {
 
     // Get InputLayer
     InputLayer* pInput = net.getInputLayer();
-    const float *pdata = pInput->pDst->getData();
-    int size3D = pInput->pDst->getSize3D();
+    const float *pdata = pInput->pDst_->getData();
+    int size3D = pInput->pDst_->getSize3D();
     fprintf(stderr, "size3D: %d\n", size3D);
 
     // Add data
@@ -104,10 +104,10 @@ void test_flatten_image() {
     pInput->FlattenImageToTensor(s3, true);
 
     // Verify data
-    int wholeSize = pInput->pDst->getWholeSize();
+    int wholeSize = pInput->pDst_->getWholeSize();
     for (int i = 0; i < wholeSize; ++i)
     {
-        printf("%d - %f\n", i, pInput->pDst->pData[i] * 255);
+        printf("%d - %f\n", i, pInput->pDst_->pData_[i] * 255);
     }
 
 }
@@ -171,8 +171,8 @@ void test_add_batch_image() {
      * Verify
      **********************************************/
     InputLayer* pInput = net.getInputLayer();
-    const float *pdata = pInput->pDst->getData();
-    int size3D = pInput->pDst->getSize3D();
+    const float *pdata = pInput->pDst_->getData();
+    int size3D = pInput->pDst_->getSize3D();
     fprintf(stderr, "size3D: %d\n", size3D);
 
     unsigned char* pImg = new unsigned char[size3D];

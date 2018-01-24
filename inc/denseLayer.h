@@ -9,25 +9,25 @@ namespace mkt {
     {
 
     public:
-        int unit;
+        int unit_;
 
         // Constructor with ID
         DenseLayer(
             Layer* prevLayer,
-            std::string id_,
-            int unit_,
-            ActivationType actType_,
-            InitializerType weightInitType_,
-            InitializerType biasInitType_
-        ): unit{unit_}, Layer(LayerType::FullConnected, actType_, weightInitType_, biasInitType_)
+            std::string id,
+            int unit,
+            ActivationType actType,
+            InitializerType weightInitType,
+            InitializerType biasInitType
+        ): unit_{unit}, Layer(LayerType::FullConnected, actType, weightInitType, biasInitType)
         {
-            id = id_;
+            id = id;
 
-            int batchSize = prevLayer->pDst->getBatchSize();
-            int h = prevLayer->pDst->getHeight();
-            int w = prevLayer->pDst->getWidth();
-            int c = prevLayer->pDst->getDepth();
-            int size3D = prevLayer->pDst->getSize3D();
+            int batchSize = prevLayer->pDst_->getBatchSize();
+            int h = prevLayer->pDst_->getHeight();
+            int w = prevLayer->pDst_->getWidth();
+            int c = prevLayer->pDst_->getDepth();
+            int size3D = prevLayer->pDst_->getSize3D();
 
             // fprintf(stderr, "dense constructor\n");
             // fprintf(stderr, "batchSize: %d\n", batchSize);
@@ -37,11 +37,11 @@ namespace mkt {
             // fprintf(stderr, "size3D: %d\n", size3D);
 
             // pSrc_ point to pDst_ of previous layer
-            pSrc = prevLayer->pDst;
+            pSrc_ = prevLayer->pDst_;
 
-            pDst = new Tensor{batchSize, 1, unit, 1};
-            pW   = new Tensor{1, size3D, unit, 1};
-            pB   = new Tensor{1, 1, unit, 1};
+            pDst_ = new Tensor{batchSize, 1, unit, 1};
+            pW_   = new Tensor{1, size3D, unit, 1};
+            pB_   = new Tensor{1, 1, unit, 1};
 
             // TODO: Activation
         };
@@ -49,24 +49,24 @@ namespace mkt {
         // Constructor without ID
         DenseLayer(
             Layer* prevLayer,
-            int unit_,
-            ActivationType actType_,
-            InitializerType weightInitType_,
-            InitializerType biasInitType_
-        ): unit{unit_}, Layer(LayerType::FullConnected, actType_, weightInitType_, biasInitType_)
+            int unit,
+            ActivationType actType,
+            InitializerType weightInitType,
+            InitializerType biasInitType
+        ): unit_{unit}, Layer(LayerType::FullConnected, actType, weightInitType, biasInitType)
         {
-            int batchSize = prevLayer->pDst->getBatchSize();
-            int h = prevLayer->pDst->getHeight();
-            int w = prevLayer->pDst->getWidth();
-            int c = prevLayer->pDst->getDepth();
-            int size3D = prevLayer->pDst->getSize3D();
+            int batchSize = prevLayer->pDst_->getBatchSize();
+            int h = prevLayer->pDst_->getHeight();
+            int w = prevLayer->pDst_->getWidth();
+            int c = prevLayer->pDst_->getDepth();
+            int size3D = prevLayer->pDst_->getSize3D();
 
             // pSrc_ point to pDst_ of previous layer
-            pSrc = prevLayer->pDst;
+            pSrc_ = prevLayer->pDst_;
 
-            pDst = new Tensor{batchSize, 1, unit, 1};
-            pW   = new Tensor{1, size3D, unit, 1};
-            pB   = new Tensor{1, 1, unit, 1};
+            pDst_ = new Tensor{batchSize, 1, unit, 1};
+            pW_   = new Tensor{1, size3D, unit, 1};
+            pB_   = new Tensor{1, 1, unit, 1};
 
             // TODO: Activation
         };

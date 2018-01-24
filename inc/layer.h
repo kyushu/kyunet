@@ -35,54 +35,54 @@ namespace mkt {
     class Layer
     {
     protected:
-        LayerType type;
-        InitializerType weightInitType;
-        InitializerType biasInitType;
-        ActivationType activationType;
+        LayerType type_;
+        InitializerType weightInitType_;
+        InitializerType biasInitType_;
+        ActivationType activationType_;
 
     public:
-        std::string id;
-        Tensor *pSrc;    // point to dst_tensor of previous layer
-        Tensor *pDst;    // new a destination tensor
-        Tensor *pW;      // new a weight tensor
-        Tensor* pB;      // new a bias tensor
+        std::string id_;
+        Tensor *pSrc_;    // point to dst_tensor of previous layer
+        Tensor *pDst_;    // new a destination tensor
+        Tensor *pW_;      // new a weight tensor
+        Tensor* pB_;      // new a bias tensor
 
-        int batchSize;
+        int batchSize_;
 
-        int dh; // DstTensor height
-        int dw; // DstTensor widht
-        int dc; // DstTensor depth (channel)
+        int dh_; // DstTensor height
+        int dw_; // DstTensor widht
+        int dc_; // DstTensor depth (channel)
 
-        int fh; // filter height
-        int fw; // filter width
-        int fc; // filter channel = number of Filter(kernel)
+        int fh_; // filter height
+        int fw_; // filter width
+        int fc_; // filter channel = number of Filter(kernel)
 
 
     public:
         Layer(
             LayerType type,
-            ActivationType activationType_ = ActivationType::NONE,
-            InitializerType weightInitType_ = InitializerType::NONE,
-            InitializerType biasInitType_ = InitializerType::ZERO
+            ActivationType activationType = ActivationType::NONE,
+            InitializerType weightInitType = InitializerType::NONE,
+            InitializerType biasInitType = InitializerType::ZERO
         ):
-            type{type},
-            activationType{activationType_},
-            weightInitType{weightInitType_},
-            biasInitType{biasInitType_},
-            batchSize{0},
-            dh{0}, dw{0}, dc{0},
-            fh{0}, fw{0}, fc{0},
-            pSrc{nullptr},
-            pDst{nullptr},
-            pW{nullptr},
-            pB{nullptr}
+            type_{type},
+            activationType_{activationType},
+            weightInitType_{weightInitType},
+            biasInitType_{biasInitType},
+            batchSize_{0},
+            dh_{0}, dw_{0}, dc_{0},
+            fh_{0}, fw_{0}, fc_{0},
+            pSrc_{nullptr},
+            pDst_{nullptr},
+            pW_{nullptr},
+            pB_{nullptr}
         {};
 
         virtual ~Layer() {
-            pSrc = nullptr;
-            delete pDst;
-            delete pW;
-            delete pB;
+            pSrc_ = nullptr;
+            delete pDst_;
+            delete pW_;
+            delete pB_;
         };
 
         // TODO: copy constructor

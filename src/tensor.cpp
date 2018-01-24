@@ -36,27 +36,27 @@ namespace mkt {
 
         // fprintf(stderr, "init_type: %d\n", init_type);
 
-        wholeSize = batchSize * size3D;
+        wholeSize_ = batchSize_ * size3D_;
 
-        if (wholeSize == 0)
+        if (wholeSize_ == 0)
         {
             fprintf(stderr, "wholeSize == 0\n");
             return;
         }
 
-        pData = new float[wholeSize];
+        pData_ = new float[wholeSize_];
 
         switch (init_type) {
             case InitializerType::ZERO:
             {
-                std::fill_n(pData, wholeSize, 0);
+                std::fill_n(pData_, wholeSize_, 0);
                 break;
             }
             case InitializerType::TEST:
             {
-                for (int i = 0; i < wholeSize; ++i)
+                for (int i = 0; i < wholeSize_; ++i)
                 {
-                    pData[i] = i;
+                    pData_[i] = i;
                 }
                 break;
             }
@@ -87,32 +87,32 @@ namespace mkt {
     OP_STATUS Tensor::addData(char const *filename) {
 
         // Safety Check
-        if (wrIdx >= batchSize)
+        if (wrIdx_ >= batchSize_)
         {
-            fprintf(stderr, "cur = %d > %d\n", wrIdx, batchSize);
+            fprintf(stderr, "cur = %d > %d\n", wrIdx_, batchSize_);
             return OP_STATUS::OVER_MAX_SIZE;
         }
 
         // Get current write address
-        float* ptr = pData + wrIdx * size3D;
+        float* ptr = pData_ + wrIdx_ * size3D_;
 
         // Load image from file
         int w, h, c;
         unsigned char *pImg = stbi_load(filename, &w, &h, &c, 0);
 
-        if (w != width && h != height && c != channel)
+        if (w != width_ && h != height_ && c != channel_)
         {
             return OP_STATUS::UNMATCHED_SIZE;
         }
 
         // Conver unsigned char to float
         fprintf(stderr, "w: %d, h: %d, c: %d\n", w, h, c);
-        for (int i = 0; i < size3D; ++i)
+        for (int i = 0; i < size3D_; ++i)
         {
             *(ptr+i) = (float)*(pImg+i);
         }
 
-        ++wrIdx;
+        ++wrIdx_;
 
         return OP_STATUS::SUCCESS;
     }
@@ -123,21 +123,21 @@ namespace mkt {
         assert(pImg);
 
         // Safety Check
-        if (wrIdx >= batchSize)
+        if (wrIdx_ >= batchSize_)
         {
-            fprintf(stderr, "cur = %d > %d\n", wrIdx, batchSize);
+            fprintf(stderr, "cur = %d > %d\n", wrIdx_, batchSize_);
             return OP_STATUS::OVER_MAX_SIZE;
         }
 
         // Get current write address
-        float* ptr = pData + wrIdx * size3D;
+        float* ptr = pData_ + wrIdx_ * size3D_;
 
-        for (int i = 0; i < size3D; ++i)
+        for (int i = 0; i < size3D_; ++i)
         {
             *(ptr+i) = *(pImg+i);
         }
 
-        ++wrIdx;
+        ++wrIdx_;
 
         return OP_STATUS::SUCCESS;
     }
@@ -146,68 +146,68 @@ namespace mkt {
     OP_STATUS Tensor::addData(std::vector<float> vImg) {
 
         // Safety Check
-        if (wrIdx >= batchSize)
+        if (wrIdx_ >= batchSize_)
         {
-            fprintf(stderr, "cur = %d > %d\n", wrIdx, batchSize);
+            fprintf(stderr, "cur = %d > %d\n", wrIdx_, batchSize_);
             return OP_STATUS::OVER_MAX_SIZE;
         }
 
-        if (vImg.size() != size3D)
+        if (vImg.size() != size3D_)
         {
             return OP_STATUS::UNMATCHED_SIZE;
         }
 
         // Get current write address
-        float* ptr = pData + wrIdx * size3D;
+        float* ptr = pData_ + wrIdx_ * size3D_;
 
-        for (int i = 0; i < size3D; ++i)
+        for (int i = 0; i < size3D_; ++i)
         {
             *(ptr+i) = vImg.at(i);
         }
 
-        ++wrIdx;
+        ++wrIdx_;
 
         return OP_STATUS::SUCCESS;
     }
 
 
     void Tensor::cleanData() {
-        std::memset(pData, 0, wholeSize * sizeof(float));
+        std::memset(pData_, 0, wholeSize_ * sizeof(float));
     }
 
     /********************************
     ** Get functions
     ********************************/
     const float* Tensor::getData() {
-        return pData;
+        return pData_;
     }
 
     int Tensor::getBatchSize() {
-        return batchSize;
+        return batchSize_;
     }
 
     int Tensor::getWidth() {
-        return width;
+        return width_;
     }
 
     int Tensor::getHeight() {
-        return height;
+        return height_;
     }
 
     int Tensor::getDepth() {
-        return channel;
+        return channel_;
     }
 
     int Tensor::getSize2D() {
-        return size2D;
+        return size2D_;
     }
 
     int Tensor::getSize3D() {
-        return size3D;
+        return size3D_;
     }
 
     int Tensor::getWholeSize() {
-        return wholeSize;
+        return wholeSize_;
     }
 }
 

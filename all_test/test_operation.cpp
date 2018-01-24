@@ -17,7 +17,7 @@ void test_axpy() {
     b.initialize(InitializerType::TEST);
     for (int i = 0; i < b.getWholeSize(); ++i)
     {
-        b.pData[i] += 3;
+        b.pData_[i] += 3;
     }
 
     fprintf(stderr, "a\n");
@@ -27,7 +27,7 @@ void test_axpy() {
         {
             fprintf(stderr, "\n");
         }
-        fprintf(stderr, "%.1f ", a.pData[i]);
+        fprintf(stderr, "%.1f ", a.pData_[i]);
     }
 
     fprintf(stderr, "\n\n");
@@ -38,7 +38,7 @@ void test_axpy() {
         {
             fprintf(stderr, "\n");
         }
-        fprintf(stderr, "%.1f ", b.pData[i]);
+        fprintf(stderr, "%.1f ", b.pData_[i]);
     }
 
     fprintf(stderr, "\n\n");
@@ -46,7 +46,7 @@ void test_axpy() {
     for (int i = 0; i < a.getBatchSize(); ++i)
     {
         int size3D = a.getSize3D();
-        axpy(a.getSize3D(), 1.0, b.pData, a.pData+i*size3D);
+        axpy(a.getSize3D(), 1.0, b.pData_, a.pData_+i*size3D);
     }
 
     fprintf(stderr, "axpy\n");
@@ -56,7 +56,7 @@ void test_axpy() {
         {
             fprintf(stderr, "\n");
         }
-        fprintf(stderr, "%.1f ", a.pData[i]);
+        fprintf(stderr, "%.1f ", a.pData_[i]);
     }
 
     fprintf(stderr, "\n\n");
@@ -65,7 +65,7 @@ void test_axpy() {
 int main(int argc, char const *argv[])
 {
 
-
+    test_axpy();
 
 
 

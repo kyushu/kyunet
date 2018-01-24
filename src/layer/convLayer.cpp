@@ -4,17 +4,17 @@ namespace mkt {
 
     ConvLayer::ConvLayer(
             Layer* prevLayer,
-            std::string id_,
-            int nfilter_, int kernelSize_, int stride_, int padding_, ,
-            ActivationType actType_,
-            InitializerType weightInitType_,
-            InitializerType biasInitType_,
-            PaddingType padding_):
-        nfilter{nfilter_},
-        kernelSize{kernelSize_},
-        stride{stride_},
-        padding{padding_},
-        Layer(LayerType::FullConnected, actType_, weightInitType_, biasInitType_)
+            std::string id,
+            int nfilter, int kernelSize, int stride, int padding,
+            ActivationType actType,
+            InitializerType weightInitType,
+            InitializerType biasInitType,
+            PaddingType padding):
+        nfilter_{nfilter},
+        kernelSize_{kernelSize},
+        stride_{stride},
+        padding_{padding},
+        Layer(LayerType::FullConnected, actType, weightInitType, biasInitType)
     {
 
         // calculate pDst size

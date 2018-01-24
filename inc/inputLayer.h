@@ -10,14 +10,14 @@ namespace mkt {
     // private:
     //     LayerType type;
     public:
-        InputLayer(std::string id_, int bSize, int h, int w, int c): Layer(LayerType::Input) {
-            id = id_;
+        InputLayer(std::string id, int bSize, int h, int w, int c): Layer(LayerType::Input) {
+            id_ = id;
             // this->dh_ = h;
             // this->dw_ = w;
             // this->dc_ = c;
-            pDst = new Tensor{bSize, h, w, c};
-            pW = new Tensor(); // empty Tensor
-            pB = new Tensor(); // empty Tensor
+            pDst_ = new Tensor{bSize, h, w, c};
+            pW_ = new Tensor(); // empty Tensor
+            pB_ = new Tensor(); // empty Tensor
 
         };
 
