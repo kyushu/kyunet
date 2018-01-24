@@ -10,7 +10,9 @@ namespace mkt {
         int nfilter_;
         int kernelSize_;
         int stride_;
-        PaddingType padding_;
+        int padding;
+        PaddingType paddingType_;
+
 
         ConvLayer(
             Layer* prevLayer,
@@ -19,10 +21,15 @@ namespace mkt {
             ActivationType actType,
             InitializerType weightInitType,
             InitializerType biasInitType,
-            PaddingType padding
+            PaddingType paddingType
         );
 
         ~ConvLayer();
+
+
+        // Computation Function
+        void forward();
+        void backward();
 
     };
 
