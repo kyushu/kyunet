@@ -43,7 +43,7 @@ void test_axpy() {
 
     fprintf(stderr, "\n\n");
 
-    for (int i = 0; i < a.getBatchSize(); ++i)
+    for (int i = 0; i < a.getNumOfData(); ++i)
     {
         int size3D = a.getSize3D();
         axpy(a.getSize3D(), 1.0, b.pData_, a.pData_+i*size3D);

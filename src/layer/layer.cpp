@@ -38,7 +38,7 @@ namespace mkt {
 
     // ##################################
     void Layer::addBias() {
-        for (int i = 0; i < pDst_->getBatchSize(); ++i)
+        for (int i = 0; i < pDst_->getNumOfData(); ++i)
         {
             int numData = i * pDst_->getSize3D();
             axpy(pDst_->getSize3D(), 1.0, pB_->pData_, pDst_->pData_+numData);
@@ -100,13 +100,13 @@ namespace mkt {
     }
 
     int Layer::getOutputHeight() {
-        return dh_;
+        return oh_;
     }
     int Layer::getOutputWidth() {
-        return dw_;
+        return ow_;
     }
     int Layer::getOutputChannel() {
-        return dc_;
+        return oc_;
     }
 
     int Layer::getFilterHeight() {

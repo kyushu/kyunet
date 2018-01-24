@@ -23,7 +23,7 @@ namespace mkt {
         {
             id = id;
 
-            int batchSize = prevLayer->pDst_->getBatchSize();
+            int batchSize = prevLayer->pDst_->getNumOfData();
             int h = prevLayer->pDst_->getHeight();
             int w = prevLayer->pDst_->getWidth();
             int c = prevLayer->pDst_->getDepth();
@@ -40,7 +40,7 @@ namespace mkt {
             pSrc_ = prevLayer->pDst_;
 
             pDst_ = new Tensor{batchSize, 1, unit, 1};
-            pW_   = new Tensor{1, size3D, unit, 1};
+            pW_   = new Tensor{size3D, unit, 1, 1};
             pB_   = new Tensor{1, 1, unit, 1};
 
             // TODO: Activation
@@ -55,7 +55,7 @@ namespace mkt {
             InitializerType biasInitType
         ): unit_{unit}, Layer(LayerType::FullConnected, actType, weightInitType, biasInitType)
         {
-            int batchSize = prevLayer->pDst_->getBatchSize();
+            int batchSize = prevLayer->pDst_->getNumOfData();
             int h = prevLayer->pDst_->getHeight();
             int w = prevLayer->pDst_->getWidth();
             int c = prevLayer->pDst_->getDepth();

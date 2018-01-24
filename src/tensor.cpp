@@ -36,7 +36,7 @@ namespace mkt {
 
         // fprintf(stderr, "init_type: %d\n", init_type);
 
-        wholeSize_ = batchSize_ * size3D_;
+        wholeSize_ = num_ * size3D_;
 
         if (wholeSize_ == 0)
         {
@@ -77,6 +77,7 @@ namespace mkt {
             }
             default:
                 fprintf(stderr, "Default: NO Initialize\n");
+                break;
         }
 
     }
@@ -87,9 +88,9 @@ namespace mkt {
     OP_STATUS Tensor::addData(char const *filename) {
 
         // Safety Check
-        if (wrIdx_ >= batchSize_)
+        if (wrIdx_ >= num_)
         {
-            fprintf(stderr, "cur = %d > %d\n", wrIdx_, batchSize_);
+            fprintf(stderr, "cur = %d > %d\n", wrIdx_, num_);
             return OP_STATUS::OVER_MAX_SIZE;
         }
 
@@ -123,9 +124,9 @@ namespace mkt {
         assert(pImg);
 
         // Safety Check
-        if (wrIdx_ >= batchSize_)
+        if (wrIdx_ >= num_)
         {
-            fprintf(stderr, "cur = %d > %d\n", wrIdx_, batchSize_);
+            fprintf(stderr, "cur = %d > %d\n", wrIdx_, num_);
             return OP_STATUS::OVER_MAX_SIZE;
         }
 
@@ -146,9 +147,9 @@ namespace mkt {
     OP_STATUS Tensor::addData(std::vector<float> vImg) {
 
         // Safety Check
-        if (wrIdx_ >= batchSize_)
+        if (wrIdx_ >= num_)
         {
-            fprintf(stderr, "cur = %d > %d\n", wrIdx_, batchSize_);
+            fprintf(stderr, "cur = %d > %d\n", wrIdx_, num_);
             return OP_STATUS::OVER_MAX_SIZE;
         }
 
@@ -182,8 +183,8 @@ namespace mkt {
         return pData_;
     }
 
-    int Tensor::getBatchSize() {
-        return batchSize_;
+    int Tensor::getNumOfData() {
+        return num_;
     }
 
     int Tensor::getWidth() {

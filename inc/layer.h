@@ -49,9 +49,9 @@ namespace mkt {
 
         int batchSize_;
 
-        int dh_; // DstTensor height
-        int dw_; // DstTensor widht
-        int dc_; // DstTensor depth (channel)
+        int oh_; // DstTensor height
+        int ow_; // DstTensor widht
+        int oc_; // DstTensor depth (channel)
 
         int fh_; // filter height
         int fw_; // filter width
@@ -70,7 +70,7 @@ namespace mkt {
             weightInitType_{weightInitType},
             biasInitType_{biasInitType},
             batchSize_{0},
-            dh_{0}, dw_{0}, dc_{0},
+            oh_{0}, ow_{0}, oc_{0},
             fh_{0}, fw_{0}, fc_{0},
             pSrc_{nullptr},
             pDst_{nullptr},

@@ -35,7 +35,7 @@ namespace mkt {
     class Tensor
     {
     public:
-        int batchSize_; // batch size
+        int num_; // batch size
         int channel_; // channel / depth
         int height_; // height
         int width_; // width
@@ -50,7 +50,7 @@ namespace mkt {
 
     public:
         Tensor():
-            batchSize_{0},
+            num_{0},
             channel_{0},
             height_{0},
             width_{0},
@@ -62,14 +62,14 @@ namespace mkt {
         {};
 
         Tensor(int batchSize, int height, int width, int ch):
-            batchSize_{batchSize},
+            num_{batchSize},
             height_{height},
             width_{width},
             channel_{ch}
         {
             size2D_ = height_ * width_;
             size3D_ = size2D_ * channel_;
-            // fprintf(stderr, "tensor construct batchSize_: %d\n", batchSize_);
+            // fprintf(stderr, "tensor construct num_: %d\n", num_);
             // fprintf(stderr, "tensor construct height_: %d\n", height);
             // fprintf(stderr, "tensor construct width_: %d\n", width_);
             // fprintf(stderr, "tensor construct channel_: %d\n", channel_);
@@ -100,7 +100,7 @@ namespace mkt {
 
         // Getter
         const float* getData();
-        int getBatchSize();
+        int getNumOfData();
         int getDepth();
         int getWidth();
         int getHeight();

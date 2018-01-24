@@ -19,7 +19,7 @@ namespace mkt {
 
         // 2. Z = X * Weight
         gemm_nr(0, 0,                                           /*trans_A, trans_B*/
-            pDst_->batchSize_, pDst_->size3D_, pSrc_->size3D_,  /*M,       N,K*/
+            pDst_->num_, pDst_->size3D_, pSrc_->size3D_,  /*M,       N,K*/
             1.0f, 1.0f,                                         /*ALPHA,   BETA*/
             pSrc_->pData_, pSrc_->size3D_,                      /*A,       lda(K)*/
             pW_->pData_,   pDst_->size3D_,                      /*B,       ldb(N)*/
