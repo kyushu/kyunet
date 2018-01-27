@@ -2,6 +2,9 @@ cmake_minimum_required(VERSION 2.9)
 
 project(all_test)
 
+# Set compile mode to debug
+set(CMAKE_BUILD_TYPE RelWithDebInfo)
+
 # stb_SRC is already included in kyunet/CMakeList.txt
 # so we don't need to include stb header here again.
 
@@ -34,6 +37,9 @@ find_package(OpenCV REQUIRED)
 
         add_executable(test_operation test_operation.cpp)
         target_link_libraries(test_operation ${OpenCV_LIBS} libkyunet)
+
+        add_executable(im2col_test im2col_test.cpp)
+        target_link_libraries(im2col_test libkyunet)
 
 
     else()

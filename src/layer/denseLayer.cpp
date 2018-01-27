@@ -18,7 +18,7 @@ namespace mkt {
         pDst_->cleanData();
 
         // 2. Z = X * Weight
-        gemm_nr(0, 0,                                           /*trans_A, trans_B*/
+        gemm_cpu(0, 0,                                           /*trans_A, trans_B*/
             pDst_->num_, pDst_->size3D_, pSrc_->size3D_,  /*M,       N,K*/
             1.0f, 1.0f,                                         /*ALPHA,   BETA*/
             pSrc_->pData_, pSrc_->size3D_,                      /*A,       lda(K)*/

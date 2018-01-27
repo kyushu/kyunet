@@ -43,7 +43,7 @@ namespace mkt {
             pW_   = new Tensor{size3D, unit, 1, 1};
             pB_   = new Tensor{1, 1, unit, 1};
 
-            // TODO: Activation
+            // TODO: Activation setting
         };
 
         // Constructor without ID

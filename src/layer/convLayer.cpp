@@ -2,6 +2,7 @@
 
 namespace mkt {
 
+    // Constructor
     ConvLayer::ConvLayer(
             Layer* prevLayer,
             std::string id,
@@ -15,11 +16,11 @@ namespace mkt {
         kernelSize_{kernelSize},
         stride_{stride},
         padding_{padding},
-        paddingType_{paddingType}
+        paddingType_{paddingType},
         Layer(LayerType::Convolution, actType, weightInitType, biasInitType)
     {
 
-        int batchSize = prevLayer->pDst_->getNumOfData()();
+        int batchSize = prevLayer->pDst_->getNumOfData();
         int ih = prevLayer->pDst_->getHeight();
         int iw = prevLayer->pDst_->getWidth();
         int ic = prevLayer->pDst_->getDepth();
@@ -28,29 +29,29 @@ namespace mkt {
         oc_ = nfilter;
         // calculate pDst size: W_o = (W-f +2p)/s +1
         switch(paddingType_) {
-            case valid:
-                ow_ = std::floor(float(iw - kernelSize_) / stride_) + 1;
-                oh_ = std::floor(float(ih - kernelSize_) / stride_) + 1;
+            case PaddingType::valid:
+                ow_ = floor(float(iw - kernelSize_) / stride_) + 1;
+                oh_ = floor(float(ih - kernelSize_) / stride_) + 1;
                 break;
-            case same:
+            case PaddingType::same:
                 padding_ = ((iw-1)*stride_ + kernelSize_ - iw)*0.5;
                 ow_ = int( (iw - kernelSize_ + (2*padding_)) / stride_ ) + 1;
                 oh_ = int( (ih - kernelSize_ + (2*padding_)) / stride_ ) + 1;
                 break;
             default:
-                ow_ = std::floor(float(iw - kernelSize_) / stride_) + 1;
-                oh_ = std::floor(float(ih - kernelSize_) / stride_) + 1;
+                ow_ = floor(float(iw - kernelSize_) / stride_) + 1;
+                oh_ = floor(float(ih - kernelSize_) / stride_) + 1;
                 break;
         }
 
-        pDst_ = new Tensor{batchSize, oh, ow, oc};
-        pW_   = new Tensor{ic, kernelSize_, kernelSize_, oc};
-        pB_   = new Tensor{1, 1, 1, oc};
+        pDst_ = new Tensor{batchSize, oh_, ow_, oc_};
+        pW_   = new Tensor{ic, kernelSize_, kernelSize_, oc_};
+        pB_   = new Tensor{1, 1, 1, oc_};
 
-        // TODO: Activation
+        // TODO: Activation setting
     }
 
-
+    // Destructor
     ConvLayer::~ConvLayer() {
 
     }

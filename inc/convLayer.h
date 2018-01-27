@@ -2,15 +2,16 @@
 #define _CONVLAYER_H_
 
 #include "layer.h"
+#include <math.h>
 
 namespace mkt {
-    class ConvLayer
+    class ConvLayer:public Layer
     {
     public:
         int nfilter_;
         int kernelSize_;
         int stride_;
-        int padding;
+        int padding_;
         PaddingType paddingType_;
 
 
