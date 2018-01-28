@@ -14,8 +14,12 @@ else()
         message(STATUS "The compiler ${CMAKE_CXX_COMPILER} has no C++11 support. Please use a different C++ compiler.")
 endif()
 
+
 # Set compile mode to debug
 set(CMAKE_BUILD_TYPE RelWithDebInfo)
+
+# TURN ON/OFF mktLog
+add_definitions(-DDEBUG_LOG)
 
 # Set the output directory
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)

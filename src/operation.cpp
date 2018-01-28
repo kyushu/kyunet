@@ -4,6 +4,7 @@ namespace mkt {
 
 
 /*
+    General Matrix-Matrix multiplication (GEMM):
     C = alpha(AxB) + beta*C
     C{MXN} = A{MXK} * B{KXN}
     M = Number of rows in matrix A.
@@ -20,33 +21,24 @@ namespace mkt {
     ldc = Leading dimension of matrix C. It cannot be less than N when the order parameter
         is set to RowMajor, or less than M when it is set to ColumnMajorOrder.
 
-    // General Matrix-Matrix multiplication (Row major)
-    //
-    //                lda = K = h*w*c           ldb = N
-    //                ________________     _________________
-    //               |                |   |                 |
-    //               |                |   |                 |
-    // M(batch size) |       A        | X |        B        | K
-    //               |                |   |                 |
-    //               |________________|   |_________________|
-    //
-    //                                            ||
-    //                                     _________________
-    //                                    |     ldc = N     |
-    //                                    |                 |
-    //                                    |        C        | M
-    //                                    |                 |
-    //                                    |_________________|
-    //
-    //
-*/
+    General Matrix-Matrix multiplication (Row major)
+                       lda = K = h*w*c           ldb = N
+                   ________________     _________________
+                  |                |   |                 |
+                  |                |   |                 |
+    M(batch size) |       A        | x |        B        | K
+                  |                |   |                 |
+                  |________________|   |_________________|
+                                                   ||
+                                        _________________
+                                       |     ldc = N     |
+                                       |                 |
+                                       |        C        | M
+                                       |                 |
+                                       |_________________|
 
-    // bcnn_gemm(0, 0,
-    //     batch_size, dst_size, src_size, 1.0f,
-    //     src.data, src_size,
-    //     layer->weight, dst_size,
-    //     1.0f,
-    //     dst.data, dst_size);
+
+*/
 
     int gemm_cpu(
         int trans_a, int trans_b,
@@ -72,7 +64,7 @@ namespace mkt {
                     float tmp = ALPHA * A[i * lda + k];
                     for (j = 0; j < N; ++j) {
                         C[i * ldc + j] += tmp * B[k * ldb + j];
-                        // fprintf(stderr, "c[%d] = A[%d](%f)B[%d](%f)\n", i*ldc+j, i * lda + k, tmp, k * ldb + j, B[k * ldb + j]);
+                        mktLog(1, "c[%d] = A[%d](%f)B[%d](%f)\n", i*ldc+j, i * lda + k, tmp, k * ldb + j, B[k * ldb + j]);
                     }
                 }
             }
@@ -82,7 +74,7 @@ namespace mkt {
                 for (k = 0; k < K; ++k){
                     float tmp = ALPHA * A[k * lda + i];
                     for (j = 0; j < N; ++j) {
-                        // fprintf(stderr, "c[%d] = A[%d]B[%d]\n", i*ldc+j, k * lda + i, i * ldc + j);
+                        mktLog(1, "c[%d] = A[%d]B[%d]\n", i*ldc+j, k * lda + i, i * ldc + j);
                         C[i * ldc + j] += tmp * B[k * ldb + j];
                     }
                 }
@@ -95,7 +87,7 @@ namespace mkt {
                     sum = 0;
                     for (k = 0; k < K; ++k){
                         sum += ALPHA * A[i * lda + k] * B[j * ldb + k];
-                        // fprintf(stderr, "c[%d] = A[%d]B[%d]\n", i*ldc+j, i*lda+k, j*ldb+k);
+                        mktLog(1, "c[%d] = A[%d]B[%d]\n", i*ldc+j, i*lda+k, j*ldb+k);
                     }
                     C[i * ldc + j] += sum;
                 }
@@ -107,7 +99,7 @@ namespace mkt {
                 for (k = 0; k < K; ++k){
                     float tmp = ALPHA * A[i * lda + k];
                     for (j = 0; j < N; ++j) {
-                        // fprintf(stderr, "c[%d] = A[%d]B[%d]\n", i*ldc+j, i *lda+k, k*ldb+j);
+                        mktLog(1, "c[%d] = A[%d]B[%d]\n", i*ldc+j, i *lda+k, k*ldb+j);
                         C[i * ldc + j] += tmp * B[k * ldb + j];
                     }
                 }
@@ -154,7 +146,7 @@ namespace mkt {
                 for (int kernel_col = 0; kernel_col < kernel_w; kernel_col++) {
 
                     int input_row = -pad_h + kernel_row * dilation_h;
-                    // fprintf(stderr, "c:%d, kr:%d, kc: %d, input_row: %d\n", channels, kernel_row, kernel_col, input_row);
+                    mktLog(1, "c:%d, kr:%d, kc: %d, input_row: %d\n", channels, kernel_row, kernel_col, input_row);
 
                     for (int output_rows = output_h; output_rows; output_rows--) {
                         if (!is_a_ge_zero_and_a_lt_b(input_row, height)) {
@@ -164,15 +156,17 @@ namespace mkt {
                         }
                         else {
                             int input_col = -pad_w + kernel_col * dilation_w;
-                            // fprintf(stderr, "input_col: %d\n", input_col);
+                            // mktLog(1, "input_col: %d\n", input_col);
                             for (int output_col = output_w; output_col; output_col--) {
                                 if (is_a_ge_zero_and_a_lt_b(input_col, width)) {
                                     *(data_col++) = data_im[input_row * width + input_col];
-                                    // fprintf(stderr, "%d - input_row:%d\n", output_col, input_row);
-                                    // fprintf(stderr, "%d - width:%d\n",     output_col, width);
-                                    // fprintf(stderr, "%d - input_col:%d\n", output_col, input_col);
 
-                                    // fprintf(stderr, "input_row * width + input_col: %d\n", input_row * width + input_col);
+                                    // LOG
+                                    mktLog(1, "%d - input_row:%d\n", output_col, input_row);
+                                    mktLog(1, "%d - width:%d\n",     output_col, width);
+                                    mktLog(1, "%d - input_col:%d\n", output_col, input_col);
+                                    mktLog(1, "input_row * width + input_col: %d\n", input_row * width + input_col);
+                                    // LOG
                                 } else {
                                     *(data_col++) = 0;
                                 }

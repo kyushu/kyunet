@@ -1,3 +1,7 @@
+#ifndef _OPERATION_H_
+#define _OPERATION_H_
+
+#include "common_inc.h"
 
 namespace mkt {
 
@@ -28,3 +32,6 @@ namespace mkt {
         const int dilation_h, const int dilation_w,
         float* data_im);
 }
+
+
+#endif
