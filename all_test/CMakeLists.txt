@@ -41,6 +41,9 @@ find_package(OpenCV REQUIRED)
         add_executable(im2col_test im2col_test.cpp)
         target_link_libraries(im2col_test libkyunet)
 
+        add_executable(test_convlayer test_convlayer.cpp)
+        target_link_libraries(test_convlayer ${OpenCV_LIBS} libkyunet)
+
 
     else()
         message("OpenCV not found")

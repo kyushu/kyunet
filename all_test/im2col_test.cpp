@@ -86,10 +86,12 @@ int main(int argc, char const *argv[])
     //#############################
     // column patch tensor
     mktLog(2, "filter.size2D: %d\n", filter.getSize2D());
+    mktLog(2, "ic:%d\n", ic);
     mktLog(2, "dst.size2D: %d\n", dst.getSize2D());
 
     mkt::Tensor tempCol(1, filter.getSize2D()*ic, dst.getSize2D(), oc);
     tempCol.initialize(mkt::InitializerType::NONE);
+    mktLog(2, "tempCol.getSize2D(): %d\n", tempCol.getSize2D());
 
     mktLog(2, "b4 im2col\n");
 

@@ -20,7 +20,6 @@ namespace {
     #ifdef DEBUG_LOG
 
 
-
         int enable = log_mode & LOG_MOD;
         if (LOG_MOD > 0 && enable == 0)
         {

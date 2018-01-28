@@ -56,6 +56,22 @@ namespace mkt {
         return pDenseLayer;
     }
 
+    Layer* Net::addConvLayer(Layer* prevLayer, std::string id, int nfilter, int kernelSize, int stride, int padding, PaddingType paddingType, ActivationType activationType, InitializerType weightInitType, InitializerType biasInitType) {
+
+        if (layers.size() == 0)
+        {
+            fprintf(stderr, "please add input layer first\n");
+            return nullptr;
+        }
+
+        // Instantiate Conv Layer
+        ConvLayer* pConvLayer = new ConvLayer{prevLayer, id, nfilter, kernelSize, stride, padding, paddingType, activationType, weightInitType, biasInitType};
+
+        // Add Layer
+        layers.push_back(pConvLayer);
+
+        return pConvLayer;
+    }
     // Initializtion Function
     void Net::initialize() {
 

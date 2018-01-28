@@ -14,19 +14,25 @@ namespace mkt {
         int padding_;
         PaddingType paddingType_;
 
+        int dilation_h_;
+        int dilation_w_;
+
+        Tensor* pTmpCol_;
+
 
         ConvLayer(
             Layer* prevLayer,
             std::string id,
-            int nfilter, int kernelSize, int stride, int padding,
+            int nfilter, int kernelSize, int stride,
+            int padding, PaddingType paddingType,
             ActivationType actType,
             InitializerType weightInitType,
-            InitializerType biasInitType,
-            PaddingType paddingType
+            InitializerType biasInitType
         );
 
         ~ConvLayer();
 
+        void initialize();
 
         // Computation Function
         void forward();

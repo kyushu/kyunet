@@ -167,6 +167,7 @@ namespace mkt {
                                     mktLog(1, "%d - input_col:%d\n", output_col, input_col);
                                     mktLog(1, "input_row * width + input_col: %d\n", input_row * width + input_col);
                                     // LOG
+
                                 } else {
                                     *(data_col++) = 0;
                                 }

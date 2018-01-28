@@ -52,6 +52,11 @@ namespace mkt {
                 std::fill_n(pData_, wholeSize_, 0);
                 break;
             }
+            case InitializerType::ONE:
+            {
+                std::fill_n(pData_, wholeSize_, 1);
+                break;
+            }
             case InitializerType::TEST:
             {
                 for (int i = 0; i < wholeSize_; ++i)

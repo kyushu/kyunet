@@ -30,6 +30,7 @@
 #include "layer.h"
 #include "inputLayer.h"
 #include "denseLayer.h"
+#include "convLayer.h"
 
 
 namespace mkt {
@@ -53,6 +54,7 @@ namespace mkt {
         // Configuration Function
         Layer* addInputLayer(std::string id, int batchSize, int h, int w, int c);
         Layer* addDenseLayer(Layer* prevLayer, std::string id, int unit, ActivationType activationType, InitializerType weightInitType, InitializerType biasInitType);
+        Layer* addConvLayer(Layer* prevLayer, std::string id, int nfilter, int kernelSize, int stride, int padding, PaddingType paddingType, ActivationType activationType, InitializerType weightInitType, InitializerType biasInitType);
 
         // Initialize Function
         void initialize();

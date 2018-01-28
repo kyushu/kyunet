@@ -37,6 +37,7 @@ namespace mkt {
     enum class InitializerType: int
     {
         NONE=0,
+        ONE,
         TEST, /*TEST*/
         ZERO,
         RANDOM,
