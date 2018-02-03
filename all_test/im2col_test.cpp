@@ -2,6 +2,8 @@
 #include "tensor.h"
 #include "operation.h"
 
+using namespace mkt;
+
 int main(int argc, char const *argv[])
 {
 

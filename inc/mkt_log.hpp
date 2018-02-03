@@ -3,15 +3,15 @@
 
 #include <stdarg.h>
 
-namespace {
+namespace mkt {
 
     /*
         LOG_MOD Value:
-            0x00: DISPLAY ALL MESSAGE
+            0x00: Turn off
             0x01: DISPLAY DEBUG MESSAGE
             0x02: DISPLAY DATA MESSAGE
      */
-    #define LOG_MOD 0x02
+    #define LOG_MOD 0x01
 
 
     // C Style
@@ -21,7 +21,7 @@ namespace {
 
 
         int enable = log_mode & LOG_MOD;
-        if (LOG_MOD > 0 && enable == 0)
+        if (enable == 0)
         {
             return;
         }

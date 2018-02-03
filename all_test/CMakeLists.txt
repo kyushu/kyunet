@@ -44,6 +44,10 @@ find_package(OpenCV REQUIRED)
         add_executable(test_convlayer test_convlayer.cpp)
         target_link_libraries(test_convlayer ${OpenCV_LIBS} libkyunet)
 
+        add_executable(sim_conv_backprop sim_conv_backprop.cpp)
+        target_link_libraries(sim_conv_backprop libkyunet)
+
+
 
     else()
         message("OpenCV not found")
