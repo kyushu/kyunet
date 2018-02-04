@@ -28,6 +28,18 @@
 
 namespace mkt {
 
+    Net::~Net(){
+
+        fprintf(stderr, "------------------- net destructor\n");
+        fprintf(stderr, "layers.size(): %ld\n", layers.size());
+        for (int i = layers.size()-1; i >= 0; --i)
+        {
+            fprintf(stderr, "delete %d\n", i);
+            delete(layers.at(i));
+        }
+
+    };
+
     // Configuration Function
     Layer* Net::addInputLayer(std::string id, int batchSize, int h, int w, int c) {
 
