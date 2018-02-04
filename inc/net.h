@@ -45,10 +45,7 @@ namespace mkt {
         //==================================
         Net(): pInputLayer{nullptr}
         {};
-        ~Net(){
-            // delete pInput;
-
-        };
+        ~Net();
         //==================================
 
         // Configuration Function

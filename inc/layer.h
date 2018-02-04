@@ -83,10 +83,26 @@ namespace mkt {
         {};
 
         virtual ~Layer() {
+            fprintf(stderr, "--------------------- Layer Destructor\n");
+
             pSrc_ = nullptr;
+            fprintf(stderr, "--------------------- Layer Destructor pSrc_\n");
+
+            fprintf(stderr, "pDst_.adr: %p\n", pDst_);
+            fprintf(stderr, "pDst_->pData.adr: %p\n", pDst_->pData_);
             delete pDst_;
+            fprintf(stderr, "--------------------- Layer Destructor pDst_\n");
+
+            fprintf(stderr, "pW_.adr: %p\n", pW_);
+            fprintf(stderr, "pW_->pData.adr: %p\n", pW_->pData_);
             delete pW_;
+            fprintf(stderr, "--------------------- Layer Destructor pW_\n");
+
+            fprintf(stderr, "pB_.adr: %p\n", pB_);
+            fprintf(stderr, "pB_->pData.adr: %p\n", pB_->pData_);
             delete pB_;
+            fprintf(stderr, "--------------------- Layer Destructor pB_\n");
+
         };
 
         // TODO: copy constructor

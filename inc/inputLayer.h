@@ -21,7 +21,9 @@ namespace mkt {
 
         };
 
-        ~InputLayer(){};
+        ~InputLayer(){
+            fprintf(stderr, "--------------------- InputLayer Destructor\n");
+        };
 
         // Method
         void initialize();

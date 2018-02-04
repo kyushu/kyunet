@@ -71,7 +71,9 @@ namespace mkt {
             // TODO: Activation
         };
 
-        ~DenseLayer(){};
+        ~DenseLayer(){
+            fprintf(stderr, "--------------------- denseLayer Destructor\n");
+        };
 
         void initialize();
 

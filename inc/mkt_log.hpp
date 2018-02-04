@@ -19,7 +19,6 @@ namespace mkt {
     {
     #ifdef DEBUG_LOG
 
-
         int enable = log_mode & LOG_MOD;
         if (enable == 0)
         {
