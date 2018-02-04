@@ -27,6 +27,39 @@
 
 namespace mkt {
 
+    // Constructor
+    Tensor::Tensor():
+        num_{0},
+        channel_{0},
+        height_{0},
+        width_{0},
+        wrIdx_{0},
+        size2D_{0},
+        size3D_{0},
+        wholeSize_{0},
+        pData_{nullptr}
+    {};
+
+    // Constructor
+    Tensor::Tensor(int batchSize, int height, int width, int ch):
+        num_{batchSize},
+        height_{height},
+        width_{width},
+        channel_{ch}
+    {
+        size2D_ = height_ * width_;
+        size3D_ = size2D_ * channel_;
+        // fprintf(stderr, "tensor construct num_: %d\n", num_);
+        // fprintf(stderr, "tensor construct height_: %d\n", height);
+        // fprintf(stderr, "tensor construct width_: %d\n", width_);
+        // fprintf(stderr, "tensor construct channel_: %d\n", channel_);
+    };
+
+    // Destructor
+    Tensor::~Tensor(){
+        delete[] pData_;
+    };
+
     // Init Tensor: allocate memory space of pData
 
     /*************
@@ -182,7 +215,7 @@ namespace mkt {
     }
 
     /********************************
-    ** Get functions
+    ** Getter
     ********************************/
     const float* Tensor::getData() {
         return pData_;

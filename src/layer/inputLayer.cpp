@@ -5,6 +5,24 @@ namespace mkt {
 
     static int MAX_PIXEL_VALUE = 255;
 
+    // Constructor
+    InputLayer::InputLayer(std::string id, int bSize, int h, int w, int c): Layer(LayerType::Input) {
+        id_ = id;
+        // this->dh_ = h;
+        // this->dw_ = w;
+        // this->dc_ = c;
+        pDst_ = new Tensor{bSize, h, w, c};
+        pW_ = new Tensor(); // empty Tensor
+        pB_ = new Tensor(); // empty Tensor
+
+    };
+
+    // Destructor
+    InputLayer::~InputLayer() {
+        fprintf(stderr, "--------------------- InputLayer Destructor\n");
+    };
+
+
     void InputLayer::initialize() {
         initOutputTensor();
     }

@@ -28,6 +28,10 @@
 
 namespace mkt {
 
+    // constructor
+    Net::Net(): pInputLayer{nullptr} {};
+
+    // Destructor
     Net::~Net(){
 
         fprintf(stderr, "------------------- net destructor\n");
