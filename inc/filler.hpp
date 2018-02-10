@@ -1,5 +1,5 @@
-#ifndef _INITIALIZER_H_
-#define _INITIALIZER_H_
+#ifndef _FILLER_H_
+#define _FILLER_H_
 
 #include <random>
 

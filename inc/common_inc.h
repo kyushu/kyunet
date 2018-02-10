@@ -26,6 +26,7 @@
 // #define NDEBUG // the assert will be disabled, if NDEBUG is defined
 #include <cassert>
 #include <cstdio>
+#include <algorithm>
 #include "mkt_log.hpp"
 
 #endif

@@ -27,10 +27,10 @@
 
 #include "stb_image.h"
 
-#include "layer.h"
-#include "inputLayer.h"
-#include "denseLayer.h"
-#include "convLayer.h"
+#include "layer/layer.h"
+#include "layer/inputLayer.h"
+#include "layer/denseLayer.h"
+#include "layer/convLayer.h"
 
 
 namespace mkt {

@@ -8,8 +8,8 @@
 #include "folder_file_utils.hpp"
 
 #include "tensor.h"
-#include "layer.h"
-#include "inputLayer.h"
+#include "layer/layer.h"
+#include "layer/inputLayer.h"
 #include "net.h"
 
 using namespace mkt;

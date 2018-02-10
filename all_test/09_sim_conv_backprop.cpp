@@ -1,6 +1,6 @@
 
 #include "tensor.h"
-#include "operation.h"
+#include "operators/mat_operators.h"
 
 
 int main(int argc, char const *argv[])

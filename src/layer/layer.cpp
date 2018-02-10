@@ -20,7 +20,7 @@
 * SOFTWARE.
 */
 
-#include "layer.h"
+#include "layer/layer.h"
 
 namespace mkt {
 
@@ -103,13 +103,22 @@ namespace mkt {
                 xavier(*pW_);
                 break;
             }
+            case InitializerType::XAVIER_UNIFORM:
+            {
+
+                Xavier xavier{Distribution::UNIFORM};
+                xavier(*pW_);
+                break;
+            }
             case InitializerType::HE_INIT_NORM:
             {
-                mktLog(1, "TODO: HE_INIT\n");
+                HeInit he{Distribution::NORM};
+                he(*pW_);
                 break;
             }
             default:
-                mktLog(1, "Default: NO Initialize\n");
+                HeInit he{Distribution::UNIFORM};
+                he(*pW_);
                 break;
         }
     }

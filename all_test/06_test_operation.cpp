@@ -2,10 +2,10 @@
 #include <cstdio>
 
 #include "tensor.h"
-#include "layer.h"
-#include "inputLayer.h"
+#include "layer/layer.h"
+#include "layer/inputLayer.h"
 #include "net.h"
-#include "operation.h"
+#include "operators/mat_operators.h"
 
 using namespace mkt;
 
