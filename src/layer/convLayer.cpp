@@ -69,20 +69,21 @@ namespace mkt {
     void ConvLayer::initialize() {
 
         initOutputTensor();
-        initWeightTensor(weightInitType_);
-        initBiasTensor(biasInitType_);
+        initWeightTensor();
+        initBiasTensor();
 
         // temporary memory for im2col and col2im
-        pTmpCol_->initialize(InitializerType::NONE);
+        pTmpCol_->allocate();
 
     }
 
     // Computation Function
     void ConvLayer::forward() {
 
-        float* pSrcData = pSrc_->pData_;
-        float* pDstData = pDst_->pData_;
-        float* pWData = pW_->pData_;
+        float* pSrcData = pSrc_->getData();
+        float* pDstData = pDst_->getData();
+        float* pWData = pW_->getData();
+        float* pTmpColData = pTmpCol_->getData();
 
         int ic = pSrc_->getDepth();
         int iw = pSrc_->getWidth();
@@ -146,7 +147,7 @@ namespace mkt {
                 padding_, padding_,
                 stride_, stride_,
                 dilation_h_, dilation_w_,
-                pTmpCol_->pData_
+                pTmpColData
             );
 
 
@@ -192,7 +193,7 @@ namespace mkt {
                 pW_->getDepth(), pDst_->getSize2D(), pW_->getSize2D()*ic,   /*M,       N, K*/
                 1.0f, 1.0f,                                                     /* ALPHA,   BETA */
                 pWData, pW_->getSize2D()*ic,                               /*A,       lda(K)*/
-                pTmpCol_->pData_,   oh*ow,                                      /*B,       ldb(N)*/
+                pTmpColData,   oh*ow,                                      /*B,       ldb(N)*/
                 pDstData, oh*ow                                            /*C,       ldc(N)*/
             );
         }

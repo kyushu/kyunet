@@ -77,8 +77,8 @@ namespace mkt {
         // Initialize Function
         virtual void initialize()=0;
         void initOutputTensor();
-        void initWeightTensor(InitializerType initType);
-        void initBiasTensor(InitializerType initType);
+        void initWeightTensor();
+        void initBiasTensor();
 
         // Computation Function
         virtual void forward()=0;     // forward pass

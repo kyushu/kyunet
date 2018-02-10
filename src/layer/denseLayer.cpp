@@ -24,7 +24,7 @@ namespace mkt {
         pSrc_ = prevLayer->pDst_;
 
         pDst_ = new Tensor{batchSize, 1, unit, 1};
-        pW_   = new Tensor{size3D, unit, 1, 1};
+        pW_   = new Tensor{size3D, 1, 1, unit};
         pB_   = new Tensor{1, 1, unit, 1};
 
         // TODO: Activation setting
@@ -49,21 +49,21 @@ namespace mkt {
         pSrc_ = prevLayer->pDst_;
 
         pDst_ = new Tensor{batchSize, 1, unit, 1};
-        pW_   = new Tensor{1, size3D, unit, 1};
+        pW_   = new Tensor{size3D, 1, 1, unit};
         pB_   = new Tensor{1, 1, unit, 1};
 
         // TODO: Activation
     }
 
-    // Destructor
+    /* Destructor */
     DenseLayer::~DenseLayer(){
         fprintf(stderr, "--------------------- denseLayer Destructor\n");
     }
 
     void DenseLayer::initialize() {
         initOutputTensor();
-        initWeightTensor(weightInitType_);
-        initBiasTensor(biasInitType_);
+        initWeightTensor();
+        initBiasTensor();
 
     }
 
@@ -72,16 +72,37 @@ namespace mkt {
         fprintf(stderr, "TODO: DenseLayer forward not yet finished\n");
         fprintf(stderr, "##########################################\n");
 
+        float* pSrcData = pSrc_->getData();
+        float* pDstData = pDst_->getData();
+        float* pWData = pW_->getData();
+
+        int batchSize = pSrc_->getNumOfData();
+        int srcSize3D = pSrc_->getSize3D();
+        int dstSize3D = pDst_->getSize3D();
+
+
         // 1. Rest data
         pDst_->cleanData();
 
-        // 2. Z = X * Weight
+        /****************************************************************
+            2. Z =      X         x      Weight
+                                          (N)
+                                       (oh*ow*oc)
+                       (K)          |w0 , ..., w15|
+                    (ih*iw*ic)      |w16, ..., w23|
+         (M)     | x0, ...,  x8|    |w24, ..., w31|   |z0 , ..., z15|
+    (batch_size) | x9, ..., x16|  x |w32, ..., w39| = |z16, ..., z31|
+                 |x17, ..., x24|    |w40, ..., w47|   |z32, ..., z47|
+                                    |w48, ..., w55|
+                                    |w56, ..., w63|
+                                    |w64, ..., w71|
+        ****************************************************************/
         gemm_cpu(0, 0,                                           /*trans_A, trans_B*/
-            pDst_->num_, pDst_->size3D_, pSrc_->size3D_,  /*M,       N,K*/
+            batchSize, dstSize3D, srcSize3D,  /*M, N, K*/
             1.0f, 1.0f,                                         /*ALPHA,   BETA*/
-            pSrc_->pData_, pSrc_->size3D_,                      /*A,       lda(K)*/
-            pW_->pData_,   pDst_->size3D_,                      /*B,       ldb(N)*/
-            pDst_->pData_, pDst_->size3D_);                     /*C,       ldc(N)*/
+            pSrcData, srcSize3D,                      /*A,       lda(K)*/
+            pWData,   dstSize3D,                      /*B,       ldb(N)*/
+            pDstData, dstSize3D);                     /*C,       ldc(N)*/
 
 
         // 3. Z + bias

@@ -44,25 +44,25 @@ namespace mkt {
     {};
 
     Layer::~Layer() {
-        fprintf(stderr, "--------------------- Layer Destructor\n");
+        mktLog(1, "--------------------- Layer Destructor\n");
 
         pSrc_ = nullptr;
-        fprintf(stderr, "--------------------- Layer Destructor pSrc_\n");
+        mktLog(1, "--------------------- Layer Destructor pSrc_\n");
 
-        fprintf(stderr, "pDst_.adr: %p\n", pDst_);
-        fprintf(stderr, "pDst_->pData.adr: %p\n", pDst_->pData_);
+        mktLog(1, "pDst_.adr: %p\n", pDst_);
+        mktLog(1, "pDst_->pData.adr: %p\n", pDst_->getData());
         delete pDst_;
-        fprintf(stderr, "--------------------- Layer Destructor pDst_\n");
+        mktLog(1, "--------------------- Layer Destructor pDst_\n");
 
-        fprintf(stderr, "pW_.adr: %p\n", pW_);
-        fprintf(stderr, "pW_->pData.adr: %p\n", pW_->pData_);
+        mktLog(1, "pW_.adr: %p\n", pW_);
+        mktLog(1, "pW_->pData.adr: %p\n", pW_->getData());
         delete pW_;
-        fprintf(stderr, "--------------------- Layer Destructor pW_\n");
+        mktLog(1, "--------------------- Layer Destructor pW_\n");
 
-        fprintf(stderr, "pB_.adr: %p\n", pB_);
-        fprintf(stderr, "pB_->pData.adr: %p\n", pB_->pData_);
+        mktLog(1, "pB_.adr: %p\n", pB_);
+        mktLog(1, "pB_->pData.adr: %p\n", pB_->getData());
         delete pB_;
-        fprintf(stderr, "--------------------- Layer Destructor pB_\n");
+        mktLog(1, "--------------------- Layer Destructor pB_\n");
 
     };
 
@@ -70,13 +70,50 @@ namespace mkt {
     // ##################################
     // Init Function
     void Layer::initOutputTensor() {
-        pDst_->initialize(InitializerType::NONE);
+        pDst_->allocate();
     }
-    void Layer::initWeightTensor(InitializerType initType) {
-        pW_->initialize(initType);
+    void Layer::initWeightTensor() {
+
+        pW_->allocate();
+        int weight_wholeSize = pW_->getWholeSize();
+        float* pWData = pW_->getData();
+        switch (weightInitType_) {
+            case InitializerType::ZERO:
+            {
+                std::fill_n(pWData, weight_wholeSize, 0);
+                break;
+            }
+            case InitializerType::ONE:
+            {
+                std::fill_n(pWData, weight_wholeSize, 1);
+                break;
+            }
+            case InitializerType::TEST:
+            {
+                for (int i = 0; i < weight_wholeSize; ++i)
+                {
+                    pWData[i] = i;
+                }
+                break;
+            }
+            case InitializerType::XAVIER_NORM:
+            {
+                mktLog(1, "TODO: XAVIER_NORM\n");
+                break;
+            }
+            case InitializerType::HE_INIT_NORM:
+            {
+                mktLog(1, "TODO: HE_INIT\n");
+                break;
+            }
+            default:
+                mktLog(1, "Default: NO Initialize\n");
+                break;
+        }
     }
-    void Layer::initBiasTensor(InitializerType initType) {
-        pB_-> initialize(initType);
+    void Layer::initBiasTensor() {
+        pB_-> allocate();
+
     }
 
     // ##################################
@@ -84,7 +121,7 @@ namespace mkt {
         for (int i = 0; i < pDst_->getNumOfData(); ++i)
         {
             int numData = i * pDst_->getSize3D();
-            axpy(pDst_->getSize3D(), 1.0, pB_->pData_, pDst_->pData_+numData);
+            axpy(pDst_->getSize3D(), 1.0, pB_->getData(), pDst_->getData()+numData);
         }
     }
 
@@ -93,31 +130,31 @@ namespace mkt {
         switch (activationType_) {
             case ActivationType::Sigmoid:
             {
-                fprintf(stderr, "TODO: Sigmoid\n");
+                mktLog(1, "TODO: Sigmoid\n");
                 break;
             }
             case ActivationType::Tanh:
             {
-                fprintf(stderr, "TODO: Tanh\n");
+                mktLog(1, "TODO: Tanh\n");
                 break;
             }
             case ActivationType::Relu:
             {
-                fprintf(stderr, "TODO: Relu\n");
+                mktLog(1, "TODO: Relu\n");
                 break;
             }
             case ActivationType::LRelu:
             {
-                fprintf(stderr, "TODO: LRelu\n");
+                mktLog(1, "TODO: LRelu\n");
                 break;
             }
             case ActivationType::Selu:
             {
-                fprintf(stderr, "TODO: Selu\n");
+                mktLog(1, "TODO: Selu\n");
                 break;
             }
             default:
-                fprintf(stderr, "Default: No Activation is applied\n");
+                mktLog(1, "Default: No Activation is applied\n");
                 break;
         }
 

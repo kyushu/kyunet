@@ -34,7 +34,7 @@
 namespace mkt {
     class Tensor
     {
-    public:
+    private:
         int num_; // batch size
         int channel_; // channel / depth
         int height_; // height
@@ -43,9 +43,10 @@ namespace mkt {
         int size2D_;
         int size3D_;
         int wholeSize_;
+        float *pData_;   // data
     public:
         int wrIdx_;
-        float *pData_;   // data
+
 
 
     public:
@@ -62,7 +63,7 @@ namespace mkt {
 
         // Initialize Function
         // void initialize(int batchSize, int h, int w, int c);
-        void initialize(InitializerType init_type);
+        void allocate();
 
         // Add Data Function
         OP_STATUS addData(char const *filename);
@@ -73,7 +74,7 @@ namespace mkt {
         void cleanData();
 
         // Getter
-        const float* getData();
+        float* getData();
         int getNumOfData();
         int getDepth();
         int getWidth();

@@ -65,7 +65,7 @@ namespace mkt {
     /*************
      * Initialize
      *************/
-    void Tensor::initialize(InitializerType init_type) {
+    void Tensor::allocate() {
 
         // fprintf(stderr, "init_type: %d\n", init_type);
 
@@ -78,45 +78,6 @@ namespace mkt {
         }
 
         pData_ = new float[wholeSize_];
-
-        switch (init_type) {
-            case InitializerType::ZERO:
-            {
-                std::fill_n(pData_, wholeSize_, 0);
-                break;
-            }
-            case InitializerType::ONE:
-            {
-                std::fill_n(pData_, wholeSize_, 1);
-                break;
-            }
-            case InitializerType::TEST:
-            {
-                for (int i = 0; i < wholeSize_; ++i)
-                {
-                    pData_[i] = i;
-                }
-                break;
-            }
-            case InitializerType::RANDOM:
-            {
-                fprintf(stderr, "TODO: RANDOM\n");
-                break;
-            }
-            case InitializerType::XAVIER:
-            {
-                fprintf(stderr, "TODO: XAVIER\n");
-                break;
-            }
-            case InitializerType::HE_INIT:
-            {
-                fprintf(stderr, "TODO: HE_INIT\n");
-                break;
-            }
-            default:
-                fprintf(stderr, "Default: NO Initialize\n");
-                break;
-        }
 
     }
 
@@ -217,7 +178,7 @@ namespace mkt {
     /********************************
     ** Getter
     ********************************/
-    const float* Tensor::getData() {
+    float* Tensor::getData() {
         return pData_;
     }
 

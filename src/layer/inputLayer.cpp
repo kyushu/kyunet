@@ -61,7 +61,7 @@ namespace mkt {
 
             int size2D = pDst_->getSize2D();
             int size3D = pDst_->getSize3D();
-            float* ptr = pDst_->pData_ + pDst_->wrIdx_ * size3D;
+            float* ptr = pDst_->getData() + pDst_->wrIdx_ * size3D;
             // fprintf(stdout, "size2D: %d\n", size2D);
             for (int i = 0; i < size3D; i+=depth)
             {
@@ -78,6 +78,7 @@ namespace mkt {
         }
     }
 
+    // For Debug
     void InputLayer::DeFlattenImage(const float* pData, int height, int width, int channel, unsigned char *pImg) {
 
 
@@ -90,7 +91,9 @@ namespace mkt {
             // float maxValue = 255;
             for (int m = 0; m < channel; ++m)
             {
-                int pixel = int(pData[idx + size2D*m] * MAX_PIXEL_VALUE);
+                // int pixel = int(pData[idx + size2D*m] * MAX_PIXEL_VALUE);
+                int pixel = int((pData[idx + size2D*m]/2.0f -0.5) * MAX_PIXEL_VALUE);
+
                  pImg[i+m] = (unsigned char)pixel;
                  // fprintf(stdout, "%d\n", i+m);
             }

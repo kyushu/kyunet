@@ -40,10 +40,17 @@ namespace mkt {
         ONE,
         TEST, /*TEST*/
         ZERO,
-        RANDOM,
-        XAVIER,
-        HE_INIT
+        XAVIER_NORM,
+        XAVIER_UNIFORM,
+        HE_INIT_NORM,
+        HE_INIT_UNIFORM
 
+    };
+
+    enum class Distribution: int
+    {
+        UNIFORM=0,
+        NORM
     };
 
 
