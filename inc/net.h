@@ -28,9 +28,9 @@
 #include "stb_image.h"
 
 #include "layer/layer.h"
-#include "layer/inputLayer.h"
-#include "layer/denseLayer.h"
-#include "layer/convLayer.h"
+#include "layer/input_layer.h"
+#include "layer/dense_layer.h"
+#include "layer/conv_layer.h"
 
 
 namespace mkt {

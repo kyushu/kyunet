@@ -1,4 +1,4 @@
-#include "layer/denseLayer.h"
+#include "layer/dense_layer.h"
 
 namespace mkt {
 

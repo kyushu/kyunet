@@ -3,7 +3,7 @@
 
 #include "tensor.h"
 #include "layer/layer.h"
-#include "layer/inputLayer.h"
+#include "layer/input_layer.h"
 #include "net.h"
 #include "operators/mat_operators.h"
 

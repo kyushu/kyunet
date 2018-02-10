@@ -1,4 +1,4 @@
-#include "layer/convLayer.h"
+#include "layer/conv_layer.h"
 
 namespace mkt {
 

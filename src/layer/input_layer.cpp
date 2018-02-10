@@ -1,5 +1,5 @@
 
-#include "layer/inputLayer.h"
+#include "layer/input_layer.h"
 
 namespace mkt {
 
