@@ -98,7 +98,9 @@ namespace mkt {
             }
             case InitializerType::XAVIER_NORM:
             {
-                mktLog(1, "TODO: XAVIER_NORM\n");
+
+                Xavier xavier{Distribution::NORM};
+                xavier(*pW_);
                 break;
             }
             case InitializerType::HE_INIT_NORM:

@@ -28,6 +28,7 @@
 
 #include "operation.h"
 #include "tensor.h"
+#include "filler.hpp"
 
 namespace mkt {
 

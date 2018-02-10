@@ -1,4 +1,4 @@
-#include "filler.h"
+#include "filler.hpp"
 #include "tensor.h"
 
 using namespace mkt;
@@ -9,9 +9,9 @@ int main(int argc, char const *argv[])
     mkt::Tensor tensor{1, 100, 100, 1};
     tensor.allocate();
     Xavier xavier{Distribution::UNIFORM};
-    // Xavier xavier{};
     xavier(tensor);
 
+    // Debug Display
     float* pData = tensor.getData();
     float sum = 0;
     for (int i = 0; i < tensor.getWholeSize(); ++i)
