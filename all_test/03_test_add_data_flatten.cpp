@@ -99,15 +99,18 @@ void test_flatten_image() {
     fprintf(stderr, "size3D: %d\n", size3D);
 
     // Add data
-    pInput->FlattenImageToTensor(s1, true);
-    pInput->FlattenImageToTensor(s2, true);
-    pInput->FlattenImageToTensor(s3, true);
+    pInput->FlattenImageToTensor(s1, false);
+    pInput->FlattenImageToTensor(s2, false);
+    pInput->FlattenImageToTensor(s3, false);
 
     // Verify data
     int wholeSize = pInput->pDst_->getWholeSize();
+    float* pIn_dstData = pInput->pDst_->getData();
+    // int scale = 255;
+    int scale = 1;
     for (int i = 0; i < wholeSize; ++i)
     {
-        printf("%d - %f\n", i, pInput->pDst_->pData_[i] * 255);
+        printf("%d - %f\n", i, pIn_dstData[i] * scale);
     }
 
 }
@@ -204,9 +207,33 @@ void test_add_batch_image() {
 int main(int argc, char const *argv[])
 {
 
-
+    std::string strProg = argv[0];
+    if (argc != 2)
+    {
+        printf("%s [option]\n", strProg.c_str());
+        printf("[option]: \n");
+        printf("0 = test_flatten_image\n");
+        printf("1 = test_add_batch_image\n");
+        return -1;
+    }
+    std::string strOpt = argv[1];
+    int option = 0;
+    if (has_only_digits(strOpt))
+    {
+        option = std::stoi(strOpt);
+    }
+    switch (option) {
+        case 0:
+            test_flatten_image();
+            break;
+        case 1:
+            test_add_batch_image();
+            break;
+        default:
+            printf("no option for this\n");
+    }
     // test_add_batch_image();
-    test_flatten_image();
+    // test_flatten_image();
 
 
     return 0;

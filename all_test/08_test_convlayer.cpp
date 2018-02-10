@@ -25,6 +25,7 @@ int main(int argc, char const *argv[])
     int channel = 3;
 
     Net net;
+    // Add Input Lauer
     InputLayer* pInputLyaer = (InputLayer *)net.addInputLayer("input", batchSize, height, width, channel);
 
     // Add ConvLayer
@@ -38,21 +39,23 @@ int main(int argc, char const *argv[])
 
     // Set pseudo data
     Tensor* pInputTensor = pInputLyaer->pDst_;
+    float* pInDstData = pInputTensor->getData();
     for (int i = 0; i < pInputTensor->getWholeSize(); ++i)
     {
-        pInputTensor->pData_[i] = i;
+        pInDstData[i] = i;
     }
 
     pConvLayer->forward();
 
     Tensor *pDst = pConvLayer->pDst_;
+    float* pDstData = pDst->getData();
     for (int i = 0; i < pDst->getWholeSize(); ++i)
     {
          if (i > 0 && i%pDst->getSize2D()==0)
         {
             mktLog(2, "\n");
         }
-        mktLog(2, "%f ", pDst->pData_[i]);
+        mktLog(2, "%f ", pDstData[i]);
     }
     mktLog(2, "\n");
 

@@ -10,13 +10,14 @@ int main(int argc, char const *argv[])
     //#############################
     // src tensor
     mkt::Tensor image(1, 4, 4, 3);
-    image.initialize(mkt::InitializerType::NONE);
+    image.allocate();
+    float* pImgData = image.getData();
     int ih = image.getHeight();
     int iw = image.getWidth();
     int ic = image.getDepth();
     mktLog(2, "src data\n");
     for (int i = 0; i < image.getSize3D(); ++i) {
-        image.pData_[i] = i;
+        pImgData[i] = i;
     }
 
     for (int i = 0; i < image.getSize2D(); ++i)
@@ -25,7 +26,7 @@ int main(int argc, char const *argv[])
         {
             mktLog(2, "\n");
         }
-        mktLog(2, "%.1f ", image.pData_[i]);
+        mktLog(2, "%.1f ", pImgData[i]);
     }
 
     mktLog(2, "\n");
@@ -36,7 +37,7 @@ int main(int argc, char const *argv[])
         {
             mktLog(2, "\n");
         }
-        mktLog(2, "%.1f ", image.pData_[i]);
+        mktLog(2, "%.1f ", pImgData[i]);
     }
     mktLog(2, "\n");
     for (int i = 2* image.getSize2D(); i < 3 * image.getSize2D(); ++i)
@@ -45,7 +46,7 @@ int main(int argc, char const *argv[])
         {
             mktLog(2, "\n");
         }
-        mktLog(2, "%.1f ", image.pData_[i]);
+        mktLog(2, "%.1f ", pImgData[i]);
     }
     mktLog(2, "\n");
 
@@ -53,13 +54,14 @@ int main(int argc, char const *argv[])
     //#############################
     // kernel tensor
     mkt::Tensor filter(2, 3, 3, 3);
-    filter.initialize(mkt::InitializerType::NONE);
+    filter.allocate();
+    float* pFilterData = filter.getData();
     int fh = filter.getHeight();
     int fw = filter.getWidth();
     int fc = filter.getDepth();
     for (int i = 0; i < filter.getWholeSize(); ++i)
     {
-        filter.pData_[i] = 1;
+        pFilterData[i] = 1;
     }
     mktLog(2, "filter\n");
     for (int i = 0; i < filter.getWholeSize(); ++i)
@@ -68,7 +70,7 @@ int main(int argc, char const *argv[])
         {
             mktLog(2, "\n");
         }
-        mktLog(2, "%.1f ", filter.pData_[i]);
+        mktLog(2, "%.1f ", pFilterData[i]);
     }
     mktLog(2, "\n");
 
@@ -82,7 +84,8 @@ int main(int argc, char const *argv[])
     int oc = 2;
 
     mkt::Tensor dst(1, oh, ow, oc);
-    dst.initialize(mkt::InitializerType::NONE);
+    dst.allocate();
+    float* pDstData = dst.getData();
 
 
     //#############################
@@ -92,20 +95,21 @@ int main(int argc, char const *argv[])
     mktLog(2, "dst.size2D: %d\n", dst.getSize2D());
 
     mkt::Tensor tempCol(1, filter.getSize2D()*ic, dst.getSize2D(), oc);
-    tempCol.initialize(mkt::InitializerType::NONE);
+    tempCol.allocate();
+    float* pTmpColData = tempCol.getData();
     mktLog(2, "tempCol.getSize2D(): %d\n", tempCol.getSize2D());
 
     mktLog(2, "b4 im2col\n");
 
     //#############################
     // im2col
-    mkt::im2col_cpu(image.pData_,
+    mkt::im2col_cpu(pImgData,
         image.getDepth(), image.getHeight(), image.getWidth(),
         filter.getHeight(), filter.getWidth(),
         padding, padding,
         stride, stride,
         dilation, dilation,
-        tempCol.pData_);
+        pTmpColData);
 
     /****************
         DISPLAY DATA
@@ -148,9 +152,9 @@ int main(int argc, char const *argv[])
     mkt::gemm_cpu(0, 0,                                                     /*trans_A, trans_B*/
             filter.getNumOfData(), dst.getSize2D(), filter.getSize2D()*ic,  /*M,       N,K*/
             1.0f, 1.0f,                                                     /*ALPHA,   BETA*/
-            filter.pData_, filter.getSize2D()*ic,                           /*A,       lda(K)*/
-            tempCol.pData_,   oh*ow,                                        /*B,       ldb(N)*/
-            dst.pData_, oh*ow                                               /*C,       ldc(N)*/
+            pFilterData, filter.getSize2D()*ic,                           /*A,       lda(K)*/
+            pTmpColData,   oh*ow,                                        /*B,       ldb(N)*/
+            pDstData, oh*ow                                               /*C,       ldc(N)*/
     );
 
     for (int i = 0; i < dst.getSize3D(); ++i)
@@ -159,7 +163,7 @@ int main(int argc, char const *argv[])
         {
             mktLog(2, "\n");
         }
-        mktLog(2, "%f ", dst.pData_[i]);
+        mktLog(2, "%f ", pDstData[i]);
     }
 
     mktLog(2, "\n");

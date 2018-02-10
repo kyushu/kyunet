@@ -13,18 +13,21 @@ int main(int argc, char const *argv[])
 
     // set src differential tensor
     mkt::Tensor src_grad(batch_size, ih, iw, ic);
-    src_grad.initialize(mkt::InitializerType::ONE);
+    src_grad.allocate();
+    float* pSrcGradData = src_grad.getData();
 
     // Set weight tensor
     int fh = 2;
     int fw = 2;
     int oc = 1;
     mkt::Tensor weight(ic, 2, 2, oc);
-    weight.initialize(mkt::InitializerType::ONE);
+    weight.allocate();
+    float* pWData = weight.getData();
 
     // Set dst differential tensor
     mkt::Tensor dst_grad(batch_size, 2, 2, oc);
-    dst_grad.initialize(mkt::InitializerType::ONE);
+    dst_grad.allocate();
+    float* pDstGradData = dst_grad.getData();
 
 
     int m = 1; // num of filter
@@ -35,7 +38,8 @@ int main(int argc, char const *argv[])
 
     // Set temporary tensor for storing Col2Im matrix
     mkt::Tensor temp(batch_size, n, k, oc);
-    temp.initialize(mkt::InitializerType::ONE);
+    temp.allocate();
+    float* ptmpData = temp.getData();
 
     // backpropagation from dst.grad_data to src.grad_data
     // Step 1. dst_grad X weight
@@ -81,9 +85,9 @@ int main(int argc, char const *argv[])
         1, 0,
         n, k, m,
         1.0f, 0,
-        weight.pData_, n,
-        dst_grad.pData_, k,
-        temp.pData_, k
+        pWData, n,
+        pDstGradData, k,
+        ptmpData, k
     );
 
     // Step 2. Col2Im: perform like De-convolution and update to src_grad.pData
@@ -95,12 +99,12 @@ int main(int argc, char const *argv[])
     int dilation_h = 1;
     int dilation_w = 1;
 
-    mkt::col2im_cpu(temp.pData_,
+    mkt::col2im_cpu(ptmpData,
         ic, ih, iw, fh, fw,
          pad_h, pad_w,
         stride_h, stride_w,
         dilation_h, dilation_w,
-        src_grad.pData_);
+        pSrcGradData);
 
 
 

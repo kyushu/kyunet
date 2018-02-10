@@ -62,7 +62,7 @@ void test_load_image_file(std::string img_dir) {
     // tensor.height_ = 480;
     // tensor.width_ = 600;
     // tensor.channel_ = 3;
-    tensor.initialize(InitializerType::NONE);
+    tensor.allocate();
     printf("batch size: %d\n", tensor.getNumOfData());
     printf("width: %d\n", tensor.getWidth());
     printf("height: %d\n", tensor.getHeight());

@@ -77,7 +77,7 @@ int main(int argc, char const *argv[])
         case InitializerType::TEST:
             fprintf(stderr, "TEST\n");
             break;
-        case InitializerType::XAVIER:
+        case InitializerType::XAVIER_NORM:
             fprintf(stderr, "XAVIER\n");
             break;
         default:
@@ -96,7 +96,7 @@ int main(int argc, char const *argv[])
         case InitializerType::TEST:
             fprintf(stderr, "TEST\n");
             break;
-        case InitializerType::XAVIER:
+        case InitializerType::XAVIER_NORM:
             fprintf(stderr, "XAVIER\n");
             break;
         default:
@@ -135,7 +135,8 @@ int main(int argc, char const *argv[])
         {
             fprintf(stderr, "\n");
         }
-        fprintf(stderr, "%.1f ", pDenseLayer->pSrc_->pData_[i]);
+        float* pSrcData = pDenseLayer->pSrc_->getData();
+        fprintf(stderr, "%.1f ", pSrcData[i]);
     }
 
     fprintf(stderr, "\n\n");
@@ -146,7 +147,8 @@ int main(int argc, char const *argv[])
         {
             fprintf(stderr, "\n");
         }
-        fprintf(stderr, "%.1f ", pDenseLayer->pW_->pData_[i]);
+        float* pWData = pDenseLayer->pW_->getData();
+        fprintf(stderr, "%.1f ", pWData[i]);
     }
     fprintf(stderr, "\n\n");
     fprintf(stderr, "Bias of Dense Layer\n");
@@ -156,7 +158,8 @@ int main(int argc, char const *argv[])
         {
             fprintf(stderr, "\n");
         }
-        fprintf(stderr, "%.1f ", pDenseLayer->pB_->pData_[i]);
+        float* pBData = pDenseLayer->pB_->getData();
+        fprintf(stderr, "%.1f ", pBData[i]);
     }
     fprintf(stderr, "\n\n");
 
@@ -164,13 +167,14 @@ int main(int argc, char const *argv[])
     pDenseLayer->forward();
     fprintf(stderr, "Dense Layer Forward Result: \n");
     int denseLayer_output_size = pDenseLayer->pDst_->getSize3D();
-    for (int i = 0; i < pDenseLayer->pDst_->wholeSize_; ++i)
+    for (int i = 0; i < pDenseLayer->pDst_->getWholeSize(); ++i)
     {
         if (i > 0 && (i % denseLayer_output_size == 0))
         {
             fprintf(stderr, "\n");
         }
-        fprintf(stderr, "%.1f\t", pDenseLayer->pDst_->pData_[i]);
+        float* pDstData = pDenseLayer->pDst_->getData();
+        fprintf(stderr, "%.1f\t", pDstData[i]);
     }
     fprintf(stderr, "\n\n");
 
