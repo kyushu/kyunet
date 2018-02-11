@@ -54,7 +54,8 @@ namespace mkt {
 
         pTmpCol_ = new Tensor{1, pW_->getSize2D()*ic, pDst_->getSize2D(), oc_};
 
-        // TODO: Activation setting
+        // Activator
+        applyActivator();
     }
 
     // Destructor
@@ -104,6 +105,7 @@ namespace mkt {
         fprintf(stderr, "dst_wholeSize: %d\n", dst_wholeSize);
         fprintf(stderr, "filter_wholeSize: %d\n", filter_wholeSize);
 
+        // 1. Z = Conv(X)
         for (int i = 0; i < batchSize; ++i)
         {
 
@@ -196,6 +198,16 @@ namespace mkt {
                 pTmpColData,   oh*ow,                                      /*B,       ldb(N)*/
                 pDstData, oh*ow                                            /*C,       ldc(N)*/
             );
+        }
+
+
+        // 2. Z + bias
+        addBias();
+
+        // 3. A = next layer input = activation(Z)
+        if (activationType_ != ActivationType::NONE)
+        {
+            pActivator_->forward(*pDst_, *pDst_);
         }
 
     }

@@ -40,7 +40,7 @@ int main(int argc, char const *argv[])
 
     InitializerType weightInitType = InitializerType::TEST;
     InitializerType biasInitType = InitializerType::ZERO;
-    Layer* pDenseLayer = net.addDenseLayer(pInputLyaer, "Layer1", 4, ActivationType::NONE, weightInitType, biasInitType);
+    Layer* pDenseLayer = net.addDenseLayer(pInputLyaer, "Layer1", 4, ActivationType::Relu, weightInitType, biasInitType);
     net.initialize();
 
     // Get InputLayer
@@ -105,7 +105,8 @@ int main(int argc, char const *argv[])
     }
 
     fprintf(stderr, "Dense Layer activation type: \n");
-    switch (pDenseLayer->getActivationType()) {
+    ActivationType actType = pDenseLayer->getActivationType();
+    switch (actType) {
         case ActivationType::NONE:
             fprintf(stderr, "NONE\n");
             break;
@@ -114,6 +115,9 @@ int main(int argc, char const *argv[])
             break;
         case ActivationType::Tanh:
             fprintf(stderr, "Tanh\n");
+            break;
+        case ActivationType::Relu:
+            fprintf(stderr, "Relu\n");
             break;
         default:
             fprintf(stderr, "Default !!!\n");

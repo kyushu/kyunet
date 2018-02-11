@@ -27,7 +27,8 @@ namespace mkt {
         pW_   = new Tensor{size3D, 1, 1, unit};
         pB_   = new Tensor{1, 1, unit, 1};
 
-        // TODO: Activation setting
+        // Activator
+        applyActivator();
     }
 
     // Constructor without ID
@@ -52,7 +53,8 @@ namespace mkt {
         pW_   = new Tensor{size3D, 1, 1, unit};
         pB_   = new Tensor{1, 1, unit, 1};
 
-        // TODO: Activation
+        // Activator
+        applyActivator();
     }
 
     /* Destructor */
@@ -109,7 +111,10 @@ namespace mkt {
         addBias();
 
         // 4. A = next layer input = activation(Z)
-        applyActivation(); // decided by activationType
+        if (activationType_ != ActivationType::NONE)
+        {
+            pActivator_->forward(*pDst_, *pDst_);
+        }
 
     }
 

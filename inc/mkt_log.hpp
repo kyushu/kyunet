@@ -11,7 +11,7 @@ namespace mkt {
             0x01: DISPLAY DEBUG MESSAGE
             0x02: DISPLAY DATA MESSAGE
      */
-    #define LOG_MOD 0x02
+    #define LOG_MOD 0x01
 
 
     // C Style

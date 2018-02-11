@@ -29,6 +29,10 @@
 #include "operators/mat_operators.h"
 #include "tensor.h"
 #include "filler.hpp"
+#include "activator/activator.h"
+#include "activator/relu_act.h"
+#include "activator/sigmoid_act.h"
+
 
 namespace mkt {
 
@@ -41,12 +45,14 @@ namespace mkt {
         InitializerType biasInitType_;
         ActivationType activationType_;
 
+
     public:
         std::string id_;
         Tensor *pSrc_;    // point to dst_tensor of previous layer
         Tensor *pDst_;    // new a destination tensor
         Tensor *pW_;      // new a weight tensor
         Tensor* pB_;      // new a bias tensor
+        Activator* pActivator_;
 
         int batchSize_;
 
@@ -85,7 +91,7 @@ namespace mkt {
         virtual void forward()=0;     // forward pass
         virtual void backward()=0;    // back propagation
         void addBias();
-        void applyActivation();
+        void applyActivator();
 
         // Getter function
         LayerType getType();

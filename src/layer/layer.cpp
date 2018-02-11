@@ -67,6 +67,11 @@ namespace mkt {
         delete pB_;
         mktLog(1, "--------------------- Layer Destructor pB_\n");
 
+        if (pActivator_)
+        {
+            delete pActivator_;
+        }
+        mktLog(1, "--------------------- Layer Destructor pActivator_\n");
     };
 
 
@@ -83,19 +88,19 @@ namespace mkt {
         switch (weightInitType_) {
             case InitializerType::ZERO:
             {
-                std::fill_n(pWData, weight_wholeSize, 0);
+                std::fill_n(pWData, weight_wholeSize, 0.0f);
                 break;
             }
             case InitializerType::ONE:
             {
-                std::fill_n(pWData, weight_wholeSize, 1);
+                std::fill_n(pWData, weight_wholeSize, 1.0f);
                 break;
             }
             case InitializerType::TEST:
             {
                 for (int i = 0; i < weight_wholeSize; ++i)
                 {
-                    pWData[i] = i;
+                    pWData[i] = float(i);
                 }
                 break;
             }
@@ -139,39 +144,21 @@ namespace mkt {
         }
     }
 
-    void Layer::applyActivation() {
-
+    void Layer::applyActivator() {
+        fprintf(stderr, "apply activator\n");
         switch (activationType_) {
-            case ActivationType::Sigmoid:
-            {
-                mktLog(1, "TODO: Sigmoid\n");
-                break;
-            }
-            case ActivationType::Tanh:
-            {
-                mktLog(1, "TODO: Tanh\n");
-                break;
-            }
             case ActivationType::Relu:
-            {
-                mktLog(1, "TODO: Relu\n");
+            fprintf(stderr, "relu\n");
+                pActivator_ = new Relu_Act{};
                 break;
-            }
-            case ActivationType::LRelu:
-            {
-                mktLog(1, "TODO: LRelu\n");
+            case ActivationType::Sigmoid:
+                fprintf(stderr, "sigmoid\n");
+                pActivator_ = new Sigmoid_Act{};
                 break;
-            }
-            case ActivationType::Selu:
-            {
-                mktLog(1, "TODO: Selu\n");
-                break;
-            }
             default:
-                mktLog(1, "Default: No Activation is applied\n");
+                fprintf(stderr, "no activator\n");
                 break;
         }
-
     }
 
     //##################################

@@ -10,7 +10,7 @@ namespace mkt {
 
 
 
-    class Sigmoid_Act: Activation
+    class Sigmoid_Act: public Activator
     {
     private:
         float negative_slope_;

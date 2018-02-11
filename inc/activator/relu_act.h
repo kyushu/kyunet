@@ -6,7 +6,7 @@
 
 namespace mkt {
 
-    class Relu_Act: Activation
+    class Relu_Act: public Activator
     {
     private:
         float negative_slope_;
