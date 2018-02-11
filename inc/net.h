@@ -31,6 +31,8 @@
 #include "layer/input_layer.h"
 #include "layer/dense_layer.h"
 #include "layer/conv_layer.h"
+#include "layer/relu_layer.h"
+#include "layer/sigmoid_layer.h"
 
 
 namespace mkt {
@@ -38,8 +40,8 @@ namespace mkt {
     class Net
     {
     private:
-        std::vector<Layer* > layers;
-        InputLayer* pInputLayer;
+        std::vector<Layer* > layers_;
+        InputLayer* pInputLayer_;
 
     public:
         //==================================
@@ -51,6 +53,8 @@ namespace mkt {
         Layer* addInputLayer(std::string id, int batchSize, int h, int w, int c);
         Layer* addDenseLayer(Layer* prevLayer, std::string id, int unit, ActivationType activationType, InitializerType weightInitType, InitializerType biasInitType);
         Layer* addConvLayer(Layer* prevLayer, std::string id, int nfilter, int kernelSize, int stride, int padding, PaddingType paddingType, ActivationType activationType, InitializerType weightInitType, InitializerType biasInitType);
+        Layer* addReluLayer(Layer* prevLayer, std::string id);
+        Layer* addSigmoidLayer(Layer* prevLayer, std::string id);
 
         // Initialize Function
         void initialize();

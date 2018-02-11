@@ -1,5 +1,5 @@
-#ifndef _CONVLAYER_H_
-#define _CONVLAYER_H_
+#ifndef _CONV_LAYER_H_
+#define _CONV_LAYER_H_
 
 #include "layer.h"
 #include <math.h>

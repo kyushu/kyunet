@@ -69,7 +69,8 @@ namespace mkt {
     {
         Input = 0,
         FullConnected,
-        Convolution
+        Convolution,
+        Relu
     };
 
     /*

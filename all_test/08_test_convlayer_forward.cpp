@@ -26,19 +26,19 @@ int main(int argc, char const *argv[])
 
     Net net;
     // Add Input Lauer
-    InputLayer* pInputLyaer = (InputLayer *)net.addInputLayer("input", batchSize, height, width, channel);
+    InputLayer* pInputLayer = (InputLayer *)net.addInputLayer("input", batchSize, height, width, channel);
 
     // Add ConvLayer
     InitializerType weightInitType = InitializerType::ONE;
     InitializerType biasInitType = InitializerType::ONE;
-    Layer* pConvLayer = net.addConvLayer(pInputLyaer, "conv_1", 2, 3, 1, 0, PaddingType::valid, ActivationType::NONE, weightInitType, biasInitType);
+    Layer* pConvLayer = net.addConvLayer(pInputLayer, "conv_1", 2, 3, 1, 0, PaddingType::valid, ActivationType::NONE, weightInitType, biasInitType);
 
 
     // Net Initialization: memory allocation
     net.initialize();
 
     // Set pseudo data
-    Tensor* pInputTensor = pInputLyaer->pDst_;
+    Tensor* pInputTensor = pInputLayer->pDst_;
     float* pInDstData = pInputTensor->getData();
     for (int i = 0; i < pInputTensor->getWholeSize(); ++i)
     {

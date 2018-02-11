@@ -50,12 +50,12 @@ namespace mkt {
 
         int batchSize_;
 
-        // result tensor
-        int oh_; // DstTensor height
-        int ow_; // DstTensor widht
-        int oc_; // DstTensor depth (channel)
+        // result tensor Dimension
+        int oh_; // Dst Tensor height
+        int ow_; // Dst Tensor widht
+        int oc_; // Dst Tensor depth (channel)
 
-        // kernel(filter) tensor
+        // kernel(filter) tensor Dimension
         int fh_; // filter height
         int fw_; // filter width
         int fc_; // filter channel = number of Filter(kernel)
@@ -66,9 +66,9 @@ namespace mkt {
     public:
         Layer(
             LayerType type,
-            ActivationType activationType = ActivationType::NONE,
+            ActivationType activationType  = ActivationType::NONE,
             InitializerType weightInitType = InitializerType::NONE,
-            InitializerType biasInitType = InitializerType::ZERO
+            InitializerType biasInitType   = InitializerType::NONE
         );
 
         virtual ~Layer();

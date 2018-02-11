@@ -28,35 +28,41 @@
 
 namespace mkt {
 
-    // constructor
-    Net::Net(): pInputLayer{nullptr} {};
+    /****************
+     *  constructor
+     ****************/
+    Net::Net(): pInputLayer_{nullptr} {};
 
-    // Destructor
+    /**************
+     *  Destructor
+     **************/
     Net::~Net(){
 
         fprintf(stderr, "------------------- net destructor\n");
-        fprintf(stderr, "layers.size(): %ld\n", layers.size());
-        for (int i = layers.size()-1; i >= 0; --i)
+        fprintf(stderr, "layers.size(): %ld\n", layers_.size());
+        for (int i = layers_.size()-1; i >= 0; --i)
         {
             fprintf(stderr, "delete %d\n", i);
-            delete(layers.at(i));
+            delete(layers_.at(i));
         }
 
     };
 
-    // Configuration Function
+    /**************************
+     *  Configuration Function
+     **************************/
     Layer* Net::addInputLayer(std::string id, int batchSize, int h, int w, int c) {
 
-        pInputLayer = new InputLayer{id, batchSize, h, w, c};
-        layers.push_back(pInputLayer);
+        pInputLayer_ = new InputLayer{id, batchSize, h, w, c};
+        layers_.push_back(pInputLayer_);
 
-        return pInputLayer;
+        return pInputLayer_;
 
     }
 
     Layer* Net::addDenseLayer(Layer* prevLayer, std::string id, int unit, ActivationType activationType, InitializerType weightInitType, InitializerType biasInitType) {
 
-        if (layers.size() == 0)
+        if (layers_.size() == 0)
         {
             fprintf(stderr, "please add input layer first\n");
             return nullptr;
@@ -67,14 +73,14 @@ namespace mkt {
         DenseLayer* pDenseLayer = new DenseLayer{prevLayer, id, unit, activationType, weightInitType, biasInitType};
 
         // Add layer
-        layers.push_back(pDenseLayer);
+        layers_.push_back(pDenseLayer);
 
         return pDenseLayer;
     }
 
     Layer* Net::addConvLayer(Layer* prevLayer, std::string id, int nfilter, int kernelSize, int stride, int padding, PaddingType paddingType, ActivationType activationType, InitializerType weightInitType, InitializerType biasInitType) {
 
-        if (layers.size() == 0)
+        if (layers_.size() == 0)
         {
             fprintf(stderr, "please add input layer first\n");
             return nullptr;
@@ -84,21 +90,61 @@ namespace mkt {
         ConvLayer* pConvLayer = new ConvLayer{prevLayer, id, nfilter, kernelSize, stride, padding, paddingType, activationType, weightInitType, biasInitType};
 
         // Add Layer
-        layers.push_back(pConvLayer);
+        layers_.push_back(pConvLayer);
 
         return pConvLayer;
     }
-    // Initializtion Function
+
+    // Add Relu layer
+    Layer* Net::addReluLayer(Layer* prevLayer, std::string id) {
+        if (layers_.size() == 0)
+        {
+            fprintf(stderr, "please add input layer first\n");
+            return nullptr;
+        }
+
+        // Instantiate Relu Layer
+        ReluLayer* pReluLayer = new ReluLayer(prevLayer, id);
+
+        // Add Layer
+        layers_.push_back(pReluLayer);
+
+        return pReluLayer;
+    }
+
+    // Add Sigmoid layer
+    Layer* Net::addSigmoidLayer(Layer* prevLayer, std::string id) {
+        if (layers_.size() == 0)
+        {
+            fprintf(stderr, "please add input layer first\n");
+            return nullptr;
+        }
+
+        // Instantiate Relu Layer
+        SigmoidLayer* psigmoidLayer = new SigmoidLayer(prevLayer, id);
+
+        // Add Layer
+        layers_.push_back(psigmoidLayer);
+
+        return psigmoidLayer;
+    }
+
+
+
+    /**************************
+     *  Initializtion Function
+     **************************/
     void Net::initialize() {
 
-        if (layers.size() == 0)
+        if (layers_.size() == 0)
         {
             return;
 
-        } else {
-            for (int i = 0; i < layers.size(); ++i)
+        }
+        else {
+            for (int i = 0; i < layers_.size(); ++i)
             {
-                Layer* layer = layers.at(i);
+                Layer* layer = layers_.at(i);
                 if (i == 0 && layer->getType() == LayerType::Input)
                 {
                     layer->initialize();
@@ -113,10 +159,10 @@ namespace mkt {
     OP_STATUS Net::add_data_from_file_list(std::vector<std::string> fileList) {
 
         int inSize = fileList.size();
-        int batchSize = pInputLayer->pDst_->getNumOfData();
-        int tensor_h = pInputLayer->pDst_->getHeight();
-        int tensor_w = pInputLayer->pDst_->getWidth();
-        int tensor_c = pInputLayer->pDst_->getDepth();
+        int batchSize = pInputLayer_->pDst_->getNumOfData();
+        int tensor_h = pInputLayer_->pDst_->getHeight();
+        int tensor_w = pInputLayer_->pDst_->getWidth();
+        int tensor_c = pInputLayer_->pDst_->getDepth();
 
         if (inSize != batchSize)
         {
@@ -151,7 +197,7 @@ namespace mkt {
                 return OP_STATUS::UNMATCHED_SIZE;
             }
 
-            pInputLayer->FlattenImageToTensor(pImg, true);
+            pInputLayer_->FlattenImageToTensor(pImg, true);
         }
 
 
@@ -159,7 +205,7 @@ namespace mkt {
 
 
     InputLayer* Net::getInputLayer() {
-        return pInputLayer;
+        return pInputLayer_;
     }
 
     // template class Net<float>;

@@ -1,5 +1,5 @@
-#ifndef _DENSELAYER_H_
-#define _DENSELAYER_H_
+#ifndef _DENSE_LAYER_H_
+#define _DENSE_LAYER_H_
 
 #include "layer.h"
 

@@ -1,12 +1,11 @@
-#include "layer/relu_layer.h"
+#include "layer/sigmoid_layer.h"
 
 namespace mkt {
 
-    ReluLayer::ReluLayer(
+    SigmoidLayer::SigmoidLayer(
         Layer* prevLayer,
-        std::string id,
-        float negative_slope
-    ): negative_slope_{negative_slope}, Layer(LayerType::Relu)
+        std::string id
+    ): Layer(LayerType::Relu)
     {
 
         batchSize_ = prevLayer->pDst_->getNumOfData();
@@ -23,18 +22,18 @@ namespace mkt {
         pDst_ = new Tensor{batchSize_, ih, iw, ic};
     };
 
-    ReluLayer::~ReluLayer() {};
+    SigmoidLayer::~SigmoidLayer() {};
 
-    void ReluLayer::initialize() {
+    void SigmoidLayer::initialize() {
         initOutputTensor();
     };
 
 
-    void ReluLayer::forward() {
-        relu_act_.forward(*pSrc_, *pDst_);
+    void SigmoidLayer::forward() {
+        sigmoid_act_.forward(*pSrc_, *pDst_);
     };
 
-    void ReluLayer::backward() {
+    void SigmoidLayer::backward() {
 
     };
 }

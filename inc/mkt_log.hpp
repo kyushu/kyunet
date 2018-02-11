@@ -31,10 +31,18 @@ namespace mkt {
         vsprintf(buf, format, args);
         va_end(args);
         fprintf(stderr, "%s", buf);
-
-
-
     #endif
+    }
+
+
+    static void inline MKT_ERR_LOG(const char* format, ...)
+    {
+        static char buf[1024];
+        va_list args;
+        va_start(args, format);
+        vsprintf(buf, format, args);
+        va_end(args);
+        fprintf(stderr, "%s", buf);
     }
 
 }

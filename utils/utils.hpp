@@ -81,7 +81,7 @@ namespace mkt {
      * Split string by specific token
      * text       : source string
      * separator  : character for split string
-     * return     : container contains separated strings  
+     * return     : container contains separated strings
      */
     static std::vector<std::string> split(const std::string &text, char separator) {
         std::vector<std::string> tokens;
@@ -102,6 +102,7 @@ namespace mkt {
     bool has_only_digits(const std::string s){
       return s.find_first_not_of( "0123456789" ) == std::string::npos;
     }
+
 }
 
 

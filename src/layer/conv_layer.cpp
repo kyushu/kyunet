@@ -22,11 +22,11 @@ namespace mkt {
         Layer(LayerType::Convolution, actType, weightInitType, biasInitType)
     {
 
-        int batchSize = prevLayer->pDst_->getNumOfData();
+        batchSize_ = prevLayer->pDst_->getNumOfData();
         int ih = prevLayer->pDst_->getHeight();
         int iw = prevLayer->pDst_->getWidth();
         int ic = prevLayer->pDst_->getDepth();
-        int size3D = prevLayer->pDst_->getSize3D();
+        // int size3D = prevLayer->pDst_->getSize3D();
 
         pSrc_ = prevLayer->pDst_;
 
@@ -48,7 +48,7 @@ namespace mkt {
                 break;
         }
 
-        pDst_ = new Tensor{batchSize, oh_, ow_, oc_};
+        pDst_ = new Tensor{batchSize_, oh_, ow_, oc_};
         pW_   = new Tensor{ic, kernelSize_, kernelSize_, oc_};
         pB_   = new Tensor{1, 1, 1, oc_};
 

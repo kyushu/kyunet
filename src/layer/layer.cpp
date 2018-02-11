@@ -49,18 +49,21 @@ namespace mkt {
         pSrc_ = nullptr;
         mktLog(1, "--------------------- Layer Destructor pSrc_\n");
 
+
         mktLog(1, "pDst_.adr: %p\n", pDst_);
-        mktLog(1, "pDst_->pData.adr: %p\n", pDst_->getData());
+        if (pDst_) {mktLog(1, "pDst_->pData.adr: %p\n", pDst_->getData());}
         delete pDst_;
         mktLog(1, "--------------------- Layer Destructor pDst_\n");
 
+
         mktLog(1, "pW_.adr: %p\n", pW_);
-        mktLog(1, "pW_->pData.adr: %p\n", pW_->getData());
+        if (pW_) {mktLog(1, "pW_->pData.adr: %p\n", pW_->getData());}
         delete pW_;
         mktLog(1, "--------------------- Layer Destructor pW_\n");
 
+
         mktLog(1, "pB_.adr: %p\n", pB_);
-        mktLog(1, "pB_->pData.adr: %p\n", pB_->getData());
+        if (pB_) {mktLog(1, "pB_->pData.adr: %p\n", pB_->getData());}
         delete pB_;
         mktLog(1, "--------------------- Layer Destructor pB_\n");
 

@@ -33,8 +33,8 @@ find_package(OpenCV REQUIRED)
         target_link_libraries(test_add_data_flatten ${OpenCV_LIBS} libkyunet)
 
         # test_denseLayer
-        add_executable(test_denseLayer 05_test_denseLayer.cpp)
-        target_link_libraries(test_denseLayer ${OpenCV_LIBS} libkyunet)
+        add_executable(test_denseLayer_forward 05_test_denseLayer_forward.cpp)
+        target_link_libraries(test_denseLayer_forward ${OpenCV_LIBS} libkyunet)
 
         # test_operation
         add_executable(test_operation 06_test_operation.cpp)
@@ -45,8 +45,8 @@ find_package(OpenCV REQUIRED)
         target_link_libraries(im2col_test libkyunet)
 
         # test_convlayer
-        add_executable(test_convlayer 08_test_convlayer.cpp)
-        target_link_libraries(test_convlayer ${OpenCV_LIBS} libkyunet)
+        add_executable(test_convlayer_forward 08_test_convlayer_forward.cpp)
+        target_link_libraries(test_convlayer_forward ${OpenCV_LIBS} libkyunet)
 
         # sim_conv_backprop
         add_executable(sim_conv_backprop 09_sim_conv_backprop.cpp)
@@ -59,6 +59,15 @@ find_package(OpenCV REQUIRED)
         # test_filler
         add_executable(test_filler 11_test_filler.cpp)
         target_link_libraries(test_filler libkyunet)
+
+        # test_relu_layer_forward
+        add_executable(test_relu_layer_forward 12_test_relu_layer_forward.cpp)
+        target_link_libraries(test_relu_layer_forward libkyunet)
+
+        # test_sigmoid_layer_forward
+        add_executable(test_sigmoid_layer_forward 13_test_sigmoid_layer_forward.cpp)
+        target_link_libraries(test_sigmoid_layer_forward libkyunet)
+
 
     else()
         message("OpenCV not found")
