@@ -24,9 +24,12 @@
 #define _COMMON_INC_H_
 
 // #define NDEBUG // the assert will be disabled, if NDEBUG is defined
-#include <cassert>
+// #include <cassert>
 #include <cstdio>
 #include <algorithm>
+// #include <limits>
+
 #include "mkt_log.hpp"
+
 
 #endif

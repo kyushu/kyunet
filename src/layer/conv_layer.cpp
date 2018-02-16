@@ -4,18 +4,28 @@ namespace mkt {
 
     // Constructor
     ConvLayer::ConvLayer(
-            Layer* prevLayer,
-            std::string id,
-            int nfilter, int kernelSize, int stride,
-            int padding, PaddingType paddingType,
-            ActivationType actType,
-            InitializerType weightInitType,
-            InitializerType biasInitType
+        Layer* prevLayer,
+        std::string id,
+        int kernel_Height,
+        int kernel_width,
+        int kernel_channel,
+        int stride_h,
+        int stride_w,
+        int pad_h,
+        int pad_w,
+        PaddingType paddingType,
+        ActivationType actType,
+        InitializerType weightInitType,
+        InitializerType biasInitType
     ):
-        nfilter_{nfilter},
-        kernelSize_{kernelSize},
-        stride_{stride},
-        padding_{padding},
+        // kernelSize_{kernelSize},
+        fh_{kernel_Height},
+        fw_{kernel_width},
+        fc_{kernel_channel},
+        stride_h_{stride_h},
+        stride_w_{stride_w},
+        pad_h_{pad_h},
+        pad_w_{pad_w},
         paddingType_{paddingType},
         dilation_h_{1},
         dilation_w_{1},
@@ -30,26 +40,32 @@ namespace mkt {
 
         pSrc_ = prevLayer->pDst_;
 
-        oc_ = nfilter;
-        // calculate pDst size: W_o = (W-f +2p)/s +1
+        oc_ = fc_;
+        // calculate pDst size: ow_ = (iw_ - fw_ +2padding_)/stride_ +1
         switch(paddingType_) {
             case PaddingType::valid:
-                ow_ = floor(float(iw - kernelSize_) / stride_) + 1;
-                oh_ = floor(float(ih - kernelSize_) / stride_) + 1;
+                ow_ = static_cast<int>( static_cast<float>(iw - fw_ + 2*pad_w_) / stride_w_) + 1;
+                oh_ = static_cast<int>( static_cast<float>(ih - fh_ + 2*pad_h_) / stride_h_) + 1;
                 break;
             case PaddingType::same:
-                padding_ = ((iw-1)*stride_ + kernelSize_ - iw)*0.5;
-                ow_ = int( (iw - kernelSize_ + (2*padding_)) / stride_ ) + 1;
-                oh_ = int( (ih - kernelSize_ + (2*padding_)) / stride_ ) + 1;
+
+                pad_w_ = static_cast<int>( ((iw-1)*stride_w_ + fw_ - iw) * 0.5 );
+                ow_    = static_cast<int>( static_cast<float>(iw - fw_ + (2*pad_w_)) / stride_w_ )  + 1;
+                M_Assert(iw_ == ow_, "iw != ow");
+
+                pad_h_ = static_cast<int>( ((ih-1)*stride_h_ + fh_ - ih) * 0.5 );
+                oh_    = static_cast<int>( static_cast<float>(ih - fh_ + (2*pad_h_)) / stride_h_ ) + 1;
+                M_Assert(ih_ == oh_, "ih != oh");
+
                 break;
             default:
-                ow_ = floor(float(iw - kernelSize_) / stride_) + 1;
-                oh_ = floor(float(ih - kernelSize_) / stride_) + 1;
+                ow_ = static_cast<int>( static_cast<float>(iw - fw_) / stride_w_)  + 1;
+                oh_ = static_cast<int>( static_cast<float>(ih - fh_) / stride_h_)  + 1;
                 break;
         }
 
         pDst_ = new Tensor{batchSize_, oh_, ow_, oc_};
-        pW_   = new Tensor{ic, kernelSize_, kernelSize_, oc_};
+        pW_   = new Tensor{ic, fh_, fw_, fc_};
         pB_   = new Tensor{1, 1, 1, oc_};
 
         pTmpCol_ = new Tensor{1, pW_->getSize2D()*ic, pDst_->getSize2D(), oc_};
@@ -122,18 +138,18 @@ namespace mkt {
                         | 3 4 5 | | 12 13 14 | | 21 22 23 |
                         | 6 7 8 | | 15 16 17 | | 24 25 26 |
 
-                im2col(src) =   | 0   1  3  4 |
-                                | 1   2  4  5 |  Channel 0
-                                | 3   4  6  7 |
-                                | 4   5  7  8 |____________
-                                | 9  10 12 13 |
-                                | 10 11 13 14 |  Channel 1
-                                | 12 13 15 16 |
-                                | 13 14 16 17 |____________
-                                | 18 19 21 22 |
-                                | 19 20 22 23 |  Channel 2
-                                | 21 22 24 25 |
-                                | 22 23 25 26 |____________
+                im2col(src) =   | s0   s1  s3  s4 |
+                                | s1   s2  s4  s5 |  Channel 0
+                                | s3   s4  s6  s7 |
+                                | s4   s5  s7  s8 |____________
+                                | s9  s10 s12 s13 |
+                                | s10 s11 s13 s14 |  Channel 1
+                                | s12 s13 s15 s16 |
+                                | s13 s14 s16 s17 |____________
+                                | s18 s19 s21 s22 |
+                                | s19 s20 s22 s23 |  Channel 2
+                                | s21 s22 s24 s25 |
+                                | s22 s23 s25 s26 |____________
                                    |  |  |  |
                                    |  |  |  |_____________________
                                    |  |  |______________          |
@@ -146,8 +162,8 @@ namespace mkt {
             mkt::im2col_cpu(pSrcData + i * src_size3D,
                 ic, ih, iw,
                 fh, fw,
-                padding_, padding_,
-                stride_, stride_,
+                pad_h_, pad_w_,
+                stride_h_, stride_w_,
                 dilation_h_, dilation_w_,
                 pTmpColData
             );
@@ -173,19 +189,19 @@ namespace mkt {
 
                 Step 2. Dst matrix = W X im2col(src) =
 
-                                | 0   1  3  4 |
-                                | 1   2  4  5 |
-                                | 3   4  6  7 |
-                                | 4   5  7  8 |
-                                | 9  10 12 13 |
-                    | F0 |      | 10 11 13 14 |
-                    | F1 |  X   | 12 13 15 16 |  =
-                                | 13 14 16 17 |
-                                | 18 19 21 22 |
-                                | 19 20 22 23 |
-                                | 21 22 24 25 |
-                                | 22 23 25 26 |
-
+                                | s0   s1  s3  s4 |
+                                | s1   s2  s4  s5 |
+                                | s3   s4  s6  s7 |
+                                | s4   s5  s7  s8 |
+                                | s9  s10 s12 s13 |
+                    | F0 |      | s10 s11 s13 s14 |
+                    | F1 |  X   | s12 s13 s15 s16 |
+                                | s13 s14 s16 s17 |
+                                | s18 s19 s21 s22 |
+                                | s19 s20 s22 s23 |
+                                | s21 s22 s24 s25 |
+                                | s22 s23 s25 s26 |
+     |
                     Dst matrix = oc X (oh*ow)
 
             */
@@ -213,5 +229,17 @@ namespace mkt {
     }
     void ConvLayer::backward() {
 
+    }
+
+
+    // Getter
+    int ConvLayer::getFilterHeight() {
+        return fh_;
+    }
+    int ConvLayer::getFilterWidth() {
+        return fw_;
+    }
+    int ConvLayer::getFilterChannel() {
+        return fc_;
     }
 }

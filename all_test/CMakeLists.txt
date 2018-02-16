@@ -68,6 +68,10 @@ find_package(OpenCV REQUIRED)
         add_executable(test_sigmoid_layer_forward 13_test_sigmoid_layer_forward.cpp)
         target_link_libraries(test_sigmoid_layer_forward libkyunet)
 
+        # test_pooling_method
+        add_executable(test_pooling_method 14_test_pooling_method.cpp)
+        target_link_libraries(test_pooling_method libkyunet)
+
 
     else()
         message("OpenCV not found")

@@ -33,6 +33,7 @@
 #include "layer/conv_layer.h"
 #include "layer/relu_layer.h"
 #include "layer/sigmoid_layer.h"
+#include "layer/pooling_layer.h"
 
 
 namespace mkt {
@@ -51,10 +52,16 @@ namespace mkt {
 
         // Configuration Function
         Layer* addInputLayer(std::string id, int batchSize, int h, int w, int c);
+
         Layer* addDenseLayer(Layer* prevLayer, std::string id, int unit, ActivationType activationType, InitializerType weightInitType, InitializerType biasInitType);
-        Layer* addConvLayer(Layer* prevLayer, std::string id, int nfilter, int kernelSize, int stride, int padding, PaddingType paddingType, ActivationType activationType, InitializerType weightInitType, InitializerType biasInitType);
+
+        Layer* addConvLayer(Layer* prevLayer, std::string id, int kernel_Height, int kernel_width, int kernel_channel, int stride_h, int stride_w, int pad_h, int pad_w, PaddingType paddingType, ActivationType activationType, InitializerType weightInitType, InitializerType biasInitType);
+
         Layer* addReluLayer(Layer* prevLayer, std::string id);
+
         Layer* addSigmoidLayer(Layer* prevLayer, std::string id);
+
+        Layer* addPoolingLayer( Layer* prevLayer, std::string id, int kernel_Height, int kernel_width, int stride_h, int stride_w, int pad_h, int pad_w, PoolingMethodType type);
 
         // Initialize Function
         void initialize();

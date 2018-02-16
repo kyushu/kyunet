@@ -78,7 +78,21 @@ namespace mkt {
         return pDenseLayer;
     }
 
-    Layer* Net::addConvLayer(Layer* prevLayer, std::string id, int nfilter, int kernelSize, int stride, int padding, PaddingType paddingType, ActivationType activationType, InitializerType weightInitType, InitializerType biasInitType) {
+    Layer* Net::addConvLayer(
+        Layer* prevLayer,
+        std::string id,
+        int kernel_Height,
+        int kernel_width,
+        int kernel_channel,
+        int stride_h,
+        int stride_w,
+        int pad_h,
+        int pad_w,
+        PaddingType paddingType,
+        ActivationType activationType,
+        InitializerType weightInitType, InitializerType biasInitType
+        )
+    {
 
         if (layers_.size() == 0)
         {
@@ -87,7 +101,7 @@ namespace mkt {
         }
 
         // Instantiate Conv Layer
-        ConvLayer* pConvLayer = new ConvLayer{prevLayer, id, nfilter, kernelSize, stride, padding, paddingType, activationType, weightInitType, biasInitType};
+        ConvLayer* pConvLayer = new ConvLayer{prevLayer, id, kernel_Height, kernel_width, kernel_channel, stride_h, stride_w, pad_h, pad_w, paddingType, activationType, weightInitType, biasInitType};
 
         // Add Layer
         layers_.push_back(pConvLayer);
@@ -129,7 +143,21 @@ namespace mkt {
         return psigmoidLayer;
     }
 
+    Layer* Net::addPoolingLayer( Layer* prevLayer, std::string id, int kernel_Height, int kernel_width, int stride_h, int stride_w, int pad_h, int pad_w, PoolingMethodType type)
+    {
 
+        if (layers_.size() == 0)
+        {
+            fprintf(stderr, "please add input layer first\n");
+            return nullptr;
+        }
+
+        PoolingLayer* poolingLayer= new PoolingLayer{prevLayer, id, kernel_Height, kernel_width, stride_h, stride_w, pad_h, pad_w, type};
+
+        layers_.push_back(poolingLayer);
+
+        return poolingLayer;
+    }
 
     /**************************
      *  Initializtion Function

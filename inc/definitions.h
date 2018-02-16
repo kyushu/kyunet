@@ -70,9 +70,15 @@ namespace mkt {
         Input = 0,
         FullConnected,
         Convolution,
+        Pooling,
         Relu
     };
 
+    enum class PoolingMethodType: int
+    {
+        MAX=0,
+        AVG
+    };
     /*
         "causal" results in causal (dilated) convolutions, e.g. output[t] does not depend on input[t+1:]. Useful when modeling temporal data where the model should not violate the temporal order. See WaveNet: A Generative Model for Raw Audio, section 2.1.
      */

@@ -4,4 +4,5 @@ namespace mkt {
     bool inline Check_EQ(const T& a, const T& b) {
         return (a == b);
     }
+
 }

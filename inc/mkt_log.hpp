@@ -2,6 +2,7 @@
 #define _MKT_LOG_HPP_
 
 #include <stdarg.h>
+#include <iostream>
 
 namespace mkt {
 
@@ -11,7 +12,7 @@ namespace mkt {
             0x01: DISPLAY DEBUG MESSAGE
             0x02: DISPLAY DATA MESSAGE
      */
-    #define LOG_MOD 0x01
+    #define LOG_MOD 0x02
 
 
     // C Style
@@ -45,6 +46,25 @@ namespace mkt {
         fprintf(stderr, "%s", buf);
     }
 
+}
+
+
+#ifndef NDEBUG
+#   define M_Assert(Expr, Msg) \
+    __M_Assert(#Expr, Expr, __FILE__, __LINE__, Msg)
+#else
+#   define M_Assert(Expr, Msg) ; // no value = do nothing
+#endif
+
+static void __M_Assert(const char* expr_str, bool expr, const char* file, int line, const char* msg)
+{
+    if (!expr)
+    {
+        std::cerr << "Assert failed:\t" << msg << "\n"
+            << "Expected:\t" << expr_str << "\n"
+            << "Source:\t\t" << file << ", line " << line << "\n";
+        abort();
+    }
 }
 
 #endif

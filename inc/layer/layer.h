@@ -61,11 +61,6 @@ namespace mkt {
         int ow_; // Dst Tensor widht
         int oc_; // Dst Tensor depth (channel)
 
-        // kernel(filter) tensor Dimension
-        int fh_; // filter height
-        int fw_; // filter width
-        int fc_; // filter channel = number of Filter(kernel)
-
 
 
 

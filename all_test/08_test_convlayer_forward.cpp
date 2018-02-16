@@ -22,16 +22,16 @@ int main(int argc, char const *argv[])
     int batchSize = 1;
     int height = 4;
     int width = 4;
-    int channel = 3;
+    int channel = 1;
 
     Net net;
-    // Add Input Lauer
+    // Add Input Layer
     InputLayer* pInputLayer = (InputLayer *)net.addInputLayer("input", batchSize, height, width, channel);
 
     // Add ConvLayer
     InitializerType weightInitType = InitializerType::ONE;
     InitializerType biasInitType = InitializerType::ONE;
-    Layer* pConvLayer = net.addConvLayer(pInputLayer, "conv_1", 2, 3, 1, 0, PaddingType::valid, ActivationType::NONE, weightInitType, biasInitType);
+    Layer* pConvLayer = net.addConvLayer(pInputLayer, "conv_1", 3, 3, 2, 1, 1, 0, 0, PaddingType::valid, ActivationType::NONE, weightInitType, biasInitType);
 
 
     // Net Initialization: memory allocation

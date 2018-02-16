@@ -24,6 +24,7 @@
 
 namespace mkt {
 
+
     Layer::Layer(
         LayerType type,
         ActivationType activationType,
@@ -36,7 +37,6 @@ namespace mkt {
         biasInitType_{biasInitType},
         batchSize_{0},
         oh_{0}, ow_{0}, oc_{0},
-        fh_{0}, fw_{0}, fc_{0},
         pSrc_{nullptr},
         pDst_{nullptr},
         pW_{nullptr},
@@ -190,16 +190,6 @@ namespace mkt {
         return oc_;
     }
 
-    int Layer::getFilterHeight() {
-        return fh_;
-    }
 
-    int Layer::getFilterWidth() {
-        return fw_;
-    }
-
-    int Layer::getFilterChannel() {
-        return fc_;
-    }
     // template class Layer<float>;
 }
