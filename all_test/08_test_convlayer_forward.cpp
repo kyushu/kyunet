@@ -29,8 +29,8 @@ int main(int argc, char const *argv[])
     InputLayer* pInputLayer = (InputLayer *)net.addInputLayer("input", batchSize, height, width, channel);
 
     // Add ConvLayer
-    InitializerType weightInitType = InitializerType::ONE;
-    InitializerType biasInitType = InitializerType::ONE;
+    InitializerType weightInitType = InitializerType::TEST;
+    InitializerType biasInitType = InitializerType::ZERO;
     Layer* pConvLayer = net.addConvLayer(pInputLayer, "conv_1", 3, 3, 2, 1, 1, 0, 0, PaddingType::valid, ActivationType::NONE, weightInitType, biasInitType);
 
 
@@ -42,22 +42,79 @@ int main(int argc, char const *argv[])
     float* pInDstData = pInputTensor->getData();
     for (int i = 0; i < pInputTensor->getWholeSize(); ++i)
     {
-        pInDstData[i] = i;
+        float fval = (float(std::rand() % 100));
+        pInDstData[i] = fval;
+    }
+
+    // input
+    int ih = pInputTensor->getHeight();
+    int iw = pInputTensor->getWidth();
+    int ic = pInputTensor->getDepth();
+    fprintf(stderr, "Input\n");
+    for (int b = 0; b < batchSize; ++b)
+    {
+        for (int c = 0; c < ic; ++c)
+        {
+            for (int h = 0; h < ih; ++h)
+            {
+                for (int w = 0; w < iw; ++w)
+                {
+                    fprintf(stderr, "[%d] = %.3f\t", w + h*iw + c*ih*iw + b*ic*ih*iw, pInDstData[w + h*iw + c*ih*iw + b*ic*ih*iw]);
+                }
+                fprintf(stderr, "\n");
+            }
+            fprintf(stderr, "\n");
+        }
+        fprintf(stderr, "\n");
     }
 
     pConvLayer->forward();
 
+    // weight
+   Tensor *pW = pConvLayer->pW_;
+   float* pWData = pW->getData();
+   int fh = pW->getHeight();
+   int fw = pW->getWidth();
+   int fc = pW->getDepth();
+   fprintf(stderr, "Weight\n");
+   for (int c = 0; c < fc; ++c)
+   {
+       for (int h = 0; h < fh; ++h)
+       {
+           for (int w = 0; w < fw; ++w)
+           {
+               fprintf(stderr, "%.2f\t", pWData[w + h*fw + c*fh*fw]);
+           }
+           fprintf(stderr, "\n");
+       }
+       fprintf(stderr, "\n");
+   }
+   fprintf(stderr, "\n");
+
+    // output
     Tensor *pDst = pConvLayer->pDst_;
     float* pDstData = pDst->getData();
-    for (int i = 0; i < pDst->getWholeSize(); ++i)
+    int batchsize = pDst->getNumOfData();
+    int wholeSize = pDst->getWholeSize();
+    int oh = pDst->getHeight();
+    int ow = pDst->getWidth();
+    int oc = pDst->getDepth();
+    fprintf(stderr, "Output\n");
+    for (int b = 0; b < batchsize; ++b)
     {
-         if (i > 0 && i%pDst->getSize2D()==0)
+        for (int c = 0; c < oc; ++c)
         {
-            mktLog(2, "\n");
+            for (int h = 0; h < oh; ++h)
+            {
+                for (int w = 0; w < ow; ++w)
+                {
+                    fprintf(stderr, "[%d]=%.3f\t", w + h*ow + c*oh*ow + b*oc*oh*ow, pDstData[w + h*ow + c*oh*ow + b*oc*oh*ow]);
+                }
+                fprintf(stderr, "\n");
+            }
+            fprintf(stderr, "\n");
         }
-        mktLog(2, "%f ", pDstData[i]);
     }
-    mktLog(2, "\n");
 
 
     return 0;
