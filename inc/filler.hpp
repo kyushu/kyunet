@@ -1,5 +1,5 @@
-#ifndef _FILLER_H_
-#define _FILLER_H_
+#ifndef MKT_FILLER_H
+#define MKT_FILLER_H
 
 #include <random>
 

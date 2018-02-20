@@ -1,5 +1,5 @@
-#ifndef _SIGMOID_H_
-#define _SIGMOID_H_
+#ifndef MKT_SIGMOID_H
+#define MKT_SIGMOID_H
 
 #include <math.h>
 #include "activator/activator.h"

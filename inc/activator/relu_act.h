@@ -1,5 +1,5 @@
-#ifndef _RELU_H_
-#define _RELU_H_
+#ifndef MKT_RELU_H
+#define MKT_RELU_H
 
 #include "activator/activator.h"
 

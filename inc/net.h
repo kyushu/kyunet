@@ -20,8 +20,8 @@
 * SOFTWARE.
 */
 
-#ifndef _NET_H_
-#define _NET_H_
+#ifndef MKT_NET_H
+#define MKT_NET_H
 
 // #include <cstdio>
 

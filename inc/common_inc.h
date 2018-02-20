@@ -20,8 +20,8 @@
 * SOFTWARE.
 */
 
-#ifndef _COMMON_INC_H_
-#define _COMMON_INC_H_
+#ifndef MKT_COMMON_INC_H
+#define MKT_COMMON_INC_H
 
 // #define NDEBUG // the assert will be disabled, if NDEBUG is defined
 // #include <cassert>

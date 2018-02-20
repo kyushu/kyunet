@@ -20,8 +20,8 @@
 * SOFTWARE.
 */
 
-#ifndef _DEFINITIONS_h_
-#define _DEFINITIONS_h_
+#ifndef MKT_DEFINITIONS_h
+#define MKT_DEFINITIONS_h
 
 namespace mkt {
 

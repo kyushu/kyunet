@@ -1,5 +1,5 @@
-#ifndef _AUX_OPERATORS_H_
-#define _AUX_OPERATORS_H_
+#ifndef MKT_AUX_OPERATORS_H
+#define MKT_AUX_OPERATORS_H
 
 namespace mkt {
 

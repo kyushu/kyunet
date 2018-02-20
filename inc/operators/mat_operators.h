@@ -1,5 +1,5 @@
-#ifndef _OPERATION_H_
-#define _OPERATION_H_
+#ifndef MKT_MATH_OPERATION_H
+#define MKT_MATH_OPERATION_H
 
 #include "common_inc.h"
 

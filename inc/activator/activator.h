@@ -1,5 +1,5 @@
-#ifndef _ACTIVATION_H_
-#define _ACTIVATION_H_
+#ifndef MKT_ACTIVATION_H
+#define MKT_ACTIVATION_H
 
 #include "tensor.h"
 #include "help_func/helper.hpp"

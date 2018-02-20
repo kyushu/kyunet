@@ -1,5 +1,5 @@
-#ifndef _POOL_LAYER_H_
-#define _POOL_LAYER_H_
+#ifndef MKT_POOL_LAYER_H
+#define MKT_POOL_LAYER_H
 
 #include "layer.h"
 

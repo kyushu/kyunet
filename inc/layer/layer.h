@@ -20,8 +20,8 @@
 * SOFTWARE.
 */
 
-#ifndef _LAYER_H_
-#define _LAYER_H_
+#ifndef MKT_LAYER_H
+#define MKT_LAYER_H
 
 #include <iostream>
 #include <string>

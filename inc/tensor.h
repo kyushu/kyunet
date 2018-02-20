@@ -21,8 +21,8 @@
 */
 
 
-#ifndef _TENSOR_H_
-#define _TENSOR_H_
+#ifndef MKT_TENSOR_H
+#define MKT_TENSOR_H
 
 #include <stdio.h>
 #include <vector>

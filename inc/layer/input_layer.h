@@ -1,5 +1,5 @@
-#ifndef _INPUT_LAYER_H_
-#define _INPUT_LAYER_H_
+#ifndef MKT_INPUT_LAYER_H
+#define MKT_INPUT_LAYER_H
 
 #include "layer.h"
 

@@ -1,5 +1,5 @@
-#ifndef _RELU_LAYER_H_
-#define _RELU_LAYER_H_
+#ifndef MKT_RELU_LAYER_H
+#define MKT_RELU_LAYER_H
 
 #include "layer/layer.h"
 #include "activator/relu_act.h"

@@ -1,5 +1,5 @@
-#ifndef _DENSE_LAYER_H_
-#define _DENSE_LAYER_H_
+#ifndef MKT_DENSE_LAYER_H
+#define MKT_DENSE_LAYER_H
 
 #include "layer.h"
 

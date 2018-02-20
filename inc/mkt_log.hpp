@@ -1,5 +1,5 @@
-#ifndef _MKT_LOG_HPP_
-#define _MKT_LOG_HPP_
+#ifndef MKT_LOG_HPP
+#define MKT_LOG_HPP
 
 #include <stdarg.h>
 #include <iostream>
