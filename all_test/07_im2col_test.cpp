@@ -2,6 +2,8 @@
 #include "tensor.h"
 #include "operators/mat_operators.h"
 
+#include "definitions.h"
+
 using namespace mkt;
 
 int main(int argc, char const *argv[])
@@ -149,12 +151,13 @@ int main(int argc, char const *argv[])
 
     //#############################
     // kernel X im2col
-    mkt::gemm_cpu(0, 0,                                                     /*trans_A, trans_B*/
+    mkt::gemm_cpu(CBLAS_TRANSPOSE::CblasNoTrans, CBLAS_TRANSPOSE::CblasNoTrans,                                                     /*trans_A, trans_B*/
             filter.getNumOfData(), dst.getSize2D(), filter.getSize2D()*ic,  /*M,       N,K*/
-            1.0f, 1.0f,                                                     /*ALPHA,   BETA*/
-            pFilterData, filter.getSize2D()*ic,                           /*A,       lda(K)*/
-            pTmpColData,   oh*ow,                                        /*B,       ldb(N)*/
-            pDstData, oh*ow                                               /*C,       ldc(N)*/
+            1.0f,                                                           /*ALPHA*/
+            pFilterData, filter.getSize2D()*ic,                             /*A,       lda(K)*/
+            pTmpColData,   oh*ow,                                           /*B,       ldb(N)*/
+            1.0f,                                                           /*BETA*/
+            pDstData, oh*ow                                                 /*C,       ldc(N)*/
     );
 
     for (int i = 0; i < dst.getSize3D(); ++i)

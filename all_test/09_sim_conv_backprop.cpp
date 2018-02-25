@@ -1,7 +1,9 @@
 
 #include "tensor.h"
 #include "operators/mat_operators.h"
+#include "definitions.h"
 
+using namespace mkt;
 
 int main(int argc, char const *argv[])
 {
@@ -67,27 +69,43 @@ int main(int argc, char const *argv[])
     5. src_grad_data =  | w0d2+w2d0 , w0d3+w1d2+w2d1+w3d0 , w1d3+w3d1 |
                         | w2d2      , w2d3+w3d2           , w3d3      |
 
-    c0m, c1m, c2m, c3m = convert c0, c1, c2, c3 from column vector(col) to matrix(im))
-    src_grad_data is composited by c0m, c1m, c2m, c3m
+        c0m, c1m, c2m, c3m = convert c0, c1, c2, c3 from column vector(col) to matrix(im))
 
-    here display src_grad_data is composited by c0m, c1m, c2m, c3m
-    Left-Top of src_grad_data      Right-Top of src_grad_data
-        | w0d0 , w0d1|                | w0d1 , w1d1|
-        | w0d2 , w0d3|                | w1d2 , w1d3|
+        c0m = c0( | w0d0, w0d1, w0d2, w0d3 | ) COL_TO_IM = |w0d0 , w0d1|
+                                                           |w0d2 , w0d3|
 
-        | w2d0 , w2d1|                | w3d0 , w3d1|
-        | w2d2 , w2d3|                | w3d2 , w3d3|
-    Left-Bottom of src_grad_data      Right-bottom of src_grad_data
+        c1m = c0( | w1d0, w1d1, w1d2, w1d3 | ) COL_TO_IM = |w0d1 , w1d1|
+                                                           |w1d2 , w1d3|
+
+        c2m = c0( | w2d0, w2d1, w2d2, w2d3 | ) COL_TO_IM = |w2d0 , w2d1|
+                                                           |w2d2 , w2d3|
+
+        c3m = c0( | w3d0, w3d1, w3d2, w3d3 | ) COL_TO_IM = |w3d0 , w3d1|
+                                                           |w3d2 , w3d3|
+
+        src_grad_data is composited by c0m, c1m, c2m, c3m
+
+        here display src_grad_data is composited by c0m, c1m, c2m, c3m
+        part of c0m, c1m, c2m, c3m are overlaped.
+
+        Left-Top of src_grad_data      Right-Top of src_grad_data
+            | w0d0 , w0d1|                | w0d1 , w1d1|
+            | w0d2 , w0d3|                | w1d2 , w1d3|
+
+            | w2d0 , w2d1|                | w3d0 , w3d1|
+            | w2d2 , w2d3|                | w3d2 , w3d3|
+        Left-Bottom of src_grad_data      Right-bottom of src_grad_data
 
     */
     mkt::mktLog(1, "gemm(weight, dst_grad, temp)\n");
     mkt::gemm_cpu(
-        1, 0,
-        n, k, m,
-        1.0f, 0,
-        pWData, n,
-        pDstGradData, k,
-        ptmpData, k
+        CblasTrans, CblasNoTrans,               // trans_a, trans_b
+        n, k, m,            // M, N, K
+        1.0f,               // Alpha
+        pWData, n,          // A,       lda
+        pDstGradData, k,    // B,       lda
+        0,                  // Beta
+        ptmpData, k         // C,       lda
     );
 
     // Step 2. Col2Im: perform like De-convolution and update to src_grad.pData

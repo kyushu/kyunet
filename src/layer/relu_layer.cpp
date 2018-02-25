@@ -20,7 +20,7 @@ namespace mkt {
         ow_ = iw;
         oc_ = ic;
 
-        pDst_ = new Tensor{batchSize_, ih, iw, ic};
+        pDst_ = new Tensor{batchSize_, oh_, ow_, oc_};
     };
 
     ReluLayer::~ReluLayer() {};

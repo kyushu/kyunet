@@ -1,5 +1,7 @@
 #include "operators/mat_operators.h"
-#include <iostream>
+// #include <iostream>
+
+
 namespace mkt {
 
 
@@ -29,7 +31,8 @@ namespace mkt {
     M(batch size) |       A        | x |        B        | K
                   |                |   |                 |
                   |________________|   |_________________|
-                                                   ||
+
+                                                ||
                                         _________________
                                        |     ldc = N     |
                                        |                 |
@@ -38,14 +41,16 @@ namespace mkt {
                                        |_________________|
 
 
+
 */
 
     int gemm_cpu(
-        int trans_a, int trans_b,
+        CBLAS_TRANSPOSE trans_a, CBLAS_TRANSPOSE trans_b,
         int M, int N, int K,
-        float ALPHA, float BETA,
+        float ALPHA,
         float *A, int lda,
         float *B, int ldb,
+        float BETA,
         float *C, int ldc)
     {
         int i, j, k;
@@ -58,31 +63,36 @@ namespace mkt {
             }
         }
 
-        if (!trans_a && !trans_b) {
+        if (trans_a == CblasNoTrans &&
+            trans_b == CblasNoTrans) {
             for (i = 0; i < M; ++i){
                 for (k = 0; k < K; ++k){
                     float tmp = ALPHA * A[i * lda + k];
+                    mktLog(1, "ALPHA(%f) * A[%d](%f)= %f\n", ALPHA, i * lda + k, A[i * lda + k], tmp);
                     for (j = 0; j < N; ++j) {
                         C[i * ldc + j] += tmp * B[k * ldb + j];
-                        mktLog(1, "c[%d] = A[%d](%f)B[%d](%f)\n", i*ldc+j, i * lda + k, tmp, k * ldb + j, B[k * ldb + j]);
+                        mktLog(1, "c[%d](%f) += A[%d](%f)B[%d](%f)\n", i*ldc+j, C[i * ldc + j], i * lda + k, tmp, k * ldb + j, B[k * ldb + j]);
                     }
                 }
             }
         }
-        else if (trans_a && !trans_b) {
+        else if (trans_a == CblasTrans &&
+                 trans_b == CblasNoTrans) {
             for (i = 0; i < M; ++i){
                 for (k = 0; k < K; ++k){
                     float tmp = ALPHA * A[k * lda + i];
+                    mktLog(1, "ALPHA(%f) * A[%d](%f)= %f\n", ALPHA, i * lda + k, A[i * lda + k], tmp);
                     for (j = 0; j < N; ++j) {
-                        mktLog(1, "c[%d] = ", i*ldc+j);
-                        mktLog(1, "A[%d]", k * lda + i);
-                        mktLog(1, "B[%d]\n", k * ldb + j);
                         C[i * ldc + j] += tmp * B[k * ldb + j];
+                        mktLog(1, "c[%d](%f) = ", i*ldc+j, C[i * ldc + j]);
+                        mktLog(1, "A[%d](%f) * ", k * lda + i, tmp);
+                        mktLog(1, "B[%d](%f)\n", k * ldb + j, B[k * ldb + j]);
                     }
                 }
             }
         }
-        else if (!trans_a && trans_b) {
+        else if (trans_a == CblasNoTrans &&
+                 trans_b == CblasTrans) {
             float sum = 0;
             for (i = 0; i < M; ++i){
                 for (j = 0; j < N; ++j){
@@ -110,7 +120,52 @@ namespace mkt {
         return 0;
     }
 
-    // Result = aX + Y
+    /* General Matrix-Vector operation
+     *
+     * Eq 1. y = alpha * A * x + beta * y
+     * Eq 2. y = alpha * transpose(A) * x + beta * y
+     *
+     * A: mxn matrix
+     * x: vector
+     * y: vector
+     */
+    int gemv_cpu(
+        CBLAS_TRANSPOSE trans_a,
+        int m, int n,
+        float alpha, float *a, float *x,
+        float beta, float *y)
+    {
+        int i, j;
+        if (trans_a == CBLAS_TRANSPOSE::CblasNoTrans) {
+            if (beta != 1.0f) {
+                for (i = 0; i < m; ++i) {
+                    y[i] *= beta;
+                }
+            }
+            for (i = 0; i < m; ++i) {
+                for (j = 0; j < n; ++j) {
+                    y[i] += alpha * a[i * n + j] * x[j];
+                }
+            }
+        }
+        else {
+            if (beta != 1.0f) {
+                for (i = 0; i < n; ++i) {
+                    y[i] *= beta;
+                }
+            }
+            for (i = 0; i < n; ++i) {
+                for (j = 0; j < m; ++j) {
+                    y[i] += alpha * a[i * m + j] * x[j];
+                }
+            }
+        }
+        return 0;
+    }
+
+    /*
+     * Result = aX + Y
+     */
     int axpy(int n, float a, float *x, float *y)
     {
         for (int i = 0; i < n; ++i)
@@ -119,18 +174,21 @@ namespace mkt {
         }
     }
 
-    // TODO
-
-    // Function uses casting from int to unsigned to compare if value of
-    // parameter a is greater or equal to zero and lower than value of
-    // parameter b. The b parameter is of type signed and is always positive,
-    // therefore its value is always lower than 0x800... where casting
-    // negative value of a parameter converts it to value higher than 0x800...
-    // The casting allows to use one condition instead of two.
+    /*
+     * Function uses casting from int to unsigned to compare if value of
+     * parameter a is greater or equal to zero and lower than value of
+     * parameter b. The b parameter is of type signed and is always positive,
+     * therefore its value is always lower than 0x800... where casting
+     * negative value of a parameter converts it to value higher than 0x800...
+     * The casting allows to use one condition instead of two.
+     */
     inline bool is_a_ge_zero_and_a_lt_b(int a, int b) {
         return static_cast<unsigned>(a) < static_cast<unsigned>(b);
     }
 
+    /*
+     * Image patch to Column
+     */
     void im2col_cpu(const float* data_im,
         const int channels, const int height, const int width,
         const int kernel_h, const int kernel_w,
@@ -184,7 +242,9 @@ namespace mkt {
         }
     }
 
-
+    /*
+     * Column to Image patch
+     */
     void col2im_cpu(const float* data_col, const int channels,
         const int height, const int width, const int kernel_h, const int kernel_w,
         const int pad_h, const int pad_w,
@@ -244,6 +304,16 @@ namespace mkt {
         }
     }
 
+    void set_memory(const int N, const float alpha, float* Y) {
+        if (alpha == 0) {
+            std::memset(Y, 0, sizeof(float)*N);
+        }
+        else {
+            for (int i = 0; i < N; ++i) {
+                Y[i] = alpha;
+            }
+        }
+    }
 
 
 } // namespace mkt

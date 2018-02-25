@@ -18,10 +18,7 @@ using namespace mkt;
 int main(int argc, char const *argv[])
 {
 
-    // Preset test data
-    unsigned char s0[] = {1,2, 4,5, 7,8, 10,11};
-    unsigned char s1[] = {3,5, 7,9, 6,8, 4,6};
-    unsigned char s2[] = {7,2, 6,9, 3,4, 9,1};
+
 
         /*13,14,15, 16,17,18, 19,20,21, 22,23,24, 25,26,27, 28,29,30, 31,32,33, 34,35,36};*/
 
@@ -29,18 +26,35 @@ int main(int argc, char const *argv[])
     // unsigned char s2[] = {4,5,6, 4,5,6, 4,5,6, 4,5,6, 4,5,6, 4,5,6, 4,5,6, 4,5,6, 4,5,6, 4,5,6, 4,5,6, 4,5,6};
     // unsigned char s3[] = {7,8,9, 7,8,9, 7,8,9, 7,8,9, 7,8,9, 7,8,9, 7,8,9, 7,8,9, 7,8,9, 7,8,9, 7,8,9, 7,8,9};
 
-    int channel = 2/*3*/;
-    int height = 2/*4*/;
-    int width = 2/*3*/;
-    int batchSize = 3;
+    int channel = 2;
+    int height = 4;
+    int width = 3;
+    int batchSize = 1;
+
+    // test data
+    unsigned char s0[] = {1,3,  2,4,  3,6,
+                          4,7,  5,8,  3,7,
+                          7,3,  8,7,  9,2,
+                          10,5, 11,7, 12,10};
+
+
+    unsigned char s1[] = {3,11, 5,2, 4,8,
+                          7,12, 9,5, 6,1,
+                          6,11, 8,2, 9,4,
+                          4,6,  6,8, 2,11};
+
+    unsigned char s2[] = {7,7, 2,5, 3,10,
+                          6,3, 9,8, 8,4,
+                          3,2, 4,8, 5,9,
+                          9,3, 1,5, 8,7};
 
     // Configure, initialize network
     Net net;
-    InputLayer* pInputLyaer = (InputLayer *)net.addInputLayer("input", batchSize, height, width, channel);
+    InputLayer* pInputLayer = (InputLayer *)net.addInputLayer("input", batchSize, height, width, channel);
 
-    InitializerType weightInitType = InitializerType::TEST;
+    InitializerType weightInitType = InitializerType::ONE;
     InitializerType biasInitType = InitializerType::ZERO;
-    Layer* pDenseLayer = net.addDenseLayer(pInputLyaer, "Layer1", 4, ActivationType::Relu, weightInitType, biasInitType);
+    Layer* pDenseLayer = net.addDenseLayer(pInputLayer, "Layer1", 4, ActivationType::Relu, weightInitType, biasInitType);
     net.initialize();
 
     // Get InputLayer
@@ -50,9 +64,20 @@ int main(int argc, char const *argv[])
     fprintf(stderr, "denseLayerSrcSize: %d\n", denseLayerSrcSize);
 
     // Add data
-    pInputLyaer->FlattenImageToTensor(s0, false);
-    pInputLyaer->FlattenImageToTensor(s1, false);
-    pInputLyaer->FlattenImageToTensor(s2, false);
+    for (int i = 0; i < batchSize; ++i)
+    {
+        switch (i) {
+            case 0:
+            pInputLayer->FlattenImageToTensor(s0, false);
+            break;
+            case 1:
+            pInputLayer->FlattenImageToTensor(s1, false);
+            break;
+            case 2:
+            pInputLayer->FlattenImageToTensor(s2, false);
+            break;
+        }
+    }
 
     // pInput->FlattenImageToTensor(s1, false);
     // pInput->FlattenImageToTensor(s2, true);
@@ -133,15 +158,27 @@ int main(int argc, char const *argv[])
 
     // PRINT TEST RESULT
     fprintf(stderr, "Source of Dense Layer\n");
-    for (int i = 0; i < pDenseLayer->pSrc_->getWholeSize(); ++i)
+    float* pSrcData = pDenseLayer->pSrc_->getData();
+    // fprintf(stderr, "%.1f ", pSrcData[i]);
+    for (int b = 0; b < batchSize; ++b)
     {
-        if (i > 0 && (i % pDenseLayer->pSrc_->getSize3D() == 0))
+        fprintf(stderr, "[batch]: %d\n", b);
+        for (int c = 0; c < channel; ++c)
         {
-            fprintf(stderr, "\n");
+            fprintf(stderr, "  ch: %d\n", c);
+            for (int h = 0; h < height; ++h)
+            {
+                for (int w = 0; w < width; ++w)
+                {
+                    fprintf(stderr, "\t%.2f\t", pSrcData[w + h*width + c*height*width + b*width*height*channel]);
+                }
+                fprintf(stderr, "\n");
+            }
+            // fprintf(stderr, "\n");
         }
-        float* pSrcData = pDenseLayer->pSrc_->getData();
-        fprintf(stderr, "%.1f ", pSrcData[i]);
+        // fprintf(stderr, "\n");
     }
+
 
     fprintf(stderr, "\n\n");
     fprintf(stderr, "Weight of Dense Layer\n");

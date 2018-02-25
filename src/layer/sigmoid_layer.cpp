@@ -5,7 +5,7 @@ namespace mkt {
     SigmoidLayer::SigmoidLayer(
         Layer* prevLayer,
         std::string id
-    ): Layer(LayerType::Relu)
+    ): Layer(LayerType::Sigmoid)
     {
 
         batchSize_ = prevLayer->pDst_->getNumOfData();
@@ -19,7 +19,7 @@ namespace mkt {
         ow_ = iw;
         oc_ = ic;
 
-        pDst_ = new Tensor{batchSize_, ih, iw, ic};
+        pDst_ = new Tensor{batchSize_, oh_, ow_, oc_};
     };
 
     SigmoidLayer::~SigmoidLayer() {};

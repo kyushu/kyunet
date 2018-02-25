@@ -111,8 +111,7 @@ namespace mkt {
 
     // Add Relu layer
     Layer* Net::addReluLayer(Layer* prevLayer, std::string id) {
-        if (layers_.size() == 0)
-        {
+        if (layers_.size() == 0) {
             fprintf(stderr, "please add input layer first\n");
             return nullptr;
         }
@@ -128,8 +127,7 @@ namespace mkt {
 
     // Add Sigmoid layer
     Layer* Net::addSigmoidLayer(Layer* prevLayer, std::string id) {
-        if (layers_.size() == 0)
-        {
+        if (layers_.size() == 0) {
             fprintf(stderr, "please add input layer first\n");
             return nullptr;
         }
@@ -146,8 +144,7 @@ namespace mkt {
     Layer* Net::addPoolingLayer( Layer* prevLayer, std::string id, int kernel_Height, int kernel_width, int stride_h, int stride_w, int pad_h, int pad_w, PoolingMethodType type)
     {
 
-        if (layers_.size() == 0)
-        {
+        if (layers_.size() == 0) {
             fprintf(stderr, "please add input layer first\n");
             return nullptr;
         }
@@ -159,15 +156,26 @@ namespace mkt {
         return poolingLayer;
     }
 
+    Layer* Net::addSoftmaxLayer( Layer* prevLayer, std::string id)
+    {
+
+        if (layers_.size() == 0) {
+            fprintf(stderr, "please add input layer first\n");
+            return nullptr;
+        }
+
+        SoftmaxLayer* softmaxLayer= new SoftmaxLayer{prevLayer, id};
+        layers_.push_back(softmaxLayer);
+        return softmaxLayer;
+    }
+
     /**************************
      *  Initializtion Function
      **************************/
     void Net::initialize() {
 
-        if (layers_.size() == 0)
-        {
+        if (layers_.size() == 0) {
             return;
-
         }
         else {
             for (int i = 0; i < layers_.size(); ++i)
@@ -178,6 +186,25 @@ namespace mkt {
                     layer->initialize();
                 } else {
                     layer->initialize();
+                }
+            }
+        }
+    }
+
+    /**************************
+     *  Forward
+     **************************/
+    void Net::forward() {
+        if (layers_.size() == 0) {
+            return;
+        } else {
+            for (int i = 0; i < layers_.size(); ++i)
+            {
+                Layer* pLayer = layers_.at(i);
+                if (i == 0) {
+                    M_Assert(pLayer->getType() == LayerType::Input, "The first layer is not InputLayer");
+                } else {
+                    pLayer->forward();
                 }
             }
         }

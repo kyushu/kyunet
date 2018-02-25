@@ -34,6 +34,7 @@
 #include "layer/relu_layer.h"
 #include "layer/sigmoid_layer.h"
 #include "layer/pooling_layer.h"
+#include "layer/softmax_layer.h"
 
 
 namespace mkt {
@@ -63,8 +64,13 @@ namespace mkt {
 
         Layer* addPoolingLayer( Layer* prevLayer, std::string id, int kernel_Height, int kernel_width, int stride_h, int stride_w, int pad_h, int pad_w, PoolingMethodType type);
 
+        Layer* addSoftmaxLayer( Layer* prevLayer, std::string id);
+
         // Initialize Function
         void initialize();
+
+        // Forward Function
+        void forward();
 
         // Add Data Function
         OP_STATUS add_data_from_file_list(std::vector<std::string> fileList);

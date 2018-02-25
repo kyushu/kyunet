@@ -207,12 +207,13 @@ namespace mkt {
             */
 
             mkt::gemm_cpu(
-                0, 0,                                                           /*trans_A, trans_B*/
-                pW_->getDepth(), pDst_->getSize2D(), pW_->getSize2D()*ic,   /*M,       N, K*/
-                1.0f, 1.0f,                                                     /* ALPHA,   BETA */
-                pWData, pW_->getSize2D()*ic,                               /*A,       lda(K)*/
-                pTmpColData,   oh*ow,                                      /*B,       ldb(N)*/
-                pDstData, oh*ow                                            /*C,       ldc(N)*/
+                CblasNoTrans, CblasNoTrans,                                                       /* trans_A, trans_B*/
+                pW_->getDepth(), pDst_->getSize2D(), pW_->getSize2D()*ic,   /* M,       N, K*/
+                1.0f,                                                       /* ALPHA */
+                pWData, pW_->getSize2D()*ic,                                /* A,       lda(K)*/
+                pTmpColData,   oh*ow,                                       /* B,       ldb(N)*/
+                1.0f,                                                       /* BETA */
+                pDstData, oh*ow                                             /* C,       ldc(N)*/
             );
         }
 

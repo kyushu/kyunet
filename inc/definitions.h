@@ -71,7 +71,9 @@ namespace mkt {
         FullConnected,
         Convolution,
         Pooling,
-        Relu
+        Relu,
+        Sigmoid,
+        Softmax
     };
 
     enum class PoolingMethodType: int
@@ -89,6 +91,11 @@ namespace mkt {
         // causal
     };
 
+    enum CBLAS_TRANSPOSE
+    {
+        CblasNoTrans=0,
+        CblasTrans
+    };
 }
 
 
