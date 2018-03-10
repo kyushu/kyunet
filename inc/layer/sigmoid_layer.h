@@ -16,8 +16,8 @@ namespace mkt {
 
         void initialize();
         // Computation Function
-        void forward();
-        void backward();
+        void Forward();
+        void Backward();
     };
 }
 #endif

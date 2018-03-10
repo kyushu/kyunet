@@ -54,14 +54,14 @@ namespace mkt {
 
         if (pDst_)
         {
-            int depth  = pDst_->getDepth();
-            int height = pDst_->getHeight();
-            int width  = pDst_->getWidth();
+            int depth  = pDst_->Channel();
+            int height = pDst_->Height();
+            int width  = pDst_->Width();
             int sz = width*height;
 
-            int size2D = pDst_->getSize2D();
-            int size3D = pDst_->getSize3D();
-            float* ptr = pDst_->getData() + pDst_->wrIdx_ * size3D;
+            int size2D = pDst_->Size2D();
+            int size3D = pDst_->Size3D();
+            float* ptr = pDst_->cpu_data() + pDst_->wrIdx_ * size3D;
             // fprintf(stdout, "size2D: %d\n", size2D);
             for (int i = 0; i < size3D; i+=depth)
             {

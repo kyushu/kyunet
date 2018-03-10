@@ -19,6 +19,19 @@
 * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 * SOFTWARE.
 */
+/*
+ *                Layer(l-1)                    Layer(l)
+ *         _______________________      _______________________
+ *        |            _______   |      |            _______   |
+ *        |           |      |   |      |           |      |   |
+ *    --->|-->pSrc    | pDst |---|----->|-->pSrc    | pDst |---|----->
+ *        |           |______|   |      |           |______|   |
+ *        |                      |      |                      |
+ *        |  (ext_Src)           |      |   (ext_Src)          |
+ *        |______________________|      |______________________|
+ *                                 ------------------------------
+ *        ext_Src: extra input sources but not the output of previous layer
+ */
 
 #ifndef MKT_LAYER_H
 #define MKT_LAYER_H
@@ -48,15 +61,18 @@ namespace mkt {
 
     public:
         std::string id_;
-        Tensor *pSrc_;    // point to dst_tensor of previous layer
-        Tensor *pDst_;    // new a destination tensor
-        Tensor *pW_;      // new a weight tensor
-        Tensor* pB_;      // new a bias tensor
+        Tensor *pSrc_;      // point to dst_tensor of previous layer
+        Tensor *pDst_;      // destination tensor
+        Tensor* pDif_;      // derivate data
+
+        Tensor *pW_;        // weight tensor
+        Tensor* pB_;        // bias tensor
+
         Activator* pActivator_;
 
         int batchSize_;
 
-        // result tensor Dimension
+        // tensor Dimension
         int oh_; // Dst Tensor height
         int ow_; // Dst Tensor widht
         int oc_; // Dst Tensor depth (channel)
@@ -83,23 +99,23 @@ namespace mkt {
         void initBiasTensor();
 
         // Computation Function
-        virtual void forward()=0;     // forward pass
-        virtual void backward()=0;    // back propagation
+        virtual void Forward()=0;     // forward pass
+        virtual void Backward()=0;    // back propagation
         void addBias();
         void applyActivator();
 
         // Getter function
-        LayerType getType();
-        InitializerType getWeightInitType();
-        InitializerType getBiasInitType();
-        ActivationType getActivationType();
-        int getBatchSize();
-        int getOutputHeight();
-        int getOutputWidth();
-        int getOutputChannel();
-        int getFilterHeight();
-        int getFilterWidth();
-        int getFilterChannel();
+        LayerType Type();
+        InitializerType Weight_Init_Type();
+        InitializerType Bias_Init_Type();
+        ActivationType Activation_Type();
+        int BatchSize();
+        int Output_Height();
+        int Output_Width();
+        int Output_Channel();
+        int Filter_Height();
+        int Filter_Width();
+        int Filter_Channel();
 
 
 

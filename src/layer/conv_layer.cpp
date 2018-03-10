@@ -31,11 +31,11 @@ namespace mkt {
         dilation_w_{1},
         Layer(LayerType::Convolution, actType, weightInitType, biasInitType)
     {
-
-        batchSize_ = prevLayer->pDst_->getNumOfData();
-        int ih = prevLayer->pDst_->getHeight();
-        int iw = prevLayer->pDst_->getWidth();
-        int ic = prevLayer->pDst_->getDepth();
+        id_ = id;
+        batchSize_ = prevLayer->pDst_->NumOfData();
+        int ih = prevLayer->pDst_->Height();
+        int iw = prevLayer->pDst_->Width();
+        int ic = prevLayer->pDst_->Channel();
         // int size3D = prevLayer->pDst_->getSize3D();
 
         pSrc_ = prevLayer->pDst_;
@@ -51,11 +51,11 @@ namespace mkt {
 
                 pad_w_ = static_cast<int>( ((iw-1)*stride_w_ + fw_ - iw) * 0.5 );
                 ow_    = static_cast<int>( static_cast<float>(iw - fw_ + (2*pad_w_)) / stride_w_ )  + 1;
-                M_Assert(iw_ == ow_, "iw != ow");
+                MKT_Assert(iw_ == ow_, "iw != ow");
 
                 pad_h_ = static_cast<int>( ((ih-1)*stride_h_ + fh_ - ih) * 0.5 );
                 oh_    = static_cast<int>( static_cast<float>(ih - fh_ + (2*pad_h_)) / stride_h_ ) + 1;
-                M_Assert(ih_ == oh_, "ih != oh");
+                MKT_Assert(ih_ == oh_, "ih != oh");
 
                 break;
             default:
@@ -68,7 +68,7 @@ namespace mkt {
         pW_   = new Tensor{ic, fh_, fw_, fc_};
         pB_   = new Tensor{1, 1, 1, oc_};
 
-        pTmpCol_ = new Tensor{1, pW_->getSize2D()*ic, pDst_->getSize2D(), oc_};
+        pTmpCol_ = new Tensor{1, pW_->Size2D()*ic, pDst_->Size2D(), oc_};
 
         // Activator
         applyActivator();
@@ -95,27 +95,27 @@ namespace mkt {
     }
 
     // Computation Function
-    void ConvLayer::forward() {
+    void ConvLayer::Forward() {
 
-        float* pSrcData = pSrc_->getData();
-        float* pDstData = pDst_->getData();
-        float* pWData = pW_->getData();
-        float* pTmpColData = pTmpCol_->getData();
+        float* pSrcData = pSrc_->cpu_data();
+        float* pDstData = pDst_->cpu_data();
+        float* pWData = pW_->cpu_data();
+        float* pTmpColData = pTmpCol_->cpu_data();
 
-        int ic = pSrc_->getDepth();
-        int iw = pSrc_->getWidth();
-        int ih = pSrc_->getHeight();
-        int src_size3D = pSrc_->getSize3D();
-        int src_wholeSize = pSrc_->getWholeSize();
+        int ic = pSrc_->Channel();
+        int iw = pSrc_->Width();
+        int ih = pSrc_->Height();
+        int src_size3D = pSrc_->Size3D();
+        int src_wholeSize = pSrc_->WholeSize();
 
-        int batchSize = pDst_->getNumOfData();
-        int oh = pDst_->getHeight();
-        int ow = pDst_->getWidth();
-        int dst_wholeSize = pDst_->getWholeSize();
+        int batchSize = pDst_->NumOfData();
+        int oh = pDst_->Height();
+        int ow = pDst_->Width();
+        int dst_wholeSize = pDst_->WholeSize();
 
-        int fh = pW_->getHeight();
-        int fw = pW_->getWidth();
-        int filter_wholeSize = pW_->getWholeSize();
+        int fh = pW_->Height();
+        int fw = pW_->Width();
+        int filter_wholeSize = pW_->WholeSize();
 
         fprintf(stderr, "src_wholeSize: %d\n", src_wholeSize);
         fprintf(stderr, "dst_wholeSize: %d\n", dst_wholeSize);
@@ -208,9 +208,9 @@ namespace mkt {
 
             mkt::gemm_cpu(
                 CblasNoTrans, CblasNoTrans,                                                       /* trans_A, trans_B*/
-                pW_->getDepth(), pDst_->getSize2D(), pW_->getSize2D()*ic,   /* M,       N, K*/
+                pW_->Channel(), pDst_->Size2D(), pW_->Size2D()*ic,   /* M,       N, K*/
                 1.0f,                                                       /* ALPHA */
-                pWData, pW_->getSize2D()*ic,                                /* A,       lda(K)*/
+                pWData, pW_->Size2D()*ic,                                /* A,       lda(K)*/
                 pTmpColData,   oh*ow,                                       /* B,       ldb(N)*/
                 1.0f,                                                       /* BETA */
                 pDstData, oh*ow                                             /* C,       ldc(N)*/
@@ -228,7 +228,7 @@ namespace mkt {
         }
 
     }
-    void ConvLayer::backward() {
+    void ConvLayer::Backward() {
 
     }
 

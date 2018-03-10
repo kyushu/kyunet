@@ -23,11 +23,12 @@ namespace mkt {
         type_{type},
         Layer(LayerType::Pooling)
     {
+        id_ = id;
 
-        batchSize_ = prevLayer->pDst_->getNumOfData();
-        int ih = prevLayer->pDst_->getHeight();
-        int iw = prevLayer->pDst_->getWidth();
-        int ic = prevLayer->pDst_->getDepth();
+        batchSize_ = prevLayer->pDst_->NumOfData();
+        int ih = prevLayer->pDst_->Height();
+        int iw = prevLayer->pDst_->Width();
+        int ic = prevLayer->pDst_->Channel();
         pSrc_ = prevLayer->pDst_;
 
         oc_ = ic;
@@ -41,8 +42,8 @@ namespace mkt {
             if ((oh_ - 1) * stride_h > ih + pad_h_) { --oh_; }
         }
 
-        M_Assert((ow_-1)*stride_w_ < iw + pad_w_, "polling size");
-        M_Assert((oh_-1)*stride_h_ < ih + pad_h_, "polling size");
+        MKT_Assert((ow_-1)*stride_w_ < iw + pad_w_, "polling size");
+        MKT_Assert((oh_-1)*stride_h_ < ih + pad_h_, "polling size");
 
         pDst_ = new Tensor{batchSize_, oh_, ow_, oc_};
     }
@@ -61,12 +62,12 @@ namespace mkt {
     }
 
     // Computation Function
-    void PoolingLayer::forward() {
+    void PoolingLayer::Forward() {
 
-        float* pSrcData = pSrc_->getData();
-        float* pDstData = pDst_->getData();
-        int ih = pSrc_->getHeight();
-        int iw = pSrc_->getWidth();
+        float* pSrcData = pSrc_->cpu_data();
+        float* pDstData = pDst_->cpu_data();
+        int ih = pSrc_->Height();
+        int iw = pSrc_->Width();
 
         switch (type_) {
             case PoolingMethodType::MAX:
@@ -143,7 +144,7 @@ namespace mkt {
         }
     }
 
-    void PoolingLayer::backward() {
+    void PoolingLayer::Backward() {
 
     }
 

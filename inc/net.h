@@ -35,6 +35,7 @@
 #include "layer/sigmoid_layer.h"
 #include "layer/pooling_layer.h"
 #include "layer/softmax_layer.h"
+#include "layer/cross_entropy_loss_with_softmax_layer.h"
 
 
 namespace mkt {
@@ -66,11 +67,13 @@ namespace mkt {
 
         Layer* addSoftmaxLayer( Layer* prevLayer, std::string id);
 
+        Layer* addCrossEntropyLossWithSoftmaxLayer( Layer* prevLayer, std::string id);
+
         // Initialize Function
         void initialize();
 
         // Forward Function
-        void forward();
+        void Forward();
 
         // Add Data Function
         OP_STATUS add_data_from_file_list(std::vector<std::string> fileList);

@@ -3,7 +3,8 @@ cmake_minimum_required(VERSION 2.9)
 project(all_test)
 
 # Set compile mode to debug
-set(CMAKE_BUILD_TYPE RelWithDebInfo)
+# set(CMAKE_BUILD_TYPE RelWithDebInfo)
+set(CMAKE_BUILD_TYPE Debug)
 
 # stb_SRC is already included in kyunet/CMakeList.txt
 # so we don't need to include stb header here again.
@@ -75,6 +76,14 @@ find_package(OpenCV REQUIRED)
         # 15 test_softmax_layer
         add_executable(test_softmax_layer 15_test_softmax_layer.cpp)
         target_link_libraries(test_softmax_layer libkyunet)
+
+        # 16 test_dense_softmax_layer
+        add_executable(test_dense_softmax_layer 16_test_dense_softmax_layer.cpp)
+        target_link_libraries(test_dense_softmax_layer libkyunet)
+
+        # 17 test_cross_entropy_with_softmax_layer
+        add_executable(test_cross_entropy_with_softmax_layer 17_test_cross_entropy_with_softmax_layer.cpp)
+        target_link_libraries(test_cross_entropy_with_softmax_layer libkyunet)
 
     else()
         message("OpenCV not found")

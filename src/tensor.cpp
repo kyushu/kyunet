@@ -41,8 +41,8 @@ namespace mkt {
     {};
 
     // Constructor
-    Tensor::Tensor(int batchSize, int height, int width, int ch):
-        num_{batchSize},
+    Tensor::Tensor(int num, int height, int width, int ch):
+        num_{num},
         height_{height},
         width_{width},
         channel_{ch}
@@ -79,6 +79,23 @@ namespace mkt {
 
         pData_ = new float[wholeSize_];
 
+    }
+
+    void Tensor::Reshape(int num, int height, int width, int ch) {
+        num_ = num;
+        height_ = height;
+        width_ = width;
+        channel_ = ch;
+
+        size2D_ = height_ * width_;
+        size3D_ = size2D_ * channel_;
+
+        if (pData_)
+        {
+            delete[] pData_;
+        }
+
+        allocate();
     }
 
     /*********************
@@ -178,35 +195,35 @@ namespace mkt {
     /********************************
     ** Getter
     ********************************/
-    float* Tensor::getData() {
+    float* Tensor::cpu_data() {
         return pData_;
     }
 
-    int Tensor::getNumOfData() {
+    int Tensor::NumOfData() {
         return num_;
     }
 
-    int Tensor::getWidth() {
+    int Tensor::Width() {
         return width_;
     }
 
-    int Tensor::getHeight() {
+    int Tensor::Height() {
         return height_;
     }
 
-    int Tensor::getDepth() {
+    int Tensor::Channel() {
         return channel_;
     }
 
-    int Tensor::getSize2D() {
+    int Tensor::Size2D() {
         return size2D_;
     }
 
-    int Tensor::getSize3D() {
+    int Tensor::Size3D() {
         return size3D_;
     }
 
-    int Tensor::getWholeSize() {
+    int Tensor::WholeSize() {
         return wholeSize_;
     }
 }

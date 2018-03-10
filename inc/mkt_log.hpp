@@ -51,10 +51,10 @@ namespace mkt {
 
 
 #ifndef NDEBUG
-#   define M_Assert(Expr, Msg) \
+#   define MKT_Assert(Expr, Msg) \
     __M_Assert(#Expr, Expr, __FILE__, __LINE__, Msg)
 #else
-#   define M_Assert(Expr, Msg) ; // no value = do nothing
+#   define MKT_Assert(Expr, Msg) ; // no value = do nothing
 #endif
 
 static void __M_Assert(const char* expr_str, bool expr, const char* file, int line, const char* msg)
@@ -64,6 +64,50 @@ static void __M_Assert(const char* expr_str, bool expr, const char* file, int li
         std::cerr << "Assert failed:\t" << msg << "\n"
             << "Expected:\t" << expr_str << "\n"
             << "Source:\t\t" << file << ", line " << line << "\n";
+        abort();
+    }
+}
+
+
+
+template<typename T>
+static void CHECK_EQ(T a, T b, const char* func) {
+    // const char* file = __FILE__;
+    // int line = __LINE__;
+    if (a != b)
+    {
+        // std::cerr << a << "!=" << b << "\n"
+        //     << "Source:\t\t" << file << ", line " << line << "\n";
+        std::cerr << a << "!=" << b << "\n"
+            << "Source:\t\t" << func << "\n";
+        abort();
+    }
+}
+
+template<typename T>
+static void CHECK_LT(T a, T b, const char* func) {
+    // const char* file = __FILE__;
+    // int line = __LINE__;
+    if (a > b)
+    {
+        // std::cerr << a << ">" << b << "\n"
+        //     << "Source:\t\t" << file << ", line " << line << "\n";
+        std::cerr << a << ">" << b << "\n"
+            << "Source:\t\t" << func << "\n";
+        abort();
+    }
+}
+
+template<typename T>
+static void CHECK_GE(T a, T b, const char* func) {
+    // const char* file = __FILE__;
+    // int line = __LINE__;
+    if (a > b)
+    {
+        // std::cerr << a << "<" << b << "\n"
+        //     << "Source:\t\t" << file << ", line " << line << "\n";
+        std::cerr << a << "<" << b << "\n"
+            << "Source:\t\t" << func << "\n";
         abort();
     }
 }

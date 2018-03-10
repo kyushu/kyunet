@@ -26,19 +26,19 @@ int main(int argc, char const *argv[])
 
     // Feed pseudo data
     Tensor* pInputTensor = pInputLayer->pDst_;
-    float* pInDstData = pInputTensor->getData();
+    float* pInDstData = pInputTensor->cpu_data();
     fprintf(stderr, "Input data\n");
-    for (int i = 0; i < pInputTensor->getWholeSize(); ++i)
+    for (int i = 0; i < pInputTensor->WholeSize(); ++i)
     {
         float fval = (float(std::rand() % 100) / 100 - 0.5);
         pInDstData[i] = fval;
         fprintf(stderr, "%d: %f\n",i, fval);
     }
 
-    pSigmoidLayer->forward();
+    pSigmoidLayer->Forward();
 
-    int wholeSize = pSigmoidLayer->pDst_->getWholeSize();
-    float* pDstData = pSigmoidLayer->pDst_->getData();
+    int wholeSize = pSigmoidLayer->pDst_->WholeSize();
+    float* pDstData = pSigmoidLayer->pDst_->cpu_data();
     fprintf(stderr, "Relu result\n");
     for (int i = 0; i < wholeSize; ++i)
     {

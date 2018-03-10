@@ -315,5 +315,11 @@ namespace mkt {
         }
     }
 
+    void mem_copy_cpu(int size, float* pSrcData, float* pDstData) {
+        for (int i = 0; i < size; ++i)
+        {
+            pDstData[i] = pSrcData[i];
+        }
+    }
 
 } // namespace mkt

@@ -12,13 +12,13 @@ namespace mkt {
         InitializerType biasInitType
     ): unit_{unit}, Layer(LayerType::FullConnected, actType, weightInitType, biasInitType)
     {
-        id = id;
+        id_ = id;
 
-        int batchSize = prevLayer->pDst_->getNumOfData();
-        int h = prevLayer->pDst_->getHeight();
-        int w = prevLayer->pDst_->getWidth();
-        int c = prevLayer->pDst_->getDepth();
-        int size3D = prevLayer->pDst_->getSize3D();
+        int batchSize = prevLayer->pDst_->NumOfData();
+        int h = prevLayer->pDst_->Height();
+        int w = prevLayer->pDst_->Width();
+        int c = prevLayer->pDst_->Channel();
+        int size3D = prevLayer->pDst_->Size3D();
 
         // pSrc_ point to pDst_ of previous layer
         pSrc_ = prevLayer->pDst_;
@@ -40,11 +40,11 @@ namespace mkt {
         InitializerType biasInitType
     ): unit_{unit}, Layer(LayerType::FullConnected, actType, weightInitType, biasInitType)
     {
-        int batchSize = prevLayer->pDst_->getNumOfData();
-        int h = prevLayer->pDst_->getHeight();
-        int w = prevLayer->pDst_->getWidth();
-        int c = prevLayer->pDst_->getDepth();
-        int size3D = prevLayer->pDst_->getSize3D();
+        int batchSize = prevLayer->pDst_->NumOfData();
+        int h = prevLayer->pDst_->Height();
+        int w = prevLayer->pDst_->Width();
+        int c = prevLayer->pDst_->Channel();
+        int size3D = prevLayer->pDst_->Size3D();
 
         // pSrc_ point to pDst_ of previous layer
         pSrc_ = prevLayer->pDst_;
@@ -69,15 +69,15 @@ namespace mkt {
 
     }
 
-    void DenseLayer::forward() {
+    void DenseLayer::Forward() {
 
-        float* pSrcData = pSrc_->getData();
-        float* pDstData = pDst_->getData();
-        float* pWData = pW_->getData();
+        float* pSrcData = pSrc_->cpu_data();
+        float* pDstData = pDst_->cpu_data();
+        float* pWData = pW_->cpu_data();
 
-        int batchSize = pSrc_->getNumOfData();
-        int srcSize3D = pSrc_->getSize3D();
-        int dstSize3D = pDst_->getSize3D();
+        int batchSize = pSrc_->NumOfData();
+        int srcSize3D = pSrc_->Size3D();
+        int dstSize3D = pDst_->Size3D();
 
 
         // 1. Rest data
@@ -117,7 +117,7 @@ namespace mkt {
 
     }
 
-    void DenseLayer::backward() {
+    void DenseLayer::Backward() {
         fprintf(stderr, "DenseLayer backward not yet finish\n");
     }
 }

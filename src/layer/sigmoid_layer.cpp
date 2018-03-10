@@ -7,13 +7,14 @@ namespace mkt {
         std::string id
     ): Layer(LayerType::Sigmoid)
     {
+        id_ = id;
 
-        batchSize_ = prevLayer->pDst_->getNumOfData();
+        batchSize_ = prevLayer->pDst_->NumOfData();
         pSrc_ = prevLayer->pDst_;
 
-        int ih = prevLayer->pDst_->getHeight();
-        int iw = prevLayer->pDst_->getWidth();
-        int ic = prevLayer->pDst_->getDepth();
+        int ih = prevLayer->pDst_->Height();
+        int iw = prevLayer->pDst_->Width();
+        int ic = prevLayer->pDst_->Channel();
 
         oh_ = ih;
         ow_ = iw;
@@ -29,11 +30,11 @@ namespace mkt {
     };
 
 
-    void SigmoidLayer::forward() {
+    void SigmoidLayer::Forward() {
         sigmoid_act_.forward(*pSrc_, *pDst_);
     };
 
-    void SigmoidLayer::backward() {
+    void SigmoidLayer::Backward() {
 
     };
 }

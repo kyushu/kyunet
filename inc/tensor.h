@@ -51,7 +51,7 @@ namespace mkt {
 
     public:
         Tensor();
-        Tensor(int batchSize, int height, int width, int ch);
+        Tensor(int num, int height, int width, int ch);
         ~Tensor();
 
         // TODO: Tensor CopyConstructor
@@ -64,6 +64,7 @@ namespace mkt {
         // Initialize Function
         // void initialize(int batchSize, int h, int w, int c);
         void allocate();
+        void Reshape(int num, int height, int width, int ch);
 
         // Add Data Function
         OP_STATUS addData(char const *filename);
@@ -74,14 +75,14 @@ namespace mkt {
         void cleanData();
 
         // Getter
-        float* getData();
-        int getNumOfData();
-        int getDepth();
-        int getWidth();
-        int getHeight();
-        int getSize2D();
-        int getSize3D();
-        int getWholeSize();
+        float* cpu_data();
+        int NumOfData();
+        int Channel();
+        int Width();
+        int Height();
+        int Size2D();
+        int Size3D();
+        int WholeSize();
 
 
     };

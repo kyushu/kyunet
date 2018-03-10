@@ -35,12 +35,15 @@ namespace mkt {
         activationType_{activationType},
         weightInitType_{weightInitType},
         biasInitType_{biasInitType},
+        id_{""},
         batchSize_{0},
         oh_{0}, ow_{0}, oc_{0},
         pSrc_{nullptr},
         pDst_{nullptr},
+        pDif_{nullptr},
         pW_{nullptr},
-        pB_{nullptr}
+        pB_{nullptr},
+        pActivator_{nullptr}
     {};
 
     Layer::~Layer() {
@@ -51,19 +54,24 @@ namespace mkt {
 
 
         mktLog(1, "pDst_.adr: %p\n", pDst_);
-        if (pDst_) {mktLog(1, "pDst_->pData.adr: %p\n", pDst_->getData());}
+        if (pDst_) {mktLog(1, "pDst_->pData.adr: %p\n", pDst_->cpu_data());}
         delete pDst_;
         mktLog(1, "--------------------- Layer Destructor pDst_\n");
 
+        mktLog(1, "pDif_.adr: %p\n", pDif_);
+        if (pDif_) {mktLog(1, "pDif_->pData.adr: %p\n", pDif_->cpu_data());}
+        delete pDif_;
+        mktLog(1, "--------------------- Layer Destructor pDif_\n");
+
 
         mktLog(1, "pW_.adr: %p\n", pW_);
-        if (pW_) {mktLog(1, "pW_->pData.adr: %p\n", pW_->getData());}
+        if (pW_) {mktLog(1, "pW_->pData.adr: %p\n", pW_->cpu_data());}
         delete pW_;
         mktLog(1, "--------------------- Layer Destructor pW_\n");
 
 
         mktLog(1, "pB_.adr: %p\n", pB_);
-        if (pB_) {mktLog(1, "pB_->pData.adr: %p\n", pB_->getData());}
+        if (pB_) {mktLog(1, "pB_->pData.adr: %p\n", pB_->cpu_data());}
         delete pB_;
         mktLog(1, "--------------------- Layer Destructor pB_\n");
 
@@ -83,8 +91,8 @@ namespace mkt {
     void Layer::initWeightTensor() {
 
         pW_->allocate();
-        int weight_wholeSize = pW_->getWholeSize();
-        float* pWData = pW_->getData();
+        int weight_wholeSize = pW_->WholeSize();
+        float* pWData = pW_->cpu_data();
         switch (weightInitType_) {
             case InitializerType::ZERO:
             {
@@ -137,10 +145,10 @@ namespace mkt {
 
     // ##################################
     void Layer::addBias() {
-        for (int i = 0; i < pDst_->getNumOfData(); ++i)
+        for (int i = 0; i < pDst_->NumOfData(); ++i)
         {
-            int numData = i * pDst_->getSize3D();
-            axpy(pDst_->getSize3D(), 1.0, pB_->getData(), pDst_->getData()+numData);
+            int numData = i * pDst_->Size3D();
+            axpy(pDst_->Size3D(), 1.0, pB_->cpu_data(), pDst_->cpu_data()+numData);
         }
     }
 
@@ -163,30 +171,30 @@ namespace mkt {
 
     //##################################
     // Getter Function
-    LayerType Layer::getType() {
+    LayerType Layer::Type() {
         return type_;
     }
-    InitializerType Layer::getWeightInitType(){
+    InitializerType Layer::Weight_Init_Type(){
         return weightInitType_;
     }
-    InitializerType Layer::getBiasInitType(){
+    InitializerType Layer::Bias_Init_Type(){
         return biasInitType_;
     }
-    ActivationType Layer::getActivationType() {
+    ActivationType Layer::Activation_Type() {
         return activationType_;
     }
 
-    int Layer::getBatchSize() {
+    int Layer::BatchSize() {
         return batchSize_;
     }
 
-    int Layer::getOutputHeight() {
+    int Layer::Output_Height() {
         return oh_;
     }
-    int Layer::getOutputWidth() {
+    int Layer::Output_Width() {
         return ow_;
     }
-    int Layer::getOutputChannel() {
+    int Layer::Output_Channel() {
         return oc_;
     }
 

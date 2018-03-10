@@ -13,16 +13,16 @@ int main(int argc, char const *argv[])
     // src tensor
     mkt::Tensor image(1, 4, 4, 3);
     image.allocate();
-    float* pImgData = image.getData();
-    int ih = image.getHeight();
-    int iw = image.getWidth();
-    int ic = image.getDepth();
+    float* pImgData = image.cpu_data();
+    int ih = image.Height();
+    int iw = image.Width();
+    int ic = image.Channel();
     mktLog(2, "src data\n");
-    for (int i = 0; i < image.getSize3D(); ++i) {
+    for (int i = 0; i < image.Size3D(); ++i) {
         pImgData[i] = i;
     }
 
-    for (int i = 0; i < image.getSize2D(); ++i)
+    for (int i = 0; i < image.Size2D(); ++i)
     {
         if (i > 0 && i % 4 == 0)
         {
@@ -33,7 +33,7 @@ int main(int argc, char const *argv[])
 
     mktLog(2, "\n");
 
-    for (int i = image.getSize2D(); i < 2* image.getSize2D(); ++i)
+    for (int i = image.Size2D(); i < 2* image.Size2D(); ++i)
     {
         if (i > 0 && i % 4 == 0)
         {
@@ -42,7 +42,7 @@ int main(int argc, char const *argv[])
         mktLog(2, "%.1f ", pImgData[i]);
     }
     mktLog(2, "\n");
-    for (int i = 2* image.getSize2D(); i < 3 * image.getSize2D(); ++i)
+    for (int i = 2* image.Size2D(); i < 3 * image.Size2D(); ++i)
     {
         if (i > 0 && i % 4 == 0)
         {
@@ -57,18 +57,18 @@ int main(int argc, char const *argv[])
     // kernel tensor
     mkt::Tensor filter(2, 3, 3, 3);
     filter.allocate();
-    float* pFilterData = filter.getData();
-    int fh = filter.getHeight();
-    int fw = filter.getWidth();
-    int fc = filter.getDepth();
-    for (int i = 0; i < filter.getWholeSize(); ++i)
+    float* pFilterData = filter.cpu_data();
+    int fh = filter.Height();
+    int fw = filter.Width();
+    int fc = filter.Channel();
+    for (int i = 0; i < filter.WholeSize(); ++i)
     {
         pFilterData[i] = 1;
     }
     mktLog(2, "filter\n");
-    for (int i = 0; i < filter.getWholeSize(); ++i)
+    for (int i = 0; i < filter.WholeSize(); ++i)
     {
-        if (i > 0 && i%filter.getSize3D() == 0)
+        if (i > 0 && i%filter.Size3D() == 0)
         {
             mktLog(2, "\n");
         }
@@ -87,27 +87,27 @@ int main(int argc, char const *argv[])
 
     mkt::Tensor dst(1, oh, ow, oc);
     dst.allocate();
-    float* pDstData = dst.getData();
+    float* pDstData = dst.cpu_data();
 
 
     //#############################
     // column patch tensor
-    mktLog(2, "filter.size2D: %d\n", filter.getSize2D());
+    mktLog(2, "filter.size2D: %d\n", filter.Size2D());
     mktLog(2, "ic:%d\n", ic);
-    mktLog(2, "dst.size2D: %d\n", dst.getSize2D());
+    mktLog(2, "dst.size2D: %d\n", dst.Size2D());
 
-    mkt::Tensor tempCol(1, filter.getSize2D()*ic, dst.getSize2D(), oc);
+    mkt::Tensor tempCol(1, filter.Size2D()*ic, dst.Size2D(), oc);
     tempCol.allocate();
-    float* pTmpColData = tempCol.getData();
-    mktLog(2, "tempCol.getSize2D(): %d\n", tempCol.getSize2D());
+    float* pTmpColData = tempCol.cpu_data();
+    mktLog(2, "tempCol.getSize2D(): %d\n", tempCol.Size2D());
 
     mktLog(2, "b4 im2col\n");
 
     //#############################
     // im2col
     mkt::im2col_cpu(pImgData,
-        image.getDepth(), image.getHeight(), image.getWidth(),
-        filter.getHeight(), filter.getWidth(),
+        image.Channel(), image.Height(), image.Width(),
+        filter.Height(), filter.Width(),
         padding, padding,
         stride, stride,
         dilation, dilation,
@@ -144,25 +144,25 @@ int main(int argc, char const *argv[])
     // }
 
     mktLog(2, "\n");
-    mktLog(2, "M: %d\n",filter.getNumOfData());
-    mktLog(2, "N: %d\n",dst.getSize2D());
-    mktLog(2, "K: %d\n",filter.getSize2D()*ic);
+    mktLog(2, "M: %d\n",filter.NumOfData());
+    mktLog(2, "N: %d\n",dst.Size2D());
+    mktLog(2, "K: %d\n",filter.Size2D()*ic);
 
 
     //#############################
     // kernel X im2col
     mkt::gemm_cpu(CBLAS_TRANSPOSE::CblasNoTrans, CBLAS_TRANSPOSE::CblasNoTrans,                                                     /*trans_A, trans_B*/
-            filter.getNumOfData(), dst.getSize2D(), filter.getSize2D()*ic,  /*M,       N,K*/
+            filter.NumOfData(), dst.Size2D(), filter.Size2D()*ic,  /*M,       N,K*/
             1.0f,                                                           /*ALPHA*/
-            pFilterData, filter.getSize2D()*ic,                             /*A,       lda(K)*/
+            pFilterData, filter.Size2D()*ic,                             /*A,       lda(K)*/
             pTmpColData,   oh*ow,                                           /*B,       ldb(N)*/
             1.0f,                                                           /*BETA*/
             pDstData, oh*ow                                                 /*C,       ldc(N)*/
     );
 
-    for (int i = 0; i < dst.getSize3D(); ++i)
+    for (int i = 0; i < dst.Size3D(); ++i)
     {
-        if (i > 0 && i%dst.getSize2D()==0)
+        if (i > 0 && i%dst.Size2D()==0)
         {
             mktLog(2, "\n");
         }

@@ -169,6 +169,19 @@ namespace mkt {
         return softmaxLayer;
     }
 
+    Layer* Net::addCrossEntropyLossWithSoftmaxLayer( Layer* prevLayer, std::string id)
+    {
+
+        if (layers_.size() == 0) {
+            fprintf(stderr, "please add input layer first\n");
+            return nullptr;
+        }
+
+        CrossEntropyLossWithSoftmaxLayer* pCELossWithSoftmaxLayer= new CrossEntropyLossWithSoftmaxLayer{prevLayer, id};
+        layers_.push_back(pCELossWithSoftmaxLayer);
+        return pCELossWithSoftmaxLayer;
+    }
+
     /**************************
      *  Initializtion Function
      **************************/
@@ -181,7 +194,7 @@ namespace mkt {
             for (int i = 0; i < layers_.size(); ++i)
             {
                 Layer* layer = layers_.at(i);
-                if (i == 0 && layer->getType() == LayerType::Input)
+                if (i == 0 && layer->Type() == LayerType::Input)
                 {
                     layer->initialize();
                 } else {
@@ -194,7 +207,7 @@ namespace mkt {
     /**************************
      *  Forward
      **************************/
-    void Net::forward() {
+    void Net::Forward() {
         if (layers_.size() == 0) {
             return;
         } else {
@@ -202,9 +215,9 @@ namespace mkt {
             {
                 Layer* pLayer = layers_.at(i);
                 if (i == 0) {
-                    M_Assert(pLayer->getType() == LayerType::Input, "The first layer is not InputLayer");
+                    MKT_Assert(pLayer->Type() == LayerType::Input, "The first layer is not InputLayer");
                 } else {
-                    pLayer->forward();
+                    pLayer->Forward();
                 }
             }
         }
@@ -214,10 +227,10 @@ namespace mkt {
     OP_STATUS Net::add_data_from_file_list(std::vector<std::string> fileList) {
 
         int inSize = fileList.size();
-        int batchSize = pInputLayer_->pDst_->getNumOfData();
-        int tensor_h = pInputLayer_->pDst_->getHeight();
-        int tensor_w = pInputLayer_->pDst_->getWidth();
-        int tensor_c = pInputLayer_->pDst_->getDepth();
+        int batchSize = pInputLayer_->pDst_->NumOfData();
+        int tensor_h = pInputLayer_->pDst_->Height();
+        int tensor_w = pInputLayer_->pDst_->Width();
+        int tensor_c = pInputLayer_->pDst_->Channel();
 
         if (inSize != batchSize)
         {

@@ -63,10 +63,10 @@ void test_load_image_file(std::string img_dir) {
     // tensor.width_ = 600;
     // tensor.channel_ = 3;
     tensor.allocate();
-    printf("batch size: %d\n", tensor.getNumOfData());
-    printf("width: %d\n", tensor.getWidth());
-    printf("height: %d\n", tensor.getHeight());
-    printf("channel: %d\n", tensor.getDepth());
+    printf("batch size: %d\n", tensor.NumOfData());
+    printf("width: %d\n", tensor.Width());
+    printf("height: %d\n", tensor.Height());
+    printf("channel: %d\n", tensor.Channel());
 
     assert(file_list.size() >= 3);
 
@@ -103,8 +103,8 @@ void test_load_image_file(std::string img_dir) {
     /***************
      * Verify data
      **************/
-    const float *data = tensor.getData();
-    unsigned char *uchar = (unsigned char *)calloc(tensor.getSize3D(), sizeof(unsigned char));
+    const float *data = tensor.cpu_data();
+    unsigned char *uchar = (unsigned char *)calloc(tensor.Size3D(), sizeof(unsigned char));
     for (int i = 0; i < file_list.size(); ++i)
     {
         // Display
@@ -114,7 +114,7 @@ void test_load_image_file(std::string img_dir) {
 
         printf("read: %p\n", data);
 
-        for (int i = 0; i < tensor.getSize3D(); ++i)
+        for (int i = 0; i < tensor.Size3D(); ++i)
         {
             *(uchar+i) = int(*(data+i));
         }
@@ -126,7 +126,7 @@ void test_load_image_file(std::string img_dir) {
         cv::imshow("image", img_mat);
         cv::waitKey(0);
 
-        data += tensor.getSize3D();
+        data += tensor.Size3D();
     }
 
 }

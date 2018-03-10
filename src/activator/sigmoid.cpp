@@ -16,17 +16,18 @@ namespace mkt {
     void Sigmoid_Act::forward(Tensor &src, Tensor &dst) {
 
         // Check size
-        int srcWholeSize = src.getWholeSize();
-        int dstWholeSize = src.getWholeSize();
-        if (!Check_EQ(srcWholeSize, dstWholeSize))
-        {
-            MKT_ERR_LOG("Relu:Forward, size of src(%d) and dst(%d) is not equal\n", srcWholeSize, dstWholeSize);
-            return;
-        }
+        int srcWholeSize = src.WholeSize();
+        int dstWholeSize = src.WholeSize();
+        CHECK_EQ(srcWholeSize, dstWholeSize, __func__);
+        // if (!Check_EQ(srcWholeSize, dstWholeSize))
+        // {
+        //     MKT_ERR_LOG("Relu:Forward, size of src(%d) and dst(%d) is not equal\n", srcWholeSize, dstWholeSize);
+        //     return;
+        // }
 
         // Get data memory
-        float* pSrcData = src.getData();
-        float* pDstData = dst.getData();
+        float* pSrcData = src.cpu_data();
+        float* pDstData = dst.cpu_data();
 
         for (int i = 0; i < dstWholeSize; ++i)
         {

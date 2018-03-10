@@ -9,12 +9,14 @@ namespace mkt {
     ): negative_slope_{negative_slope}, Layer(LayerType::Relu)
     {
 
-        batchSize_ = prevLayer->pDst_->getNumOfData();
+        id_ = id;
+
+        batchSize_ = prevLayer->pDst_->NumOfData();
         pSrc_ = prevLayer->pDst_;
 
-        int ih = prevLayer->pDst_->getHeight();
-        int iw = prevLayer->pDst_->getWidth();
-        int ic = prevLayer->pDst_->getDepth();
+        int ih = prevLayer->pDst_->Height();
+        int iw = prevLayer->pDst_->Width();
+        int ic = prevLayer->pDst_->Channel();
 
         oh_ = ih;
         ow_ = iw;
@@ -30,11 +32,11 @@ namespace mkt {
     };
 
 
-    void ReluLayer::forward() {
+    void ReluLayer::Forward() {
         relu_act_.forward(*pSrc_, *pDst_);
     };
 
-    void ReluLayer::backward() {
+    void ReluLayer::Backward() {
 
     };
 }

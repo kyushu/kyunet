@@ -59,8 +59,8 @@ int main(int argc, char const *argv[])
 
     // Get InputLayer
     // InputLayer* pInput = net.getInputLayer();
-    // const float *pdata = pInput->pDst->getData();
-    int denseLayerSrcSize = pDenseLayer->pSrc_->getSize3D();
+    // const float *pdata = pInput->pDst->cpu_data();
+    int denseLayerSrcSize = pDenseLayer->pSrc_->Size3D();
     fprintf(stderr, "denseLayerSrcSize: %d\n", denseLayerSrcSize);
 
     // Add data
@@ -83,15 +83,15 @@ int main(int argc, char const *argv[])
     // pInput->FlattenImageToTensor(s2, true);
     // pInput->FlattenImageToTensor(s3, true);
 
-    int weightsize3D = pDenseLayer->pW_->getSize3D();
-    int weightWholeSize = pDenseLayer->pW_->getWholeSize();
-    if (pDenseLayer->getType() == LayerType::FullConnected)
+    int weightsize3D = pDenseLayer->pW_->Size3D();
+    int weightWholeSize = pDenseLayer->pW_->WholeSize();
+    if (pDenseLayer->Type() == LayerType::FullConnected)
     {
         fprintf(stderr, "Dense Layer type is correct\n");
     }
 
     fprintf(stderr, "Dense Layer weight init type: \n");
-    switch (pDenseLayer->getWeightInitType())
+    switch (pDenseLayer->Weight_Init_Type())
     {
         case InitializerType::NONE:
             fprintf(stderr, "NONE\n");
@@ -110,7 +110,7 @@ int main(int argc, char const *argv[])
             break;
     }
     fprintf(stderr, "Dense Layer bias init type: \n");
-    switch (pDenseLayer->getBiasInitType())
+    switch (pDenseLayer->Bias_Init_Type())
     {
         case InitializerType::NONE:
             fprintf(stderr, "NONE\n");
@@ -130,7 +130,7 @@ int main(int argc, char const *argv[])
     }
 
     fprintf(stderr, "Dense Layer activation type: \n");
-    ActivationType actType = pDenseLayer->getActivationType();
+    ActivationType actType = pDenseLayer->Activation_Type();
     switch (actType) {
         case ActivationType::NONE:
             fprintf(stderr, "NONE\n");
@@ -158,7 +158,7 @@ int main(int argc, char const *argv[])
 
     // PRINT TEST RESULT
     fprintf(stderr, "Source of Dense Layer\n");
-    float* pSrcData = pDenseLayer->pSrc_->getData();
+    float* pSrcData = pDenseLayer->pSrc_->cpu_data();
     // fprintf(stderr, "%.1f ", pSrcData[i]);
     for (int b = 0; b < batchSize; ++b)
     {
@@ -182,39 +182,41 @@ int main(int argc, char const *argv[])
 
     fprintf(stderr, "\n\n");
     fprintf(stderr, "Weight of Dense Layer\n");
-    for (int i = 0; i < pDenseLayer->pW_->getWholeSize(); ++i)
+    for (int i = 0; i < pDenseLayer->pW_->WholeSize(); ++i)
     {
-        if (i > 0 && (i % pDenseLayer->pW_->getWidth() == 0))
+        if (i > 0 && (i % pDenseLayer->pW_->Width() == 0))
         {
             fprintf(stderr, "\n");
         }
-        float* pWData = pDenseLayer->pW_->getData();
+        float* pWData = pDenseLayer->pW_->cpu_data();
         fprintf(stderr, "%.1f ", pWData[i]);
     }
     fprintf(stderr, "\n\n");
     fprintf(stderr, "Bias of Dense Layer\n");
-    for (int i = 0; i < pDenseLayer->pB_->getWholeSize(); ++i)
+    for (int i = 0; i < pDenseLayer->pB_->WholeSize(); ++i)
     {
-        if (i > 0 && (i % pDenseLayer->pB_->getWidth() == 0))
+        if (i > 0 && (i % pDenseLayer->pB_->Width() == 0))
         {
             fprintf(stderr, "\n");
         }
-        float* pBData = pDenseLayer->pB_->getData();
+        float* pBData = pDenseLayer->pB_->cpu_data();
         fprintf(stderr, "%.1f ", pBData[i]);
     }
     fprintf(stderr, "\n\n");
 
 
-    pDenseLayer->forward();
+    pDenseLayer->Forward();
+
+
     fprintf(stderr, "Dense Layer Forward Result: \n");
-    int denseLayer_output_size = pDenseLayer->pDst_->getSize3D();
-    for (int i = 0; i < pDenseLayer->pDst_->getWholeSize(); ++i)
+    int denseLayer_output_size = pDenseLayer->pDst_->Size3D();
+    for (int i = 0; i < pDenseLayer->pDst_->WholeSize(); ++i)
     {
         if (i > 0 && (i % denseLayer_output_size == 0))
         {
             fprintf(stderr, "\n");
         }
-        float* pDstData = pDenseLayer->pDst_->getData();
+        float* pDstData = pDenseLayer->pDst_->cpu_data();
         fprintf(stderr, "%.1f\t", pDstData[i]);
     }
     fprintf(stderr, "\n\n");

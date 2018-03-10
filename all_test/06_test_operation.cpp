@@ -12,21 +12,21 @@ using namespace mkt;
 void test_axpy() {
     Tensor a{2, 8, 1, 1};
     a.allocate();
-    float* a_data = a.getData();
+    float* a_data = a.cpu_data();
 
 
     Tensor b{1, 8, 1, 1};
     b.allocate();
-    float* b_data = b.getData();
-    for (int i = 0; i < b.getWholeSize(); ++i)
+    float* b_data = b.cpu_data();
+    for (int i = 0; i < b.WholeSize(); ++i)
     {
         b_data[i] += 3;
     }
 
     fprintf(stderr, "a\n");
-    for (int i = 0; i < a.getWholeSize(); ++i)
+    for (int i = 0; i < a.WholeSize(); ++i)
     {
-        if (i > 0 && (i % a.getSize3D() == 0))
+        if (i > 0 && (i % a.Size3D() == 0))
         {
             fprintf(stderr, "\n");
         }
@@ -35,9 +35,9 @@ void test_axpy() {
 
     fprintf(stderr, "\n\n");
     fprintf(stderr, "b\n");
-    for (int i = 0; i < b.getWholeSize(); ++i)
+    for (int i = 0; i < b.WholeSize(); ++i)
     {
-        if (i > 0 && (i % b.getSize3D() == 0))
+        if (i > 0 && (i % b.Size3D() == 0))
         {
             fprintf(stderr, "\n");
         }
@@ -46,16 +46,16 @@ void test_axpy() {
 
     fprintf(stderr, "\n\n");
 
-    for (int i = 0; i < a.getNumOfData(); ++i)
+    for (int i = 0; i < a.NumOfData(); ++i)
     {
-        int size3D = a.getSize3D();
-        axpy(a.getSize3D(), 1.0, b_data, a_data+i*size3D);
+        int size3D = a.Size3D();
+        axpy(a.Size3D(), 1.0, b_data, a_data+i*size3D);
     }
 
     fprintf(stderr, "axpy\n");
-    for (int i = 0; i < a.getWholeSize(); ++i)
+    for (int i = 0; i < a.WholeSize(); ++i)
     {
-        if (i > 0 && (i % a.getSize3D() == 0))
+        if (i > 0 && (i % a.Size3D() == 0))
         {
             fprintf(stderr, "\n");
         }

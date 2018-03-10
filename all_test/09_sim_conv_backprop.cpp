@@ -16,7 +16,7 @@ int main(int argc, char const *argv[])
     // set src differential tensor
     mkt::Tensor src_grad(batch_size, ih, iw, ic);
     src_grad.allocate();
-    float* pSrcGradData = src_grad.getData();
+    float* pSrcGradData = src_grad.cpu_data();
 
     // Set weight tensor
     int fh = 2;
@@ -24,24 +24,24 @@ int main(int argc, char const *argv[])
     int oc = 1;
     mkt::Tensor weight(ic, 2, 2, oc);
     weight.allocate();
-    float* pWData = weight.getData();
+    float* pWData = weight.cpu_data();
 
     // Set dst differential tensor
     mkt::Tensor dst_grad(batch_size, 2, 2, oc);
     dst_grad.allocate();
-    float* pDstGradData = dst_grad.getData();
+    float* pDstGradData = dst_grad.cpu_data();
 
 
     int m = 1; // num of filter
-    int n = weight.getSize2D() * weight.getNumOfData();
-    int k = dst_grad.getSize2D();
+    int n = weight.Size2D() * weight.NumOfData();
+    int k = dst_grad.Size2D();
     mkt::mktLog(1, "n: %d\n", n);
     mkt::mktLog(1, "k: %d\n", k);
 
     // Set temporary tensor for storing Col2Im matrix
     mkt::Tensor temp(batch_size, n, k, oc);
     temp.allocate();
-    float* ptmpData = temp.getData();
+    float* ptmpData = temp.cpu_data();
 
     // backpropagation from dst.grad_data to src.grad_data
     // Step 1. dst_grad X weight

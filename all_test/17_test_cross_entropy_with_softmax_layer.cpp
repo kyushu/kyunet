@@ -1,3 +1,4 @@
+
 #include "net.h"
 
 void print_matrix(int batchSize, int channel, int height, int width, float* pData) {
@@ -26,50 +27,41 @@ void print_matrix(int batchSize, int channel, int height, int width, float* pDat
 
 int main(int argc, char const *argv[])
 {
-    using namespace mkt;
 
-    // Net Configuration
-    int batchSize = 2;
+  using namespace mkt;
+
+    int batchSize = 1;
     int height = 1;
     int width = 1;
     int channel = 12;
 
-    fprintf(stderr, "[Input Data Info]\n");
-    fprintf(stderr, "batchSize: %d\n", batchSize);
-    fprintf(stderr, "channel  : %d\n", channel);
-    fprintf(stderr, "height   : %d\n", height);
-    fprintf(stderr, "width    : %d\n", width);
+    // float testData[] = {3, 4, 5, 6,
+    //                     7, 4, 9, 1,
+    //                     5, 2, 5, 1,
+    //                   8,  1, 1, 4,
+    //                   1, 2, 2, 3,
+    //                   3, 1, 1, 4};
 
+    float testData[] = {8, 1, 1, 4,
+                        1, 2, 2, 3,
+                        3, 1, 1, 4};
 
-    /**************
-     * pseudo data
-     **************/
-    float testData[] = {3, 4, 5, 6,
-                        7, 4, 9, 1,
-                        5, 2, 5, 1,
-                      8,  1, 1, 4,
-                      1, 2, 2, 3,
-                      3, 1, 1, 4};
+    int label[] = {0};
 
-
-    /*************
+     /*************
      * Config Net
      *************/
     Net net;
-    // Input Layer
+
     InputLayer* pInputLayer = (InputLayer *)net.addInputLayer("input", batchSize, height, width, channel);
 
-    // Softmax Layer
-    Layer* pSoftmaxLayer = net.addSoftmaxLayer( pInputLayer, "softmax1");
+    CrossEntropyLossWithSoftmaxLayer* pCrossEntropyLayer = (CrossEntropyLossWithSoftmaxLayer *)net.addCrossEntropyLossWithSoftmaxLayer(pInputLayer, "cross_entropy_loss");
 
 
-    /*****************************************
-     * Initialize Net (allocate memory space)
-     *****************************************/
     net.initialize();
 
     /********************************
-     * Fed Pseudo data to input layer
+     * load Pseudo data to input layer
      ********************************/
     float* pInData = pInputLayer->pDst_->cpu_data();
     for (int i = 0; i < batchSize * height * width * channel; ++i)
@@ -77,32 +69,28 @@ int main(int argc, char const *argv[])
         pInData[i] = testData[i];
     }
 
-    /*******************
-     * Check Input Layer
-     *******************/
-    // Display data
-    fprintf(stderr, "Input Data\n");
-    int inWholeSize = pInputLayer->pDst_->WholeSize();
-    print_matrix(batchSize, channel, height, width, pInData);
+    /***************************
+     * load label to loss layer
+     ***************************/
+    pCrossEntropyLayer->LoadLabel(batchSize, label);
 
-
-    /***************
-     * Test Forward
-     ***************/
     net.Forward();
 
-    /**********************************
-     * Check Dst data of softmax layer
-     **********************************/
+    /*
+     * Display Probability
+     */
+    Layer* pSoftmaxLayer = &(pCrossEntropyLayer->softmaxLayer_);
     fprintf(stderr, "Dst data (probability) of Softmax Layer\n");
     int s_dst_c = pSoftmaxLayer->pDst_->Channel();
     int s_dst_h = pSoftmaxLayer->pDst_->Height();
     int s_dst_w = pSoftmaxLayer->pDst_->Width();
-    print_matrix(2, s_dst_c, s_dst_h, s_dst_w, pSoftmaxLayer->pDst_->cpu_data());
+    //
 
     float sum = 0;
     float* softmax_dst_data = pSoftmaxLayer->pDst_->cpu_data();
+    print_matrix(batchSize, s_dst_c, s_dst_h, s_dst_w, softmax_dst_data);
     int sm_size3D = pSoftmaxLayer->pDst_->Size3D();
+    fprintf(stderr, "[Verify] each probability of each batch \n");
     for (int b = 0; b < batchSize; ++b)
     {
         fprintf(stderr, "batch: %d\n", b);
@@ -115,6 +103,9 @@ int main(int argc, char const *argv[])
         }
         printf("sum all output of softmax: %f\n", sum);
     }
+
+    float* loss = pCrossEntropyLayer->pDst_->cpu_data();
+    fprintf(stderr, "loss: %f\n", loss[0]);
 
     return 0;
 }

@@ -34,6 +34,19 @@ namespace mkt {
 
     };
 
+    // Layer type
+    enum class LayerType:int
+    {
+        Input = 0,
+        FullConnected,
+        Convolution,
+        Pooling,
+        Relu,
+        Sigmoid,
+        Softmax
+    };
+
+    // Weight Initializer type
     enum class InitializerType: int
     {
         NONE=0,
@@ -47,13 +60,14 @@ namespace mkt {
 
     };
 
+    // value Distribution type
     enum class Distribution: int
     {
         UNIFORM=0,
         NORM
     };
 
-
+    // Activattion type
     enum class ActivationType: int
     {
         NONE=0,
@@ -65,22 +79,22 @@ namespace mkt {
 
     };
 
-    enum class LayerType:int
-    {
-        Input = 0,
-        FullConnected,
-        Convolution,
-        Pooling,
-        Relu,
-        Sigmoid,
-        Softmax
-    };
-
+    // Pooling type
     enum class PoolingMethodType: int
     {
         MAX=0,
         AVG
     };
+
+    // Loss function type
+    enum class LossType: int
+    {
+        cross_entropy_loss = 0
+
+    };
+
+
+    // Padding type
     /*
         "causal" results in causal (dilated) convolutions, e.g. output[t] does not depend on input[t+1:]. Useful when modeling temporal data where the model should not violate the temporal order. See WaveNet: A Generative Model for Raw Audio, section 2.1.
      */

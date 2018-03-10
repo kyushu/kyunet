@@ -11,17 +11,18 @@ namespace mkt {
     void Relu_Act::forward(Tensor &src, Tensor &dst) {
 
         // Check size
-        int srcWholeSize = src.getWholeSize();
-        int dstWholeSize = src.getWholeSize();
-        if (!Check_EQ(srcWholeSize, dstWholeSize))
-        {
-            MKT_ERR_LOG("Relu:Forward, size of src(%d) and dst(%d) is not equal\n", srcWholeSize, dstWholeSize);
-            return;
-        }
+        int srcWholeSize = src.WholeSize();
+        int dstWholeSize = src.WholeSize();
+        CHECK_EQ(srcWholeSize, dstWholeSize, __func__);
+        // if (!Check_EQ(srcWholeSize, dstWholeSize))
+        // {
+        //     MKT_ERR_LOG("Relu:Forward, size of src(%d) and dst(%d) is not equal\n", srcWholeSize, dstWholeSize);
+        //     return;
+        // }
 
         // Get data memory
-        float* pSrcData = src.getData();
-        float* pDstData = dst.getData();
+        float* pSrcData = src.cpu_data();
+        float* pDstData = dst.cpu_data();
 
         //
         for (int i = 0; i < dstWholeSize; ++i)
@@ -34,11 +35,11 @@ namespace mkt {
 
     void Relu_Act::backward(Tensor &src, Tensor &src_grad, Tensor &dst_grad) {
 
-        float* pSrcData = src.getData();
-        float* pSrcGradData = src_grad.getData();
-        float* pDstGradData = dst_grad.getData();
+        float* pSrcData = src.cpu_data();
+        float* pSrcGradData = src_grad.cpu_data();
+        float* pDstGradData = dst_grad.cpu_data();
 
-        int wholeSize = src.getWholeSize();
+        int wholeSize = src.WholeSize();
         for (int i = 0; i < wholeSize; ++i)
         {
             pSrcGradData[i] = pDstGradData[i] *

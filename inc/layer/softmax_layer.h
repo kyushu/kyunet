@@ -10,15 +10,16 @@ namespace mkt {
     public:
         Tensor* pScale_;
 
-
+        SoftmaxLayer();
         SoftmaxLayer(Layer* prevLayer, std::string id);
         ~SoftmaxLayer();
 
         void initialize();
+        void Reshape(int num, int height, int width, int ch);
 
         // Computation Function
-        void forward();
-        void backward();
+        void Forward();
+        void Backward();
     };
 }
 
