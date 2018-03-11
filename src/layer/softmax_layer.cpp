@@ -15,7 +15,8 @@ namespace mkt {
     {
         id_ = id;
         batchSize_ = prevLayer->pDst_->NumOfData();
-        pSrc_ = prevLayer->pDst_;
+
+        pPrevLayer_ = prevLayer;
 
         int ih = prevLayer->pDst_->Height();
         int iw = prevLayer->pDst_->Width();
@@ -25,7 +26,8 @@ namespace mkt {
         ow_ = iw;
         oc_ = ic;
 
-        pDst_ = new Tensor{batchSize_, oh_, ow_, oc_};
+        pDst_  = new Tensor{batchSize_, oh_, ow_, oc_};
+        pgDst_ = new Tensor{batchSize_, oh_, ow_, oc_};
 
         // pScale_ : for a plane of source data
         pScale_ = new Tensor{1, oh_, ow_, 1};
@@ -69,8 +71,6 @@ namespace mkt {
             pScale_->allocate();
         }
 
-
-
     }
 
     /*
@@ -79,16 +79,17 @@ namespace mkt {
     void SoftmaxLayer::Forward() {
 
         // For now we just use the channel as softmax axis
+        Tensor* pSrc = pPrevLayer_->pDst_;
 
-        float* pSrcData = pSrc_->cpu_data();
-        int ic = pSrc_->Channel();
-        int size2D = pSrc_->Size2D();
-        int size3D = pSrc_->Size3D();
+        float* pSrcData = pSrc->cpu_data();
+        int ic = pSrc->Channel();
+        int size2D = pSrc->Size2D();
+        int size3D = pSrc->Size3D();
 
         float* pDstData = pDst_->cpu_data();
         fprintf(stderr, "pSrcData: %p\n", pSrcData);
         fprintf(stderr, "pDstData: %p\n", pDstData);
-        mem_copy_cpu(pSrc_->WholeSize(), pSrcData, pDstData);
+        mem_copy_cpu(pSrc->WholeSize(), pSrcData, pDstData);
         // Scale data is used to
         // 1. store the maximum value of softmax axis
         // 2. store summation of exp(data)

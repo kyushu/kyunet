@@ -8,7 +8,7 @@ namespace mkt {
     // Destructor
     Relu_Act::~Relu_Act() {};
 
-    void Relu_Act::forward(Tensor &src, Tensor &dst) {
+    void Relu_Act::Forward(Tensor &src, Tensor &dst) {
 
         // Check size
         int srcWholeSize = src.WholeSize();
@@ -33,7 +33,7 @@ namespace mkt {
 
     };
 
-    void Relu_Act::backward(Tensor &src, Tensor &src_grad, Tensor &dst_grad) {
+    void Relu_Act::Backward(Tensor &src, Tensor &src_grad, Tensor &dst_grad) {
 
         float* pSrcData = src.cpu_data();
         float* pSrcGradData = src_grad.cpu_data();

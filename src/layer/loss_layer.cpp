@@ -6,7 +6,8 @@ namespace mkt {
     LossLayer::LossLayer(Layer* prevLayer, std::string id, int numClass): Layer(LayerType::Softmax) {
 
         batchSize_ = prevLayer->pDst_->NumOfData();
-        pSrc_ = prevLayer->pDst_;
+
+        pPrevLayer_ = prevLayer;
 
         int ih = prevLayer->pDst_->Height();
         int iw = prevLayer->pDst_->Width();

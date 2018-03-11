@@ -61,12 +61,16 @@ namespace mkt {
 
     public:
         std::string id_;
-        Tensor *pSrc_;      // point to dst_tensor of previous layer
+        Layer *pPrevLayer_; // point to dst_tensor of previous layer
+
         Tensor *pDst_;      // destination tensor
-        Tensor* pDif_;      // derivate data
+        Tensor* pgDst_;      // derivate data
 
         Tensor *pW_;        // weight tensor
+        Tensor *pgW_;       // derivate data of weight
+
         Tensor* pB_;        // bias tensor
+        Tensor* pgB_;       // derviate data of bias
 
         Activator* pActivator_;
 

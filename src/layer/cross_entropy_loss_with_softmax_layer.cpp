@@ -7,7 +7,7 @@ namespace mkt {
             std::string id): Layer(LayerType::Softmax)
         {
             batchSize_ = prevLayer->pDst_->NumOfData();
-            pSrc_ = prevLayer->pDst_;
+            pPrevLayer_ = prevLayer;
 
             int ih = prevLayer->pDst_->Height();
             int iw = prevLayer->pDst_->Width();
@@ -22,14 +22,29 @@ namespace mkt {
             oc_ = 1;
 
 
-            // Setting softmaxLayer
-            softmaxLayer_.pSrc_ = prevLayer->pDst_;
+            /*
+             * Setting SoftmaxLayer:
+             * Use SoftmaxLayer as data preprocessor to
+             * calculate probability.then calculate loss
+             */
+            softmaxLayer_.pPrevLayer_ = prevLayer;
             softmaxLayer_.Reshape(batchSize_, ih, iw, ic);
 
-            pDst_ = new Tensor{1, 1, 1, 1}; // for loss
+            pDst_ = new Tensor{1, 1, 1, 1}; // only for loss
 
-            // Initialize label tensor
+            /*
+             * [pgDst_]
+             * Because the loss layer is the last layer of net
+             * there is no need for gradient data from next layer
+             */
+
+            /*
+             * pLabel_ is a Tensor for sotring Label data
+             * For now, the label data of Cross Entroyp Loss
+             * is Scale Not One-Hot encoding vector
+             */
             pLabel_ = new Tensor{batchSize_, 1, 1, 1};
+
         }
 
         // Destructor
@@ -46,12 +61,12 @@ namespace mkt {
             pLabel_->allocate();
         }
 
-        /*******************************************************************
-         * Each Turth Label is a "scalar value" not "One Hot vector"
+        /*********************************************************************
+         * Each Turth Label is a "scalar value" not "One-Hot encoding vector"
          * For example:
          * There are 10 classes and batch size = 64, so there are 64 labels
          *  the range of each label is 0 ~ 9
-         *******************************************************************/
+         *********************************************************************/
         void CrossEntropyLossWithSoftmaxLayer::LoadLabel(int num, const int* label) {
 
             CHECK_EQ(pLabel_->WholeSize(), num, __FILE__);
@@ -74,7 +89,8 @@ namespace mkt {
          *****************************************************/
         void CrossEntropyLossWithSoftmaxLayer::Forward() {
 
-            fprintf(stderr, "p0\n");
+            Tensor* pSrc = pPrevLayer_->pDst_;
+
             softmaxLayer_.Forward();
 
             int dim = softmaxLayer_.pDst_->Size3D();
@@ -112,21 +128,26 @@ namespace mkt {
             int dim = softmaxLayer_.pDst_->Size3D();
             int size2D = softmaxLayer_.pDst_->Size2D();
             float* prob = softmaxLayer_.pDst_->cpu_data();
-            float* pSrc_dif = pDif_->cpu_data();
 
-            // pSrc_dif = prob = exp(xj) / sum(exp(xi))
-            mem_copy_cpu(wholeSize, prob, pSrc_dif);
+            float* pSrc_dif = pPrevLayer_->pgDst_->cpu_data();
 
-            const float* pTruth_label = pLabel_->cpu_data();
-            for (int b = 0; b < batchSize_; ++b)
+            if (pSrc_dif)
             {
-                for (int i = 0; i < size2D; ++i)
+                // pSrc_dif = prob = exp(xj) / sum(exp(xi))
+                mem_copy_cpu(wholeSize, prob, pSrc_dif);
+
+                const float* pTruth_label = pLabel_->cpu_data();
+                for (int b = 0; b < batchSize_; ++b)
                 {
-                    // pSrc_dif[j] = exp(xj) / sum(exp(xi)) - 1, if j = the index of y = 1
-                    const int label_value = static_cast<int>( pTruth_label[i + b*size2D]);
-                    pSrc_dif[i + label_value*size2D + b*dim] -= 1;
+                    for (int i = 0; i < size2D; ++i)
+                    {
+                        // pSrc_dif[j] = exp(xj) / sum(exp(xi)) - 1, if j = the index of y = 1
+                        const int label_value = static_cast<int>( pTruth_label[i + b*size2D]);
+                        pSrc_dif[i + label_value*size2D + b*dim] -= 1;
+                    }
                 }
             }
+
         }
 }
 

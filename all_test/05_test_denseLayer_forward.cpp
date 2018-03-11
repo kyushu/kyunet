@@ -32,10 +32,10 @@ int main(int argc, char const *argv[])
     int batchSize = 1;
 
     // test data
-    unsigned char s0[] = {1,3,  2,4,  3,6,
-                          4,7,  5,8,  3,7,
-                          7,3,  8,7,  9,2,
-                          10,5, 11,7, 12,10};
+    unsigned char s0[] = {1,12,  2,11,  3,10,
+                          4,9,  5,8,  6,7,
+                          7,6,  8,5,  9,4,
+                          10,3, 11,2, 12,1};
 
 
     unsigned char s1[] = {3,11, 5,2, 4,8,
@@ -57,13 +57,11 @@ int main(int argc, char const *argv[])
     Layer* pDenseLayer = net.addDenseLayer(pInputLayer, "Layer1", 4, ActivationType::Relu, weightInitType, biasInitType);
     net.initialize();
 
-    // Get InputLayer
-    // InputLayer* pInput = net.getInputLayer();
-    // const float *pdata = pInput->pDst->cpu_data();
-    int denseLayerSrcSize = pDenseLayer->pSrc_->Size3D();
+
+    int denseLayerSrcSize = pInputLayer->pDst_->Size3D();
     fprintf(stderr, "denseLayerSrcSize: %d\n", denseLayerSrcSize);
 
-    // Add data
+    // Load data to input layer
     for (int i = 0; i < batchSize; ++i)
     {
         switch (i) {
@@ -79,10 +77,7 @@ int main(int argc, char const *argv[])
         }
     }
 
-    // pInput->FlattenImageToTensor(s1, false);
-    // pInput->FlattenImageToTensor(s2, true);
-    // pInput->FlattenImageToTensor(s3, true);
-
+    // Display Dense layer information
     int weightsize3D = pDenseLayer->pW_->Size3D();
     int weightWholeSize = pDenseLayer->pW_->WholeSize();
     if (pDenseLayer->Type() == LayerType::FullConnected)
@@ -150,7 +145,6 @@ int main(int argc, char const *argv[])
 
     }
     fprintf(stderr, "\n");
-
     fprintf(stderr, "dense weight size3D: %d\n", weightsize3D);
     fprintf(stderr, "dense weight WholeSize: %d\n", weightWholeSize);
 
@@ -158,7 +152,7 @@ int main(int argc, char const *argv[])
 
     // PRINT TEST RESULT
     fprintf(stderr, "Source of Dense Layer\n");
-    float* pSrcData = pDenseLayer->pSrc_->cpu_data();
+    float* pSrcData = pInputLayer->pDst_->cpu_data();
     // fprintf(stderr, "%.1f ", pSrcData[i]);
     for (int b = 0; b < batchSize; ++b)
     {
@@ -182,6 +176,11 @@ int main(int argc, char const *argv[])
 
     fprintf(stderr, "\n\n");
     fprintf(stderr, "Weight of Dense Layer\n");
+    for (int i = 0; i < pDenseLayer->pW_->Width(); ++i)
+    {
+        fprintf(stderr, "%d   ", i);
+    }
+    fprintf(stderr, "\n");
     for (int i = 0; i < pDenseLayer->pW_->WholeSize(); ++i)
     {
         if (i > 0 && (i % pDenseLayer->pW_->Width() == 0))

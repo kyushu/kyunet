@@ -38,19 +38,21 @@ namespace mkt {
         id_{""},
         batchSize_{0},
         oh_{0}, ow_{0}, oc_{0},
-        pSrc_{nullptr},
+        pPrevLayer_{nullptr},
         pDst_{nullptr},
-        pDif_{nullptr},
+        pgDst_{nullptr},
         pW_{nullptr},
+        pgW_{nullptr},
         pB_{nullptr},
+        pgB_{nullptr},
         pActivator_{nullptr}
     {};
 
     Layer::~Layer() {
         mktLog(1, "--------------------- Layer Destructor\n");
 
-        pSrc_ = nullptr;
-        mktLog(1, "--------------------- Layer Destructor pSrc_\n");
+        pPrevLayer_ = nullptr;
+        mktLog(1, "--------------------- Layer Destructor pPrevLayer_\n");
 
 
         mktLog(1, "pDst_.adr: %p\n", pDst_);
@@ -58,10 +60,10 @@ namespace mkt {
         delete pDst_;
         mktLog(1, "--------------------- Layer Destructor pDst_\n");
 
-        mktLog(1, "pDif_.adr: %p\n", pDif_);
-        if (pDif_) {mktLog(1, "pDif_->pData.adr: %p\n", pDif_->cpu_data());}
-        delete pDif_;
-        mktLog(1, "--------------------- Layer Destructor pDif_\n");
+        mktLog(1, "pgDst_.adr: %p\n", pgDst_);
+        if (pgDst_) {mktLog(1, "pgDst_->pData.adr: %p\n", pgDst_->cpu_data());}
+        delete pgDst_;
+        mktLog(1, "--------------------- Layer Destructor pgDst_\n");
 
 
         mktLog(1, "pW_.adr: %p\n", pW_);
@@ -87,6 +89,7 @@ namespace mkt {
     // Init Function
     void Layer::initOutputTensor() {
         pDst_->allocate();
+        pgDst_->allocate();
     }
     void Layer::initWeightTensor() {
 
@@ -137,9 +140,20 @@ namespace mkt {
                 he(*pW_);
                 break;
         }
+
+
+        pgW_->allocate();
+        std::fill_n(pgW_->cpu_data(), pgW_->WholeSize(), 0.0f);
+
     }
+
+
     void Layer::initBiasTensor() {
         pB_-> allocate();
+        std::fill_n(pB_->cpu_data(), pB_->WholeSize(), 0.0f);
+
+        pgB_->allocate();
+        std::fill_n(pgB_->cpu_data(), pgB_->WholeSize(), 0.0f);
 
     }
 

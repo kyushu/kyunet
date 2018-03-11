@@ -38,7 +38,7 @@ namespace mkt {
         int ic = prevLayer->pDst_->Channel();
         // int size3D = prevLayer->pDst_->getSize3D();
 
-        pSrc_ = prevLayer->pDst_;
+        pPrevLayer_ = prevLayer;
 
         oc_ = fc_;
         // calculate pDst size: ow_ = (iw_ - fw_ +2padding_)/stride_ +1
@@ -65,8 +65,14 @@ namespace mkt {
         }
 
         pDst_ = new Tensor{batchSize_, oh_, ow_, oc_};
+        pgDst_ = new Tensor{batchSize_, oh_, ow_, oc_};
+
         pW_   = new Tensor{ic, fh_, fw_, fc_};
+        pgW_  = new Tensor{ic, fh_, fw_, fc_};
+
         pB_   = new Tensor{1, 1, 1, oc_};
+        pgB_  = new Tensor{1, 1, 1, oc_};
+
 
         pTmpCol_ = new Tensor{1, pW_->Size2D()*ic, pDst_->Size2D(), oc_};
 
@@ -97,16 +103,18 @@ namespace mkt {
     // Computation Function
     void ConvLayer::Forward() {
 
-        float* pSrcData = pSrc_->cpu_data();
+        Tensor* pSrc = pPrevLayer_->pDst_;
+
+        float* pSrcData = pSrc->cpu_data();
         float* pDstData = pDst_->cpu_data();
         float* pWData = pW_->cpu_data();
         float* pTmpColData = pTmpCol_->cpu_data();
 
-        int ic = pSrc_->Channel();
-        int iw = pSrc_->Width();
-        int ih = pSrc_->Height();
-        int src_size3D = pSrc_->Size3D();
-        int src_wholeSize = pSrc_->WholeSize();
+        int ic = pSrc->Channel();
+        int iw = pSrc->Width();
+        int ih = pSrc->Height();
+        int src_size3D = pSrc->Size3D();
+        int src_wholeSize = pSrc->WholeSize();
 
         int batchSize = pDst_->NumOfData();
         int oh = pDst_->Height();
@@ -224,7 +232,7 @@ namespace mkt {
         // 3. A = next layer input = activation(Z)
         if (activationType_ != ActivationType::NONE)
         {
-            pActivator_->forward(*pDst_, *pDst_);
+            pActivator_->Forward(*pDst_, *pDst_);
         }
 
     }

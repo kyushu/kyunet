@@ -16,6 +16,8 @@ namespace mkt {
         int pad_w_;
         PoolingMethodType type_;
 
+        Tensor* pMask;
+
 
         PoolingLayer(
             Layer* prevLayer,

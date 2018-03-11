@@ -29,7 +29,8 @@ namespace mkt {
         int ih = prevLayer->pDst_->Height();
         int iw = prevLayer->pDst_->Width();
         int ic = prevLayer->pDst_->Channel();
-        pSrc_ = prevLayer->pDst_;
+
+        pPrevLayer_ = prevLayer;
 
         oc_ = ic;
         // calculate pDst size: ow = (W-f +2p)/s +1
@@ -45,7 +46,14 @@ namespace mkt {
         MKT_Assert((ow_-1)*stride_w_ < iw + pad_w_, "polling size");
         MKT_Assert((oh_-1)*stride_h_ < ih + pad_h_, "polling size");
 
-        pDst_ = new Tensor{batchSize_, oh_, ow_, oc_};
+        pDst_  = new Tensor{batchSize_, oh_, ow_, oc_};
+        pgDst_ = new Tensor{batchSize_, oh_, ow_, oc_};
+
+        if (type_ == PoolingMethodType::MAX)
+        {
+            // For storing index of max value of src data in each pooling window
+            pMask = new Tensor{batchSize_, oh_, ow_, oc_};
+        }
     }
 
     // Destructor
@@ -59,15 +67,23 @@ namespace mkt {
 
         initOutputTensor();
 
+        pMask->allocate();
     }
 
     // Computation Function
     void PoolingLayer::Forward() {
 
-        float* pSrcData = pSrc_->cpu_data();
+        Tensor* pSrc = pPrevLayer_->pDst_;
+
+        float* pSrcData = pSrc->cpu_data();
+        int ih = pSrc->Height();
+        int iw = pSrc->Width();
+
         float* pDstData = pDst_->cpu_data();
-        int ih = pSrc_->Height();
-        int iw = pSrc_->Width();
+        int dst_size2D = pDst_->Size2D();
+
+        float* pMaskData = pMask->cpu_data();
+
 
         switch (type_) {
             case PoolingMethodType::MAX:
@@ -89,12 +105,23 @@ namespace mkt {
                                 for (int h = hstart; h < hend; ++h) {
                                     for (int w = wstart; w < wend; ++w) {
                                         int index = h * iw + w;
-                                        fmax = pSrcData[index] > fmax ? pSrcData[index] : fmax;
+
+                                        // fmax = pSrcData[index] > fmax ? pSrcData[index] : fmax;
+                                        if (pSrcData[index] > fmax)
+                                        {
+                                            fmax = pSrcData[index];
+                                            // pool_index is in dst_size2D
+                                            // index      is in src_size2d
+                                            pMaskData[pool_index] = index;
+                                        }
                                     }
                                 }
                                 pDstData[pool_index] = fmax;
                             }
                         }
+                        // offset to next channel
+                        pDstData += dst_size2D;
+                        pMaskData += dst_size2D;
                     }
                 }
                 break;
@@ -106,8 +133,8 @@ namespace mkt {
                                 int hstart = ph * stride_h_ - pad_h_;
                                 int wstart = pw * stride_w_ - pad_w_;
 
-                                // Because we need to calculate the size of pooling window
-                                // we need to take care of "source size + padding" for the
+                                // we need to calculate the size of pooling window for average
+                                // so we need to take care of "source size + padding" for the
                                 // boundary of hend and wend
                                 int hend = std::min(hstart + fh_, ih+pad_h_);
                                 int wend = std::min(wstart + fw_, iw+pad_w_);
@@ -120,15 +147,10 @@ namespace mkt {
 
                                 int pool_index = ph * ow_ + pw;
                                 float favg = 0;
-                                // fprintf(stderr, "pool_index: %d\n", pool_index);
-                                // fprintf(stderr, "h: %d - %d\n", hstart, hend);
-                                // fprintf(stderr, "w: %d - %d\n", wstart, wend);
                                 for (int h = hstart; h < hend; ++h){
                                     for (int w = wstart; w < wend; ++w){
                                         int index = h * iw + w;
-                                        // fprintf(stderr, "[%d]=%.3f\n", index, pSrcData[index]);
                                         favg += pSrcData[index];
-                                        // fprintf(stderr, "favg: %.3f\n", favg);
                                     }
                                 }
 
@@ -145,8 +167,111 @@ namespace mkt {
     }
 
     void PoolingLayer::Backward() {
+        float* pMaskData = pMask->cpu_data();
+        float* pgDstData = pgDst_->cpu_data();
+        int dst_size2D = pgDst_->Size2D();
 
+        float* pgSrcData = pPrevLayer_->pgDst_->cpu_data();
+        int ih = pPrevLayer_->pgDst_->Height();
+        int iw = pPrevLayer_->pgDst_->Width();
+        int src_size2d = pPrevLayer_->pgDst_->Size2D();
+
+        switch(type_) {
+            case PoolingMethodType::MAX:
+                for (int b = 0; b < batchSize_; ++b) {
+                    for (int c = 0; c < oc_; ++c) {
+                        // Pooling window
+                        for (int ph = 0; ph < oh_; ++ph) {
+                            for (int pw = 0; pw < ow_; ++pw) {
+                                int pool_index = ph * ow_ + pw;
+                                int src_index = pMaskData[pool_index];
+                                pgSrcData[src_index] += pgDstData[pool_index];
+                            }
+                        }
+
+                        // offset to next channel
+                        pMaskData += dst_size2D;
+                        pgDstData += dst_size2D;
+                        pgSrcData += src_size2d;
+
+                    }
+                }
+                break;
+            case PoolingMethodType::AVG:
+                 for (int b = 0; b < batchSize_; ++b) {
+                    for (int c = 0; c < oc_; ++c) {
+                        // Pooling window
+                        for (int ph = 0; ph < oh_; ++ph) {
+                            for (int pw = 0; pw < ow_; ++pw) {
+                                int hstart = ph * stride_h_ - pad_h_;
+                                int wstart = pw * stride_w_ - pad_w_;
+                                int hend = std::min(hstart + fh_, ih+pad_h_);
+                                int wend = std::min(wstart + fw_, iw+pad_w_);
+                                int pool_size = (hend - hstart) * (wend - wstart);
+                                hstart = std::max(hstart, 0);
+                                wstart = std::max(wstart, 0);
+                                hend = std::min(hend, ih);
+                                wend = std::min(wend, iw);
+
+                                for (int h = hstart; h < hend; ++h){
+                                    for (int w = wstart; w < wend; ++w){
+                                        pgSrcData[h*iw + w] += pgDstData[ph*ow_ + pw] / pool_size;
+                                    }
+                                }
+                            }
+                        }
+                        pgDstData += dst_size2D;
+                        pgSrcData += src_size2d;
+                    }
+                }
+                break;
+            default:
+                fprintf(stderr, "wrong pooling method\n");
+
+        }
     }
+
+    /*
+
+
+  case PoolingParameter_PoolMethod_AVE:
+    // The main loop
+    for (int n = 0; n < top[0]->num(); ++n) {
+      for (int c = 0; c < channels_; ++c) {
+        for (int ph = 0; ph < pooled_height_; ++ph) {
+          for (int pw = 0; pw < pooled_width_; ++pw) {
+            int hstart = ph * stride_h_ - pad_h_;
+            int wstart = pw * stride_w_ - pad_w_;
+            int hend = min(hstart + kernel_h_, height_ + pad_h_);
+            int wend = min(wstart + kernel_w_, width_ + pad_w_);
+            int pool_size = (hend - hstart) * (wend - wstart);
+            hstart = max(hstart, 0);
+            wstart = max(wstart, 0);
+            hend = min(hend, height_);
+            wend = min(wend, width_);
+            for (int h = hstart; h < hend; ++h) {
+              for (int w = wstart; w < wend; ++w) {
+                bottom_diff[h * width_ + w] +=
+                  top_diff[ph * pooled_width_ + pw] / pool_size;
+              }
+            }
+          }
+        }
+        // offset
+        bottom_diff += bottom[0]->offset(0, 1);
+        top_diff += top[0]->offset(0, 1);
+      }
+    }
+    break;
+  case PoolingParameter_PoolMethod_STOCHASTIC:
+    NOT_IMPLEMENTED;
+    break;
+  default:
+    LOG(FATAL) << "Unknown pooling method.";
+  }
+  */
+
+
 
     // Getter Function
     int PoolingLayer::getFilterHeight() {

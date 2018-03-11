@@ -18,8 +18,8 @@ namespace mkt {
         Sigmoid_Act();
         ~Sigmoid_Act();
 
-        void forward(Tensor &src, Tensor &dst);
-        void backward(Tensor &src, Tensor &src_grad, Tensor &dst_grad);
+        void Forward(Tensor &src, Tensor &dst);
+        void Backward(Tensor &src, Tensor &src_grad, Tensor &dst_grad);
 
     };
 }

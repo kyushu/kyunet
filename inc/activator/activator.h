@@ -12,8 +12,8 @@ namespace mkt {
     {
     public:
         virtual ~Activator(){};
-        virtual void forward(Tensor &src, Tensor &dst)=0;                           // forward pass
-        virtual void backward(Tensor &src, Tensor &src_grad, Tensor &dst_grad)=0;   // back propagation
+        virtual void Forward(Tensor &src, Tensor &dst)=0;                           // forward pass
+        virtual void Backward(Tensor &src, Tensor &src_grad, Tensor &dst_grad)=0;   // back propagation
     };
 
 

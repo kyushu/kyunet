@@ -13,7 +13,7 @@ namespace mkt {
     // Destructor
     Sigmoid_Act::~Sigmoid_Act(){};
 
-    void Sigmoid_Act::forward(Tensor &src, Tensor &dst) {
+    void Sigmoid_Act::Forward(Tensor &src, Tensor &dst) {
 
         // Check size
         int srcWholeSize = src.WholeSize();
@@ -35,7 +35,7 @@ namespace mkt {
         }
     };
 
-    void Sigmoid_Act::backward(Tensor &src, Tensor &src_grad, Tensor &dst_grad) {
+    void Sigmoid_Act::Backward(Tensor &src, Tensor &src_grad, Tensor &dst_grad) {
     };
 
 }

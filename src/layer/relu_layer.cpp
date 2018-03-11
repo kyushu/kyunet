@@ -12,7 +12,8 @@ namespace mkt {
         id_ = id;
 
         batchSize_ = prevLayer->pDst_->NumOfData();
-        pSrc_ = prevLayer->pDst_;
+
+        pPrevLayer_ = prevLayer;
 
         int ih = prevLayer->pDst_->Height();
         int iw = prevLayer->pDst_->Width();
@@ -22,7 +23,9 @@ namespace mkt {
         ow_ = iw;
         oc_ = ic;
 
-        pDst_ = new Tensor{batchSize_, oh_, ow_, oc_};
+        pDst_  = new Tensor{batchSize_, oh_, ow_, oc_};
+        pgDst_ = new Tensor{batchSize_, oh_, ow_, oc_};
+
     };
 
     ReluLayer::~ReluLayer() {};
@@ -33,7 +36,9 @@ namespace mkt {
 
 
     void ReluLayer::Forward() {
-        relu_act_.forward(*pSrc_, *pDst_);
+        Tensor* pSrc = pPrevLayer_->pDst_;
+
+        relu_act_.Forward(*pSrc, *pDst_);
     };
 
     void ReluLayer::Backward() {

@@ -163,9 +163,9 @@ namespace mkt {
         return 0;
     }
 
-    /*
+    /******************
      * Result = aX + Y
-     */
+     ******************/
     int axpy(int n, float a, float *x, float *y)
     {
         for (int i = 0; i < n; ++i)
@@ -174,21 +174,22 @@ namespace mkt {
         }
     }
 
-    /*
+    /***************************************************************************
      * Function uses casting from int to unsigned to compare if value of
      * parameter a is greater or equal to zero and lower than value of
      * parameter b. The b parameter is of type signed and is always positive,
      * therefore its value is always lower than 0x800... where casting
      * negative value of a parameter converts it to value higher than 0x800...
      * The casting allows to use one condition instead of two.
-     */
+     ***************************************************************************/
     inline bool is_a_ge_zero_and_a_lt_b(int a, int b) {
         return static_cast<unsigned>(a) < static_cast<unsigned>(b);
     }
 
-    /*
+
+    /***********************
      * Image patch to Column
-     */
+     ***********************/
     void im2col_cpu(const float* data_im,
         const int channels, const int height, const int width,
         const int kernel_h, const int kernel_w,
@@ -242,9 +243,10 @@ namespace mkt {
         }
     }
 
-    /*
+
+    /************************
      * Column to Image patch
-     */
+     ************************/
     void col2im_cpu(const float* data_col, const int channels,
         const int height, const int width, const int kernel_h, const int kernel_w,
         const int pad_h, const int pad_w,
@@ -303,6 +305,7 @@ namespace mkt {
             }
         }
     }
+
 
     void set_memory(const int N, const float alpha, float* Y) {
         if (alpha == 0) {
