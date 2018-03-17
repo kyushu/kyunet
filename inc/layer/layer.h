@@ -24,7 +24,7 @@
  *         ______________________        _____________________________
  *        |            _______   |      |                  _______    |
  *        |           |      |   |      |                  |      |   |
- *    --->|           | pDst |---|----->| input( L(n-1),   | pDst |---|----->
+ *    --->|           | pDst |   |----->| input( L(n-1),   | pDst |---|----->
  *        |           |______|   |  --->|        L(n-3) )  |______|   |
  *        |                      |  |   |                             |
  *        |  (ext_Src)           |  |   |                             |
@@ -34,7 +34,7 @@
  *         ______________________   |
  *        |            _______   |  |
  *        |           |      |   |  |
- *        |           | pDst |---|---
+ *        |           | pDst |   |---
  *        |           |______|   |
  *        |                      |
  *        |  (ext_Src)           |
@@ -59,7 +59,7 @@
 #include "activator/activator.h"
 #include "activator/relu_act.h"
 #include "activator/sigmoid_act.h"
-
+#include "LayerParams.hpp"
 
 namespace mkt {
 

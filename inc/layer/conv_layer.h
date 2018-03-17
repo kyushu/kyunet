@@ -1,8 +1,9 @@
 #ifndef MKT_CONV_LAYER_H
 #define MKT_CONV_LAYER_H
 
-#include "layer.h"
 #include <math.h>
+#include "layer.h"
+
 
 namespace mkt {
     class ConvLayer:public Layer
@@ -40,6 +41,8 @@ namespace mkt {
             InitializerType biasInitType
         );
 
+        ConvLayer(Layer* prevLayer, std::string id, LayerParams params);
+
         ~ConvLayer();
 
         void initialize();
@@ -48,6 +51,7 @@ namespace mkt {
         void Forward();
         void Backward();
 
+        void calcOutputSize(int ic, int ih, int iw);
         // Getter Function
         int getFilterHeight();
         int getFilterWidth();

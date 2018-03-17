@@ -100,8 +100,8 @@ namespace mkt {
      */
     enum class PaddingType:int
     {
-        valid=0, /*No padding*/
-        same     /*padding the input such that the output has the same length as the original input*/
+        VALID=0, /*No padding*/
+        SAME     /*padding the input such that the output has the same length as the original input*/
         // causal
     };
 

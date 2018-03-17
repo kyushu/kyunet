@@ -58,6 +58,7 @@ namespace mkt {
         Layer* addDenseLayer(Layer* prevLayer, std::string id, int unit, ActivationType activationType, InitializerType weightInitType, InitializerType biasInitType);
 
         Layer* addConvLayer(Layer* prevLayer, std::string id, int kernel_Height, int kernel_width, int kernel_channel, int stride_h, int stride_w, int pad_h, int pad_w, PaddingType paddingType, ActivationType activationType, InitializerType weightInitType, InitializerType biasInitType);
+        Layer* addConvLayer(Layer* prevLayer, std::string id, LayerParams params);
 
         Layer* addReluLayer(Layer* prevLayer, std::string id);
 

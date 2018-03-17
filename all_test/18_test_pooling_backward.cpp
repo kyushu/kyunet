@@ -21,9 +21,23 @@ int main(int argc, char const *argv[])
     // Input layer
     InputLayer* pInLayer = (InputLayer *)net.addInputLayer("input", batchSize, height, width, channel);
     // Conv layer
-    InitializerType weightInitType = InitializerType::TEST;
-    InitializerType biasInitType = InitializerType::ZERO;
-    ConvLayer* pConvLayer = (ConvLayer*)net.addConvLayer(pInLayer, "conv_1", 3, 3, 2, 1, 1, 0, 0, PaddingType::valid, ActivationType::NONE, weightInitType, biasInitType);
+    LayerParams conv_params;
+    conv_params.kernel_channel = 2;
+    conv_params.kernel_height = 3;
+    conv_params.kernel_width = 3;
+    conv_params.stride_h = 1;
+    conv_params.stride_w = 1;
+    conv_params.pad_h = 0;
+    conv_params.pad_w = 0;
+    conv_params.paddingType = PaddingType::VALID;
+    conv_params.actType = ActivationType::NONE;
+    conv_params.weight_init_type = InitializerType::TEST;
+    conv_params.bias_init_type = InitializerType::ZERO;
+
+    // InitializerType weightInitType = InitializerType::TEST;
+    // InitializerType biasInitType = InitializerType::ZERO;
+    // ConvLayer* pConvLayer = (ConvLayer*)net.addConvLayer(pInLayer, "conv_1", 3, 3, 2, 1, 1, 0, 0, PaddingType::VALID, ActivationType::NONE, weightInitType, biasInitType);
+    ConvLayer* pConvLayer = (ConvLayer*)net.addConvLayer(pInLayer, "conv_1", conv_params);
     // Pooling layer
     PoolingLayer* pPoolingLayer = (PoolingLayer*)net.addPoolingLayer( pConvLayer, "Pooling", 2, 2, 1, 1, 0, 0, PoolingMethodType::MAX);
 

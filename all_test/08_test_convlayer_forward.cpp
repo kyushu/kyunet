@@ -31,7 +31,7 @@ int main(int argc, char const *argv[])
     // Add ConvLayer
     InitializerType weightInitType = InitializerType::TEST;
     InitializerType biasInitType = InitializerType::ZERO;
-    Layer* pConvLayer = net.addConvLayer(pInputLayer, "conv_1", 3, 3, 2, 1, 1, 0, 0, PaddingType::valid, ActivationType::NONE, weightInitType, biasInitType);
+    Layer* pConvLayer = net.addConvLayer(pInputLayer, "conv_1", 3, 3, 2, 1, 1, 0, 0, PaddingType::VALID, ActivationType::NONE, weightInitType, biasInitType);
 
 
     // Net Initialization: memory allocation

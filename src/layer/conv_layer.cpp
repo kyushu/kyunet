@@ -42,28 +42,79 @@ namespace mkt {
 
         oc_ = fc_;
         // calculate pDst size: ow_ = (iw_ - fw_ +2padding_)/stride_ +1
-        switch(paddingType_) {
-            case PaddingType::valid:
-                ow_ = static_cast<int>( static_cast<float>(iw - fw_ + 2*pad_w_) / stride_w_) + 1;
-                oh_ = static_cast<int>( static_cast<float>(ih - fh_ + 2*pad_h_) / stride_h_) + 1;
+        // switch(paddingType_) {
+        //     case PaddingType::valid:
+        //         ow_ = static_cast<int>( static_cast<float>(iw - fw_ + 2*pad_w_) / stride_w_) + 1;
+        //         oh_ = static_cast<int>( static_cast<float>(ih - fh_ + 2*pad_h_) / stride_h_) + 1;
 
-                break;
-            case PaddingType::same:
+        //         break;
+        //     case PaddingType::same:
 
-                pad_w_ = static_cast<int>( ((iw-1)*stride_w_ + fw_ - iw) * 0.5 );
-                ow_    = static_cast<int>( static_cast<float>(iw - fw_ + (2*pad_w_)) / stride_w_ )  + 1;
-                MKT_Assert(iw_ == ow_, "iw != ow");
+        //         pad_w_ = static_cast<int>( ((iw-1)*stride_w_ + fw_ - iw) * 0.5 );
+        //         ow_    = static_cast<int>( static_cast<float>(iw - fw_ + (2*pad_w_)) / stride_w_ )  + 1;
+        //         MKT_Assert(iw_ == ow_, "iw != ow");
 
-                pad_h_ = static_cast<int>( ((ih-1)*stride_h_ + fh_ - ih) * 0.5 );
-                oh_    = static_cast<int>( static_cast<float>(ih - fh_ + (2*pad_h_)) / stride_h_ ) + 1;
-                MKT_Assert(ih_ == oh_, "ih != oh");
+        //         pad_h_ = static_cast<int>( ((ih-1)*stride_h_ + fh_ - ih) * 0.5 );
+        //         oh_    = static_cast<int>( static_cast<float>(ih - fh_ + (2*pad_h_)) / stride_h_ ) + 1;
+        //         MKT_Assert(ih_ == oh_, "ih != oh");
 
-                break;
-            default:
-                ow_ = static_cast<int>( static_cast<float>(iw - fw_) / stride_w_)  + 1;
-                oh_ = static_cast<int>( static_cast<float>(ih - fh_) / stride_h_)  + 1;
-                break;
-        }
+        //         break;
+        //     default:
+        //         ow_ = static_cast<int>( static_cast<float>(iw - fw_) / stride_w_)  + 1;
+        //         oh_ = static_cast<int>( static_cast<float>(ih - fh_) / stride_h_)  + 1;
+        //         break;
+        // }
+
+        calcOutputSize(ic, ih, iw);
+
+        pDst_ = new Tensor{batchSize_, oh_, ow_, oc_};
+        pgDst_ = new Tensor{batchSize_, oh_, ow_, oc_};
+
+        pW_   = new Tensor{ic, fh_, fw_, fc_};
+        pgW_  = new Tensor{ic, fh_, fw_, fc_};
+
+        pB_   = new Tensor{1, 1, 1, oc_};
+        pgB_  = new Tensor{1, 1, 1, oc_};
+
+
+        pTmpCol_ = new Tensor{1, pW_->Size2D()*ic, pDst_->Size2D(), 1};
+
+        // Activator
+        applyActivator();
+    }
+
+    // construct with LayerParams
+    ConvLayer::ConvLayer(Layer* prevLayer, std::string id, LayerParams params):Layer(LayerType::Convolution) {
+        activationType_ = params.actType;
+        weightInitType_ = params.weight_init_type;
+        biasInitType_   = params.bias_init_type;
+        id_ = id;
+
+        batchSize_ = prevLayer->pDst_->NumOfData();
+        int ih = prevLayer->pDst_->Height();
+        int iw = prevLayer->pDst_->Width();
+        int ic = prevLayer->pDst_->Channel();
+
+        pPrevLayer_ = prevLayer;
+
+        fc_ = params.kernel_channel;
+        fh_ = params.kernel_height;
+        fw_ = params.kernel_width;
+
+        stride_h_ = params.stride_h;
+        stride_w_ = params.stride_w;
+
+        paddingType_ = params.paddingType;
+        pad_h_ = params.pad_h;
+        pad_w_ = params.pad_w;
+
+        // Temporary set dilation to 1
+        dilation_h_ = params.dilation_h;
+        dilation_w_ = params.dilation_w;
+
+        oc_ = fc_;
+        // Calculate oh, ow by fh, fw
+        calcOutputSize(ic, ih, iw);
 
         pDst_ = new Tensor{batchSize_, oh_, ow_, oc_};
         pgDst_ = new Tensor{batchSize_, oh_, ow_, oc_};
@@ -85,7 +136,6 @@ namespace mkt {
     ConvLayer::~ConvLayer() {
         fprintf(stderr, "---------------------- ConvLayer Destructor\n");
         delete pTmpCol_;
-
     }
 
 
@@ -256,6 +306,29 @@ namespace mkt {
 
     }
 
+    void ConvLayer::calcOutputSize(int ic, int ih, int iw) {
+        switch(paddingType_) {
+            case PaddingType::VALID:
+                ow_ = static_cast<int>( static_cast<float>(iw - fw_ + 2*pad_w_) / stride_w_) + 1;
+                oh_ = static_cast<int>( static_cast<float>(ih - fh_ + 2*pad_h_) / stride_h_) + 1;
+                break;
+            case PaddingType::SAME:
+
+                pad_w_ = static_cast<int>( ((iw-1)*stride_w_ + fw_ - iw) * 0.5 );
+                ow_    = static_cast<int>( static_cast<float>(iw - fw_ + (2*pad_w_)) / stride_w_ )  + 1;
+                MKT_Assert(iw_ == ow_, "iw != ow");
+
+                pad_h_ = static_cast<int>( ((ih-1)*stride_h_ + fh_ - ih) * 0.5 );
+                oh_    = static_cast<int>( static_cast<float>(ih - fh_ + (2*pad_h_)) / stride_h_ ) + 1;
+                MKT_Assert(ih_ == oh_, "ih != oh");
+
+                break;
+            default:
+                ow_ = static_cast<int>( static_cast<float>(iw - fw_) / stride_w_)  + 1;
+                oh_ = static_cast<int>( static_cast<float>(ih - fh_) / stride_h_)  + 1;
+                break;
+        }
+    }
 
     // Getter
     int ConvLayer::getFilterHeight() {

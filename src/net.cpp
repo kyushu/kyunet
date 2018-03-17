@@ -108,6 +108,18 @@ namespace mkt {
 
         return pConvLayer;
     }
+    Layer* Net::addConvLayer(Layer* prevLayer, std::string id, LayerParams params) {
+        if (layers_.size() == 0)
+        {
+            fprintf(stderr, "please add input layer first\n");
+            return nullptr;
+        }
+
+        ConvLayer* pConvLayer = new ConvLayer{prevLayer, id, params};
+
+        layers_.push_back(pConvLayer);
+        return pConvLayer;
+    }
 
     // Add Relu layer
     Layer* Net::addReluLayer(Layer* prevLayer, std::string id) {
@@ -213,6 +225,7 @@ namespace mkt {
         } else {
             for (int i = 0; i < layers_.size(); ++i)
             {
+                fprintf(stderr, "forward: %d\n", i);
                 Layer* pLayer = layers_.at(i);
                 if (i == 0) {
                     MKT_Assert(pLayer->Type() == LayerType::Input, "The first layer is not InputLayer");
