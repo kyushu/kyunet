@@ -32,6 +32,8 @@ namespace mkt {
 
     void ReluLayer::initialize() {
         initOutputTensor();
+
+        initGradOutputTensor();
     };
 
 

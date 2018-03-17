@@ -70,8 +70,8 @@ find_package(OpenCV REQUIRED)
         target_link_libraries(test_sigmoid_layer_forward libkyunet)
 
         # 14 test_pooling_method
-        add_executable(test_pooling_method 14_test_pooling_method.cpp)
-        target_link_libraries(test_pooling_method libkyunet)
+        add_executable(test_pooling_forward 14_test_pooling_forward.cpp)
+        target_link_libraries(test_pooling_forward libkyunet)
 
         # 15 test_softmax_layer
         add_executable(test_softmax_layer 15_test_softmax_layer.cpp)
@@ -84,6 +84,11 @@ find_package(OpenCV REQUIRED)
         # 17 test_cross_entropy_with_softmax_layer
         add_executable(test_cross_entropy_with_softmax_layer 17_test_cross_entropy_with_softmax_layer.cpp)
         target_link_libraries(test_cross_entropy_with_softmax_layer libkyunet)
+
+        # 18 test_cross_entropy_with_softmax_layer
+        add_executable(test_pooling_backward 18_test_pooling_backward.cpp)
+        target_link_libraries(test_pooling_backward libkyunet)
+
 
     else()
         message("OpenCV not found")

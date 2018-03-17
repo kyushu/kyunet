@@ -223,6 +223,26 @@ namespace mkt {
         }
     }
 
+    /**************************
+     *  Backward
+     **************************/
+    void Net::Backward() {
+        if (layers_.size() == 0) {
+            return;
+        } else {
+            for (int i = 0; i < layers_.size(); ++i)
+            {
+                Layer* pLayer = layers_.at(i);
+                if (i == 0) {
+                    MKT_Assert(pLayer->Type() == LayerType::Input, "The first layer is not InputLayer");
+                } else {
+                    pLayer->Backward();
+                }
+            }
+        }
+    }
+
+
     // Add data Function
     OP_STATUS Net::add_data_from_file_list(std::vector<std::string> fileList) {
 

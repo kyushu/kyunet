@@ -75,6 +75,10 @@ namespace mkt {
         initWeightTensor();
         initBiasTensor();
 
+        initGradOutputTensor();
+        initGradWeightTensor();
+        initGradBiasTensor();
+
     }
 
     void DenseLayer::Forward() {
@@ -131,7 +135,7 @@ namespace mkt {
             pDstData, dstSize3D);               /*C,       ldc(N)*/
 
         // 3. Z + bias
-        addBias();
+        // addBias();
 
         // 4. A = next layer input = activation(Z)
         if (activationType_ != ActivationType::NONE)

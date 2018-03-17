@@ -43,6 +43,8 @@ namespace mkt {
     void SoftmaxLayer::initialize() {
         initOutputTensor();
 
+        initGradOutputTensor();
+
         // tensor for Scale data
         pScale_->allocate();
     };

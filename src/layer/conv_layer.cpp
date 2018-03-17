@@ -46,6 +46,7 @@ namespace mkt {
             case PaddingType::valid:
                 ow_ = static_cast<int>( static_cast<float>(iw - fw_ + 2*pad_w_) / stride_w_) + 1;
                 oh_ = static_cast<int>( static_cast<float>(ih - fh_ + 2*pad_h_) / stride_h_) + 1;
+
                 break;
             case PaddingType::same:
 
@@ -74,7 +75,7 @@ namespace mkt {
         pgB_  = new Tensor{1, 1, 1, oc_};
 
 
-        pTmpCol_ = new Tensor{1, pW_->Size2D()*ic, pDst_->Size2D(), oc_};
+        pTmpCol_ = new Tensor{1, pW_->Size2D()*ic, pDst_->Size2D(), 1};
 
         // Activator
         applyActivator();
@@ -94,6 +95,10 @@ namespace mkt {
         initOutputTensor();
         initWeightTensor();
         initBiasTensor();
+
+        initGradOutputTensor();
+        initGradWeightTensor();
+        initGradBiasTensor();
 
         // temporary memory for im2col and col2im
         pTmpCol_->allocate();
@@ -117,6 +122,7 @@ namespace mkt {
         int src_wholeSize = pSrc->WholeSize();
 
         int batchSize = pDst_->NumOfData();
+        int oc = pDst_->Channel();
         int oh = pDst_->Height();
         int ow = pDst_->Width();
         int dst_wholeSize = pDst_->WholeSize();
@@ -146,22 +152,32 @@ namespace mkt {
                         | 3 4 5 | | 12 13 14 | | 21 22 23 |
                         | 6 7 8 | | 15 16 17 | | 24 25 26 |
 
+                fileer = |f0, f1|
+                         |f2, f3|
+
+                The first region of src which is applied filter is
+                | 0 1| convert to col vector= |0|
+                | 3 4|                        |1|
+                                              |3|
+                                              |4|
+
+                Conver src from image to column vector
                 im2col(src) =   | s0   s1  s3  s4 |
-                                | s1   s2  s4  s5 |  Channel 0
+                                | s1   s2  s4  s5 |  src Channel 0
                                 | s3   s4  s6  s7 |
                                 | s4   s5  s7  s8 |____________
                                 | s9  s10 s12 s13 |
-                                | s10 s11 s13 s14 |  Channel 1
+                                | s10 s11 s13 s14 |  src Channel 1
                                 | s12 s13 s15 s16 |
                                 | s13 s14 s16 s17 |____________
                                 | s18 s19 s21 s22 |
-                                | s19 s20 s22 s23 |  Channel 2
+                                | s19 s20 s22 s23 |  src Channel 2
                                 | s21 s22 s24 s25 |
                                 | s22 s23 s25 s26 |____________
-                                   |  |  |  |
-                                   |  |  |  |_____________________
-                                   |  |  |______________          |
-                                   |  |________         |         |
+                                   |   |   |   |
+                                   |   |   |   |__________________
+                                   |   |   |____________          |
+                                   |   |_______         |         |
                                    |           |        |         |
                             =   | patch_0 , patch_1, patch_2, patch_3 |
 
@@ -227,7 +243,7 @@ namespace mkt {
 
 
         // 2. Z + bias
-        addBias();
+        // addBias();
 
         // 3. A = next layer input = activation(Z)
         if (activationType_ != ActivationType::NONE)

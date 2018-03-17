@@ -64,10 +64,14 @@ namespace mkt {
 
     // Initialization
     void PoolingLayer::initialize() {
-
         initOutputTensor();
 
-        pMask->allocate();
+        initGradOutputTensor();
+
+        if (type_ == PoolingMethodType::MAX)
+        {
+            pMask->allocate();
+        }
     }
 
     // Computation Function
@@ -76,17 +80,19 @@ namespace mkt {
         Tensor* pSrc = pPrevLayer_->pDst_;
 
         float* pSrcData = pSrc->cpu_data();
+        int src_size2d = pSrc->Size2D();
         int ih = pSrc->Height();
         int iw = pSrc->Width();
 
         float* pDstData = pDst_->cpu_data();
         int dst_size2D = pDst_->Size2D();
 
-        float* pMaskData = pMask->cpu_data();
-
 
         switch (type_) {
             case PoolingMethodType::MAX:
+            {
+                float* pMaskData = pMask->cpu_data();
+
                 for (int b = 0; b < batchSize_; ++b) {
                     for (int c = 0; c < oc_; ++c) {
                         for (int ph = 0; ph < oh_; ++ph) {
@@ -122,8 +128,10 @@ namespace mkt {
                         // offset to next channel
                         pDstData += dst_size2D;
                         pMaskData += dst_size2D;
+                        pSrcData += src_size2d;
                     }
                 }
+            }
                 break;
             case PoolingMethodType::AVG:
                 for (int b = 0; b < batchSize_; ++b) {
@@ -157,6 +165,9 @@ namespace mkt {
                                 pDstData[pool_index] = favg / pool_size;
                             }
                         }
+                        // offset to next channel
+                        pDstData += dst_size2D;
+                        pSrcData += src_size2d;
                     }
                 }
                 break;
@@ -230,48 +241,6 @@ namespace mkt {
 
         }
     }
-
-    /*
-
-
-  case PoolingParameter_PoolMethod_AVE:
-    // The main loop
-    for (int n = 0; n < top[0]->num(); ++n) {
-      for (int c = 0; c < channels_; ++c) {
-        for (int ph = 0; ph < pooled_height_; ++ph) {
-          for (int pw = 0; pw < pooled_width_; ++pw) {
-            int hstart = ph * stride_h_ - pad_h_;
-            int wstart = pw * stride_w_ - pad_w_;
-            int hend = min(hstart + kernel_h_, height_ + pad_h_);
-            int wend = min(wstart + kernel_w_, width_ + pad_w_);
-            int pool_size = (hend - hstart) * (wend - wstart);
-            hstart = max(hstart, 0);
-            wstart = max(wstart, 0);
-            hend = min(hend, height_);
-            wend = min(wend, width_);
-            for (int h = hstart; h < hend; ++h) {
-              for (int w = wstart; w < wend; ++w) {
-                bottom_diff[h * width_ + w] +=
-                  top_diff[ph * pooled_width_ + pw] / pool_size;
-              }
-            }
-          }
-        }
-        // offset
-        bottom_diff += bottom[0]->offset(0, 1);
-        top_diff += top[0]->offset(0, 1);
-      }
-    }
-    break;
-  case PoolingParameter_PoolMethod_STOCHASTIC:
-    NOT_IMPLEMENTED;
-    break;
-  default:
-    LOG(FATAL) << "Unknown pooling method.";
-  }
-  */
-
-
 
     // Getter Function
     int PoolingLayer::getFilterHeight() {

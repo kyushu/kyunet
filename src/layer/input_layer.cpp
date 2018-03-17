@@ -12,8 +12,6 @@ namespace mkt {
         // this->dw_ = w;
         // this->dc_ = c;
         pDst_ = new Tensor{bSize, h, w, c};
-        pW_ = new Tensor(); // empty Tensor
-        pB_ = new Tensor(); // empty Tensor
 
     };
 

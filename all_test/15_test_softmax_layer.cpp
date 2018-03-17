@@ -1,28 +1,5 @@
 #include "net.h"
-
-void print_matrix(int batchSize, int channel, int height, int width, float* pData) {
-    int size2D = height*width;
-    int size3D = height*width*channel;
-    for (int b = 0; b < batchSize; ++b)
-    {
-        fprintf(stderr, "batch: %d\n", b);
-        for (int c = 0; c < channel; ++c)
-        {
-            for (int h = 0; h < height; ++h)
-            {
-                for (int w = 0; w < width; ++w)
-                {
-                    fprintf(stderr, "%f\t", pData[w + h*width + c*size2D + b*size3D]);
-                }
-                fprintf(stderr, "\n");
-            }
-            fprintf(stderr, "\n");
-        }
-        fprintf(stderr, "\n");
-    }
-
-    fprintf(stderr, "\n");
-}
+#include "test_utils.hpp"
 
 int main(int argc, char const *argv[])
 {

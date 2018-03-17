@@ -75,6 +75,9 @@ namespace mkt {
         // Forward Function
         void Forward();
 
+        // Backward Function
+        void Backward();
+
         // Add Data Function
         OP_STATUS add_data_from_file_list(std::vector<std::string> fileList);
 

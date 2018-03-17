@@ -89,8 +89,12 @@ namespace mkt {
     // Init Function
     void Layer::initOutputTensor() {
         pDst_->allocate();
+    }
+
+    void Layer::initGradOutputTensor() {
         pgDst_->allocate();
     }
+
     void Layer::initWeightTensor() {
 
         pW_->allocate();
@@ -140,31 +144,32 @@ namespace mkt {
                 he(*pW_);
                 break;
         }
+    }
 
-
+    void Layer::initGradWeightTensor() {
         pgW_->allocate();
         std::fill_n(pgW_->cpu_data(), pgW_->WholeSize(), 0.0f);
-
     }
 
 
     void Layer::initBiasTensor() {
         pB_-> allocate();
         std::fill_n(pB_->cpu_data(), pB_->WholeSize(), 0.0f);
+    }
 
+    void Layer::initGradBiasTensor() {
         pgB_->allocate();
         std::fill_n(pgB_->cpu_data(), pgB_->WholeSize(), 0.0f);
-
     }
 
     // ##################################
-    void Layer::addBias() {
-        for (int i = 0; i < pDst_->NumOfData(); ++i)
-        {
-            int numData = i * pDst_->Size3D();
-            axpy(pDst_->Size3D(), 1.0, pB_->cpu_data(), pDst_->cpu_data()+numData);
-        }
-    }
+    // void Layer::addBias() {
+    //     for (int i = 0; i < pDst_->NumOfData(); ++i)
+    //     {
+    //         int numData = i * pDst_->Size3D();
+    //         axpy(pDst_->Size3D(), 1.0, pB_->cpu_data(), pDst_->cpu_data()+numData);
+    //     }
+    // }
 
     void Layer::applyActivator() {
         fprintf(stderr, "apply activator\n");

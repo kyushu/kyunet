@@ -30,6 +30,8 @@ namespace mkt {
 
     void SigmoidLayer::initialize() {
         initOutputTensor();
+
+        initGradOutputTensor();
     };
 
 

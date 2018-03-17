@@ -20,8 +20,8 @@ int main(int argc, char const *argv[])
 
     // Net Configuration
     int batchSize = 1;
-    int height = 4;
-    int width = 4;
+    int height = 9;
+    int width = 9;
     int channel = 1;
 
     Net net;
@@ -42,7 +42,7 @@ int main(int argc, char const *argv[])
     float* pInDstData = pInputTensor->cpu_data();
     for (int i = 0; i < pInputTensor->WholeSize(); ++i)
     {
-        float fval = (float(std::rand() % 100));
+        float fval = (float(std::rand() % 10));
         pInDstData[i] = fval;
     }
 

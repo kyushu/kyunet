@@ -20,16 +20,30 @@
 * SOFTWARE.
 */
 /*
- *                Layer(l-1)                    Layer(l)
- *         _______________________      _______________________
- *        |            _______   |      |            _______   |
- *        |           |      |   |      |           |      |   |
- *    --->|-->pSrc    | pDst |---|----->|-->pSrc    | pDst |---|----->
- *        |           |______|   |      |           |______|   |
- *        |                      |      |                      |
- *        |  (ext_Src)           |      |   (ext_Src)          |
- *        |______________________|      |______________________|
- *                                 ------------------------------
+ *                L(n-1)                               L(n)
+ *         ______________________        _____________________________
+ *        |            _______   |      |                  _______    |
+ *        |           |      |   |      |                  |      |   |
+ *    --->|           | pDst |---|----->| input( L(n-1),   | pDst |---|----->
+ *        |           |______|   |  --->|        L(n-3) )  |______|   |
+ *        |                      |  |   |                             |
+ *        |  (ext_Src)           |  |   |                             |
+ *        |______________________|  |   |_____________________________|
+ *                                  |
+ *                L(n-3)            |
+ *         ______________________   |
+ *        |            _______   |  |
+ *        |           |      |   |  |
+ *        |           | pDst |---|---
+ *        |           |______|   |
+ *        |                      |
+ *        |  (ext_Src)           |
+ *        |______________________|
+ *
+ *
+ *
+ *
+ *
  *        ext_Src: extra input sources but not the output of previous layer
  */
 
@@ -98,14 +112,20 @@ namespace mkt {
 
         // Initialize Function
         virtual void initialize()=0;
+
         void initOutputTensor();
+        void initGradOutputTensor();
+
         void initWeightTensor();
+        void initGradWeightTensor();
+
         void initBiasTensor();
+        void initGradBiasTensor();
 
         // Computation Function
         virtual void Forward()=0;     // forward pass
         virtual void Backward()=0;    // back propagation
-        void addBias();
+
         void applyActivator();
 
         // Getter function
