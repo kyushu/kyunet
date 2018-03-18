@@ -168,6 +168,16 @@ namespace mkt {
         return poolingLayer;
     }
 
+    Layer* Net::addPoolingLayer( Layer* prevLayer, std::string id, LayerParams params) {
+        if (layers_.size() == 0) {
+            fprintf(stderr, "please add input layer first\n");
+            return nullptr;
+        }
+        PoolingLayer* poolingLayer= new PoolingLayer{prevLayer, id, params};
+        layers_.push_back(poolingLayer);
+        return poolingLayer;
+    }
+
     Layer* Net::addSoftmaxLayer( Layer* prevLayer, std::string id)
     {
 

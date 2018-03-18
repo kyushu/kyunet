@@ -1,20 +1,22 @@
 #ifndef PARAMETER_HPP
 #define PARAMETER_HPP
 
+#include "definitions.h"
+
 namespace mkt {
 
     struct LayerParams
     {
-        int kernel_channel;
-        int kernel_height;
-        int kernel_width;
+        int fc;
+        int fh;
+        int fw;
 
         int stride_h;
         int stride_w;
 
         int pad_h;
         int pad_w;
-        PaddingType paddingType;
+        PaddingType padding_type;
 
         int dilation_h;
         int dilation_w;
@@ -24,46 +26,51 @@ namespace mkt {
         InitializerType weight_init_type;
         InitializerType bias_init_type;
 
+        PoolingMethodType pooling_type;
+
         // constructor
         LayerParams():
-            kernel_channel{0},
-            kernel_height{0},
-            kernel_width{0},
+            fc{0},
+            fh{0},
+            fw{0},
             stride_h{0},
             stride_w{0},
             pad_h{0},
             pad_w{0},
-            paddingType{PaddingType::VALID},
+            padding_type{PaddingType::VALID},
             dilation_h{1},
             dilation_w{1},
             actType{ActivationType::NONE},
             weight_init_type{InitializerType::NONE},
-            bias_init_type{InitializerType::NONE}
+            bias_init_type{InitializerType::NONE},
+            pooling_type{PoolingMethodType::MAX}
         {};
 
         LayerParams(
-            int kh,
-            int kw,
-            int kc,
+            int kernel_channel,
+            int kernel_height,
+            int kernel_width,
             int sh,
             int sw,
             int ph,
             int pw,
-            PaddingType pType,
+            PaddingType padType,
             ActivationType aType,
             InitializerType wInitType,
-            InitializerType bInitType
+            InitializerType bInitType,
+            PoolingMethodType poolingType
         ):
-            kernel_channel{kc},
-            kernel_height{kh},
-            kernel_width{kw},
+            fc{kernel_channel},
+            fh{kernel_height},
+            fw{kernel_width},
             stride_h{sh},
             stride_w{sw},
             pad_h{ph},
             pad_w{pw},
-            paddingType{pType},
+            padding_type{padType},
             weight_init_type{wInitType},
-            bias_init_type{bInitType}
+            bias_init_type{bInitType},
+            pooling_type{poolingType}
         {};
     };
 }

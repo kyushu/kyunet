@@ -19,17 +19,14 @@ namespace mkt {
         Tensor* pMask;
 
 
-        PoolingLayer(
-            Layer* prevLayer,
-            std::string id,
-            int kernel_Height,
-            int kernel_width,
-            int stride_h,
-            int stride_w,
-            int pad_h,
-            int pad_w,
+        PoolingLayer(Layer* prevLayer, std::string id,
+            int kernel_Height, int kernel_width,
+            int stride_h, int stride_w,
+            int pad_h, int pad_w,
             PoolingMethodType type
             );
+        PoolingLayer(Layer* prevLayer, std::string id, LayerParams params);
+
         ~PoolingLayer();
 
         void initialize();

@@ -52,17 +52,46 @@ namespace mkt {
 
         pPrevLayer_ = prevLayer;
 
-        pDst_ = new Tensor{batchSize_, 1, 1, unit};
-        pgDst_ = new Tensor{batchSize_, 1, 1, unit};
+        pDst_  = new Tensor{batchSize_, 1, 1, unit_};
+        pgDst_ = new Tensor{batchSize_, 1, 1, unit_};
 
-        pW_   = new Tensor{1, unit, input_size3D, 1};
-        pgW_  = new Tensor{1, unit, input_size3D, 1};
+        pW_   = new Tensor{1, unit_, input_size3D, 1};
+        pgW_  = new Tensor{1, unit_, input_size3D, 1};
 
-        pB_   = new Tensor{1, 1, 1, unit};
-        pgB_  = new Tensor{1, 1, 1, unit};
+        pB_   = new Tensor{1, 1, 1, unit_};
+        pgB_  = new Tensor{1, 1, 1, unit_};
 
         // Activator
         applyActivator();
+    }
+
+    DenseLayer::DenseLayer(Layer* prevLayer, std::string id, LayerParams params):Layer(LayerType::FullConnected) {
+
+        id_ = id;
+
+        batchSize_ = prevLayer->pDst_->NumOfData();
+        int h = prevLayer->pDst_->Height();
+        int w = prevLayer->pDst_->Width();
+        int c = prevLayer->pDst_->Channel();
+        int input_size3D = prevLayer->pDst_->Size3D();
+
+        pPrevLayer_ = prevLayer;
+
+        // Parameter setting
+        activationType_ = params.actType;
+        weightInitType_ = params.weight_init_type;
+        biasInitType_   = params.bias_init_type;
+
+        unit_ = params.fc;
+
+        pDst_ = new Tensor{batchSize_, 1, 1, unit_};
+        pgDst_ = new Tensor{batchSize_, 1, 1, unit_};
+
+        pW_   = new Tensor{1, unit_, input_size3D, 1};
+        pgW_  = new Tensor{1, unit_, input_size3D, 1};
+
+        pB_   = new Tensor{1, 1, 1, unit_};
+        pgB_  = new Tensor{1, 1, 1, unit_};
     }
 
     /* Destructor */
@@ -161,7 +190,7 @@ namespace mkt {
         }
 
 
-        // 2. [Update gradient with respect to  Weight]
+        // 2. [Update gradient with respect to Weight]
         /*************************************************************
          *
          * A = pgDstData (M x N) = (Batch_size x Dst_Size3D)
@@ -176,6 +205,7 @@ namespace mkt {
         int src_size3D = pPrevLayer_->pDst_->Size3D();
 
         int dst_size3D = pDst_->Size3D();
+        // pgWData will be reset after update weight
         gemm_cpu(
             CblasTrans, CblasNoTrans,
             dst_size3D, src_size3D, batchSize_,

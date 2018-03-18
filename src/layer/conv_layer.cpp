@@ -6,9 +6,9 @@ namespace mkt {
     ConvLayer::ConvLayer(
         Layer* prevLayer,
         std::string id,
-        int kernel_Height,
-        int kernel_width,
-        int kernel_channel,
+        int fh,
+        int fw,
+        int fc,
         int stride_h,
         int stride_w,
         int pad_h,
@@ -19,14 +19,14 @@ namespace mkt {
         InitializerType biasInitType
     ):
         // kernelSize_{kernelSize},
-        fh_{kernel_Height},
-        fw_{kernel_width},
-        fc_{kernel_channel},
+        fh_{fh},
+        fw_{fw},
+        fc_{fc},
         stride_h_{stride_h},
         stride_w_{stride_w},
         pad_h_{pad_h},
         pad_w_{pad_w},
-        paddingType_{paddingType},
+        padding_type_{paddingType},
         dilation_h_{1},
         dilation_w_{1},
         Layer(LayerType::Convolution, actType, weightInitType, biasInitType)
@@ -42,7 +42,7 @@ namespace mkt {
 
         oc_ = fc_;
         // calculate pDst size: ow_ = (iw_ - fw_ +2padding_)/stride_ +1
-        // switch(paddingType_) {
+        // switch(padding_type_) {
         //     case PaddingType::valid:
         //         ow_ = static_cast<int>( static_cast<float>(iw - fw_ + 2*pad_w_) / stride_w_) + 1;
         //         oh_ = static_cast<int>( static_cast<float>(ih - fh_ + 2*pad_h_) / stride_h_) + 1;
@@ -85,9 +85,6 @@ namespace mkt {
 
     // construct with LayerParams
     ConvLayer::ConvLayer(Layer* prevLayer, std::string id, LayerParams params):Layer(LayerType::Convolution) {
-        activationType_ = params.actType;
-        weightInitType_ = params.weight_init_type;
-        biasInitType_   = params.bias_init_type;
         id_ = id;
 
         batchSize_ = prevLayer->pDst_->NumOfData();
@@ -97,14 +94,19 @@ namespace mkt {
 
         pPrevLayer_ = prevLayer;
 
-        fc_ = params.kernel_channel;
-        fh_ = params.kernel_height;
-        fw_ = params.kernel_width;
+        // Parameter setting
+        activationType_ = params.actType;
+        weightInitType_ = params.weight_init_type;
+        biasInitType_   = params.bias_init_type;
+
+        fc_ = params.fc;
+        fh_ = params.fh;
+        fw_ = params.fw;
 
         stride_h_ = params.stride_h;
         stride_w_ = params.stride_w;
 
-        paddingType_ = params.paddingType;
+        padding_type_ = params.padding_type;
         pad_h_ = params.pad_h;
         pad_w_ = params.pad_w;
 
@@ -190,48 +192,59 @@ namespace mkt {
         {
 
             /*
-                im2col
-                For example:
-                    src     =ih(3) X iw(3) X ic(3)
-                    filter  = fh(2) X fw(2) X fc(2)
-                    padding = 0
-                    stride  = 1
-                    dst     = oh(2) X ow(2)
+            Im2col
+            For example:
+                src     =ih(3) * iw(3) * ic(3)
+                filter  = ic(3) * fh(2) * fw(2) * fc(2)
+                padding = 0
+                stride  = 1
+                dst     = oh(2) * ow(2)
 
-                src =   | 0 1 2 | |  9 10 11 | | 18 19 20 |
-                        | 3 4 5 | | 12 13 14 | | 21 22 23 |
-                        | 6 7 8 | | 15 16 17 | | 24 25 26 |
+            src =   | 0 1 2 | |  9 10 11 | | 18 19 20 |
+                    | 3 4 5 | | 12 13 14 | | 21 22 23 |
+                    | 6 7 8 | | 15 16 17 | | 24 25 26 |
 
-                fileer = |f0, f1|
-                         |f2, f3|
+            According to the dimension of src and filter
+            The filter is
+            Filter_0    |w0_0_0, w0_0_1||w1_0_0, w1_0_1||w2_0_0, w2_0_1|
+                        |w0_0_2, w0_0_3||w1_0_2, w1_0_3||w2_0_2, w2_0_3|
 
-                The first region of src which is applied filter is
-                | 0 1| convert to col vector= |0|
-                | 3 4|                        |1|
-                                              |3|
-                                              |4|
+            Filter_1    |w0_1_0, w0_0_1||w1_1_0, w0_0_1||w2_1_0, w0_0_1|
+                        |w0_1_2, w0_0_3||w1_1_2, w0_0_3||w2_1_2, w0_0_3|
 
-                Conver src from image to column vector
-                im2col(src) =   | s0   s1  s3  s4 |
-                                | s1   s2  s4  s5 |  src Channel 0
-                                | s3   s4  s6  s7 |
-                                | s4   s5  s7  s8 |____________
-                                | s9  s10 s12 s13 |
-                                | s10 s11 s13 s14 |  src Channel 1
-                                | s12 s13 s15 s16 |
-                                | s13 s14 s16 s17 |____________
-                                | s18 s19 s21 s22 |
-                                | s19 s20 s22 s23 |  src Channel 2
-                                | s21 s22 s24 s25 |
-                                | s22 s23 s25 s26 |____________
-                                   |   |   |   |
-                                   |   |   |   |__________________
-                                   |   |   |____________          |
-                                   |   |_______         |         |
-                                   |           |        |         |
-                            =   | patch_0 , patch_1, patch_2, patch_3 |
+            wi_f_c,
+            i=index of scr channel
+            f=index of filter
+            c=index of weight of filter
 
-                im2col matrix = (fh*fw*ic) X (oh*ow)
+
+            The first region of src which is applied to filter is
+            |0 1| convert to col vector= |0|
+            |3 4|                        |1|
+                                         |3|
+                                         |4|
+
+            Conver src from image to column vector
+            im2col(src) =   | s0   s1  s3  s4 |
+                            | s1   s2  s4  s5 |  src Channel 0
+                            | s3   s4  s6  s7 |
+                            | s4   s5  s7  s8 |____________
+                            | s9  s10 s12 s13 |
+                            | s10 s11 s13 s14 |  src Channel 1
+                            | s12 s13 s15 s16 |
+                            | s13 s14 s16 s17 |____________
+                            | s18 s19 s21 s22 |
+                            | s19 s20 s22 s23 |  src Channel 2
+                            | s21 s22 s24 s25 |
+                            | s22 s23 s25 s26 |____________
+                               |   |   |   |
+                               |   |   |   |__________________
+                               |   |   |____________          |
+                               |   |_______         |         |
+                               |           |        |         |
+                        =   | patch_0 , patch_1, patch_2, patch_3 |
+
+            im2col matrix = (ic*fh*fw) X (oh*ow)
             */
             mkt::im2col_cpu(pSrcData + i * src_size3D,
                 ic, ih, iw,
@@ -245,57 +258,71 @@ namespace mkt {
 
 
             /*
-                GEMM: kernel X im2col
-                For example: (same as above)
-                    src     =ih(3) X iw(3) X ic(3)
-                    filter  = fh(2) X fw(2) X fc(2)
-                    padding = 0
-                    stride  = 1
-                    dst     = oh(2) X ow(2)
+            GEMM: kernel X im2col
+            For example: (same as above)
+                src     = ih(3) * iw(3) * ic(3)
+                filter  = ( ic(3) * fh(2) * fw(2) ) * fc(2)
+                padding = 0
+                stride  = 1
+                dst     = oh(2) X ow(2)
 
-                Step 1. treat filter as [w0, w1, w2, w3] (fhxfw)
-                        so filter matrix(W) is
-                    | w0_0, ..., w0_3, w0_4, ..., w0_7, w0_8, ..., w0_11 | = filter 0 (F0)
-                    | w1_0, ..., w1_3, w1_4, ..., w1_7, w1_8, ..., w0_11 | = filter 1 (F1)
+            1. Convert filter from |w0,w1| to [w0, w1, w2, w3]
+                                   |w2,w3|
 
-                    W matrix = oc X (fh*fw*ic)
+                According to the dimension of src and filter
+                The filter is
+                Filter_0    |w0_0_0,w0_0_1||w1_0_0,w1_0_1||w2_0_0,w2_0_1|
+                            |w0_0_2,w0_0_3||w1_0_2,w1_0_3||w2_0_2,w2_0_3|
+
+                Filter_1    |w0_1_0,w0_0_1||w1_1_0,w0_0_1||w2_1_0,w0_0_1|
+                            |w0_1_2,w0_0_3||w1_1_2,w0_0_3||w2_1_2,w0_0_3|
+
+                wi_f_c, i=index of scr channel
+                        f=index of filter
+                        c=index of weight of filter
+
+                The filter matrix is
+                | w0_0_0, ..., w0_0_3, w1_0_4, ..., w1_0_7, w2_0_8, ..., w2_0_11 | = filter 0 (F0)
+                | w0_1_0, ..., w0_1_3, w1_1_4, ..., w1_1_7, w2_1_8, ..., w2_0_11 | = filter 1 (F1)
+
+                W matrix = oc X (fh*fw*ic)
 
 
-                Step 2. Dst matrix = W X im2col(src) =
+            2. Dst matrix = W X im2col(src) =
 
-                                | s0   s1  s3  s4 |
-                                | s1   s2  s4  s5 |
-                                | s3   s4  s6  s7 |
-                                | s4   s5  s7  s8 |
-                                | s9  s10 s12 s13 |
-                    | F0 |      | s10 s11 s13 s14 |
-                    | F1 |  X   | s12 s13 s15 s16 |
-                                | s13 s14 s16 s17 |
-                                | s18 s19 s21 s22 |
-                                | s19 s20 s22 s23 |
-                                | s21 s22 s24 s25 |
-                                | s22 s23 s25 s26 |
-     |
-                    Dst matrix = oc X (oh*ow)
+                            |  s0  s1  s3  s4 |
+                            |  s1  s2  s4  s5 |
+                            |  s3  s4  s6  s7 |
+                            |  s4  s5  s7  s8 |
+                            |  s9 s10 s12 s13 |
+                | F0 |      | s10 s11 s13 s14 |
+                | F1 |  X   | s12 s13 s15 s16 |
+                            | s13 s14 s16 s17 |
+                            | s18 s19 s21 s22 |
+                            | s19 s20 s22 s23 |
+                            | s21 s22 s24 s25 |
+                            | s22 s23 s25 s26 |
+
+                Dst matrix = oc X (oh*ow)
 
             */
 
             mkt::gemm_cpu(
-                CblasNoTrans, CblasNoTrans,                                                       /* trans_A, trans_B*/
+                CblasNoTrans, CblasNoTrans,                          /* trans_A, trans_B*/
                 pW_->Channel(), pDst_->Size2D(), pW_->Size2D()*ic,   /* M,       N, K*/
-                1.0f,                                                       /* ALPHA */
-                pWData, pW_->Size2D()*ic,                                /* A,       lda(K)*/
-                pTmpColData,   oh*ow,                                       /* B,       ldb(N)*/
-                1.0f,                                                       /* BETA */
-                pDstData, oh*ow                                             /* C,       ldc(N)*/
+                1.0f,                                                /* ALPHA */
+                pWData, pW_->Size2D()*ic,                            /* A,       lda(K)*/
+                pTmpColData,   oh*ow,                                /* B,       ldb(N)*/
+                1.0f,                                                /* BETA */
+                pDstData, oh*ow                                      /* C,       ldc(N)*/
             );
         }
 
 
-        // 2. Z + bias
+        // 2. Z = WX + Bias
         // addBias();
 
-        // 3. A = next layer input = activation(Z)
+        // 3. A = activation(Z) = the input of next layer
         if (activationType_ != ActivationType::NONE)
         {
             pActivator_->Forward(*pDst_, *pDst_);
@@ -303,11 +330,94 @@ namespace mkt {
 
     }
     void ConvLayer::Backward() {
+        // backpropagation from dst.grad_data to src.grad_data
+        // Step 1. dst_grad X weight
+        /*
 
+        1. w = [w0, w1, w2, w3]
+
+        2. dst_grad = [d0, d1, d2, d3]
+
+                 | w0 |
+        3. w_t = | w1 |
+                 | w2 |
+                 | w3 |
+
+                                 | w0 |                       | w0d0, w0d1, w0d2, w0d3 |   | c0 |
+        4. gemm(w_t, dst_grad) = | w1 |  X [d0, d1, d2, d3] = | w1d0, w1d1, w1d2, w1d3 | = | c1 |
+                                 | w2 |                       | w2d0, w2d1, w2d2, w2d3 |   | c2 |
+                                 | w3 |                       | w3d0, w3d1, w3d2, w3d3 |   | c3 |
+
+
+        base on reverse convolution, the src_grad_data is
+
+                            | w0d0      , w0d1                , w1d1      |
+        5. src_grad_data =  | w0d2+w2d0 , w0d3+w1d2+w2d1+w3d0 , w1d3+w3d1 |
+                            | w2d2      , w2d3+w3d2           , w3d3      |
+
+            c0m, c1m, c2m, c3m = convert c0, c1, c2, c3 from column vector(col) to matrix(im))
+
+            c0m = c0( | w0d0, w0d1, w0d2, w0d3 | ) COL_TO_IM = |w0d0 , w0d1|
+                                                               |w0d2 , w0d3|
+
+            c1m = c0( | w1d0, w1d1, w1d2, w1d3 | ) COL_TO_IM = |w0d1 , w1d1|
+                                                               |w1d2 , w1d3|
+
+            c2m = c0( | w2d0, w2d1, w2d2, w2d3 | ) COL_TO_IM = |w2d0 , w2d1|
+                                                               |w2d2 , w2d3|
+
+            c3m = c0( | w3d0, w3d1, w3d2, w3d3 | ) COL_TO_IM = |w3d0 , w3d1|
+                                                               |w3d2 , w3d3|
+
+            src_grad_data is composited by c0m, c1m, c2m, c3m
+
+            here display src_grad_data is composited by c0m, c1m, c2m, c3m
+            part of c0m, c1m, c2m, c3m are overlaped.
+
+            Left-Top of src_grad_data      Right-Top of src_grad_data
+                | w0d0 , w0d1|                | w0d1 , w1d1|
+                | w0d2 , w0d3|                | w1d2 , w1d3|
+
+                | w2d0 , w2d1|                | w3d0 , w3d1|
+                | w2d2 , w2d3|                | w3d2 , w3d3|
+            Left-Bottom of src_grad_data      Right-bottom of src_grad_data
+
+        */
+        float* pWData = pW_->cpu_data();
+        float* pgDstData = pgDst_->cpu_data();
+        float* pTmpColData = pTmpCol_->cpu_data();
+
+        int m = oc_; // num of filter
+        int n = pW_->Size2D() * pW_->NumOfData();
+        int k = pgDst_->Size2D();
+        mkt::gemm_cpu(
+            CblasTrans, CblasNoTrans,               // trans_a, trans_b
+            n, k, m,            // M, N, K
+            1.0f,               // Alpha
+            pWData, n,          // A,       lda
+            pgDstData, k,       // B,       lda
+            0,                  // Beta
+            pTmpColData, k      // C,       lda
+        );
+
+        Tensor* pgSrc = pPrevLayer_->pgDst_;
+        float* pgSrcData = pgSrc->cpu_data();
+        int ic = pgSrc->Channel();
+        int ih = pgSrc->Height();
+        int iw = pgSrc->Width();
+
+        mkt::col2im_cpu(
+            pTmpColData,
+            ic, ih, iw,
+            fh_, fw_,
+            pad_h_, pad_w_,
+            stride_h_, stride_w_,
+            dilation_h_, dilation_w_,
+            pgSrcData);
     }
 
     void ConvLayer::calcOutputSize(int ic, int ih, int iw) {
-        switch(paddingType_) {
+        switch(padding_type_) {
             case PaddingType::VALID:
                 ow_ = static_cast<int>( static_cast<float>(iw - fw_ + 2*pad_w_) / stride_w_) + 1;
                 oh_ = static_cast<int>( static_cast<float>(ih - fh_ + 2*pad_h_) / stride_h_) + 1;

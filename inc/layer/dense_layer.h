@@ -29,6 +29,7 @@ namespace mkt {
             InitializerType weightInitType,
             InitializerType biasInitType
         );
+        DenseLayer(Layer* prevLayer, std::string id, LayerParams params);
 
         ~DenseLayer();
 

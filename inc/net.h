@@ -65,6 +65,7 @@ namespace mkt {
         Layer* addSigmoidLayer(Layer* prevLayer, std::string id);
 
         Layer* addPoolingLayer( Layer* prevLayer, std::string id, int kernel_Height, int kernel_width, int stride_h, int stride_w, int pad_h, int pad_w, PoolingMethodType type);
+        Layer* addPoolingLayer( Layer* prevLayer, std::string id, LayerParams params);
 
         Layer* addSoftmaxLayer( Layer* prevLayer, std::string id);
 

@@ -16,7 +16,7 @@ namespace mkt {
         int stride_w_;
         int pad_h_;
         int pad_w_;
-        PaddingType paddingType_;
+        PaddingType padding_type_;
 
         // kernel(filter) tensor Dimension
         int dilation_h_;
@@ -28,9 +28,9 @@ namespace mkt {
         ConvLayer(
             Layer* prevLayer,
             std::string id,
-            int kernel_Height,
-            int kernel_width,
-            int kernel_channel,
+            int fh,
+            int fw,
+            int fc,
             int stride_h,
             int stride_w,
             int pad_h,

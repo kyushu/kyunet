@@ -39,7 +39,7 @@ int main(int argc, char const *argv[])
     mkt::mktLog(1, "k: %d\n", k);
 
     // Set temporary tensor for storing Col2Im matrix
-    mkt::Tensor temp(batch_size, n, k, oc);
+    mkt::Tensor temp(1, n, k, 1);
     temp.allocate();
     float* ptmpData = temp.cpu_data();
 
