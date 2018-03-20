@@ -1,4 +1,3 @@
 # kyunet
-neural network network framework
+Implement a neural network framework from scratch for understanding.
 
-the reference: jnbraun/bcnn, ncnn, keras, MXNet, nnabla
