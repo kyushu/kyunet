@@ -36,8 +36,8 @@ namespace mkt {
         void Backward();
 
         // Getter Function
-        int getFilterHeight();
-        int getFilterWidth();
+        int getFiltergetHeight();
+        int getFiltergetWidth();
     };
 
 }

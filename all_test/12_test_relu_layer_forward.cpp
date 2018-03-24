@@ -26,9 +26,9 @@ int main(int argc, char const *argv[])
 
     // Feed pseudo data
     Tensor* pInputTensor = pInputLayer->pDst_;
-    float* pInDstData = pInputTensor->cpu_data();
+    float* pInDstData = pInputTensor->getCPUData();
     fprintf(stderr, "Input data\n");
-    for (int i = 0; i < pInputTensor->WholeSize(); ++i)
+    for (int i = 0; i < pInputTensor->getWholeSize(); ++i)
     {
         float fval = (float(std::rand() % 100) / 100 - 0.5);
         pInDstData[i] = fval;
@@ -37,8 +37,8 @@ int main(int argc, char const *argv[])
 
     pReluLayer->Forward();
 
-    int wholeSize = pReluLayer->pDst_->WholeSize();
-    float* pDstData = pReluLayer->pDst_->cpu_data();
+    int wholeSize = pReluLayer->pDst_->getWholeSize();
+    float* pDstData = pReluLayer->pDst_->getCPUData();
     fprintf(stderr, "Relu result\n");
     for (int i = 0; i < wholeSize; ++i)
     {

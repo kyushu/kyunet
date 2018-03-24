@@ -114,7 +114,7 @@ namespace mkt {
         virtual void initialize()=0;
 
         void initOutputTensor();
-        void initGradOutputTensor();
+        void initGradTensor();
 
         void initWeightTensor();
         void initGradWeightTensor();
@@ -134,12 +134,12 @@ namespace mkt {
         InitializerType Bias_Init_Type();
         ActivationType Activation_Type();
         int BatchSize();
-        int Output_Height();
-        int Output_Width();
-        int Output_Channel();
-        int Filter_Height();
-        int Filter_Width();
-        int Filter_Channel();
+        int Output_getHeight();
+        int Output_getWidth();
+        int Output_getChannel();
+        int Filter_getHeight();
+        int Filter_getWidth();
+        int Filter_getChannel();
 
 
 

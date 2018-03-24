@@ -195,35 +195,35 @@ namespace mkt {
     /********************************
     ** Getter
     ********************************/
-    float* Tensor::cpu_data() {
+    float* Tensor::getCPUData() {
         return pData_;
     }
 
-    int Tensor::NumOfData() {
+    int Tensor::getNumOfData() {
         return num_;
     }
 
-    int Tensor::Width() {
+    int Tensor::getWidth() {
         return width_;
     }
 
-    int Tensor::Height() {
+    int Tensor::getHeight() {
         return height_;
     }
 
-    int Tensor::Channel() {
+    int Tensor::getChannel() {
         return channel_;
     }
 
-    int Tensor::Size2D() {
+    int Tensor::getSize2D() {
         return size2D_;
     }
 
-    int Tensor::Size3D() {
+    int Tensor::getSize3D() {
         return size3D_;
     }
 
-    int Tensor::WholeSize() {
+    int Tensor::getWholeSize() {
         return wholeSize_;
     }
 }

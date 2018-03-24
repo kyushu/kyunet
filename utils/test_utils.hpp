@@ -15,7 +15,7 @@ static void print_matrix(int batchSize, int channel, int height, int width, floa
             {
                 for (int w = 0; w < width; ++w)
                 {
-                    fprintf(stderr, "%f\t", pData[w + h*width + c*size2D + b*size3D]);
+                    fprintf(stderr, "%.3f\t", pData[w + h*width + c*size2D + b*size3D]);
                 }
                 if (height > 1) { fprintf(stderr, "\n"); }
             }
@@ -27,5 +27,23 @@ static void print_matrix(int batchSize, int channel, int height, int width, floa
     fprintf(stderr, "\n");
 }
 
+static void genRndPseudoData(float* pData, int num, int ch, int height, int width) {
+
+    for (int b = 0; b < num; ++b)
+    {
+        for (int c = 0; c < ch; ++c)
+        {
+            for (int h = 0; h < height; ++h)
+            {
+                for (int w = 0; w < width; ++w)
+                {
+                    float rndVal = (rand() % 1000) / 1000.0f;
+                    pData[w + h*width + c*(height*width) + b*(ch*height*width)] = rndVal;
+                    // fprintf(stderr, "data[%d]=%f\n", w + h*width + c*(height*width) + b*(channel*height*width), rndVal);
+                }
+            }
+        }
+    }
+}
 
 #endif

@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 2.9)
+cmake_minimum_required(VERSION 3.1)
 
 project(all_test)
 
@@ -89,6 +89,9 @@ find_package(OpenCV REQUIRED)
         add_executable(test_pooling_backward 18_test_pooling_backward.cpp)
         target_link_libraries(test_pooling_backward libkyunet)
 
+        # 19_test_convLayer_backward
+        add_executable(test_convLayer_backward 19_test_convLayer_backward.cpp)
+        target_link_libraries(test_convLayer_backward libkyunet)
 
     else()
         message("OpenCV not found")

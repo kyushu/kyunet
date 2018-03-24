@@ -40,7 +40,7 @@ int main(int argc, char const *argv[])
     /********************************
      * load Pseudo data to input layer
      ********************************/
-    float* pInData = pInputLayer->pDst_->cpu_data();
+    float* pInData = pInputLayer->pDst_->getCPUData();
     for (int i = 0; i < batchSize * height * width * channel; ++i)
     {
         pInData[i] = testData[i];
@@ -58,15 +58,15 @@ int main(int argc, char const *argv[])
      */
     Layer* pSoftmaxLayer = &(pCrossEntropyLayer->softmaxLayer_);
     fprintf(stderr, "Dst data (probability) of Softmax Layer\n");
-    int s_dst_c = pSoftmaxLayer->pDst_->Channel();
-    int s_dst_h = pSoftmaxLayer->pDst_->Height();
-    int s_dst_w = pSoftmaxLayer->pDst_->Width();
+    int s_dst_c = pSoftmaxLayer->pDst_->getChannel();
+    int s_dst_h = pSoftmaxLayer->pDst_->getHeight();
+    int s_dst_w = pSoftmaxLayer->pDst_->getWidth();
     //
 
     float sum = 0;
-    float* softmax_dst_data = pSoftmaxLayer->pDst_->cpu_data();
+    float* softmax_dst_data = pSoftmaxLayer->pDst_->getCPUData();
     print_matrix(batchSize, s_dst_c, s_dst_h, s_dst_w, softmax_dst_data);
-    int sm_size3D = pSoftmaxLayer->pDst_->Size3D();
+    int sm_size3D = pSoftmaxLayer->pDst_->getSize3D();
     fprintf(stderr, "[Verify] each probability of each batch \n");
     for (int b = 0; b < batchSize; ++b)
     {
@@ -81,7 +81,7 @@ int main(int argc, char const *argv[])
         printf("sum all output of softmax: %f\n", sum);
     }
 
-    float* loss = pCrossEntropyLayer->pDst_->cpu_data();
+    float* loss = pCrossEntropyLayer->pDst_->getCPUData();
     fprintf(stderr, "loss: %f\n", loss[0]);
 
     return 0;

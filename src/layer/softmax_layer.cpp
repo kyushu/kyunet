@@ -14,13 +14,13 @@ namespace mkt {
     ): Layer(LayerType::Softmax)
     {
         id_ = id;
-        batchSize_ = prevLayer->pDst_->NumOfData();
+        batchSize_ = prevLayer->pDst_->getNumOfData();
 
         pPrevLayer_ = prevLayer;
 
-        int ih = prevLayer->pDst_->Height();
-        int iw = prevLayer->pDst_->Width();
-        int ic = prevLayer->pDst_->Channel();
+        int ih = prevLayer->pDst_->getHeight();
+        int iw = prevLayer->pDst_->getWidth();
+        int ic = prevLayer->pDst_->getChannel();
 
         oh_ = ih;
         ow_ = iw;
@@ -43,7 +43,7 @@ namespace mkt {
     void SoftmaxLayer::initialize() {
         initOutputTensor();
 
-        initGradOutputTensor();
+        initGradTensor();
 
         // tensor for Scale data
         pScale_->allocate();
@@ -83,25 +83,25 @@ namespace mkt {
         // For now we just use the channel as softmax axis
         Tensor* pSrc = pPrevLayer_->pDst_;
 
-        float* pSrcData = pSrc->cpu_data();
-        int ic = pSrc->Channel();
-        int size2D = pSrc->Size2D();
-        int size3D = pSrc->Size3D();
+        float* pSrcData = pSrc->getCPUData();
+        int ic = pSrc->getChannel();
+        int size2D = pSrc->getSize2D();
+        int size3D = pSrc->getSize3D();
 
-        float* pDstData = pDst_->cpu_data();
+        float* pDstData = pDst_->getCPUData();
         fprintf(stderr, "pSrcData: %p\n", pSrcData);
         fprintf(stderr, "pDstData: %p\n", pDstData);
-        mem_copy_cpu(pSrc->WholeSize(), pSrcData, pDstData);
+        mem_copy_cpu(pSrc->getWholeSize(), pSrcData, pDstData);
         // Scale data is used to
         // 1. store the maximum value of softmax axis
         // 2. store summation of exp(data)
-        float* pScaleData = pScale_->cpu_data();
+        float* pScaleData = pScale_->getCPUData();
 
         // sum_multiplier is a Row vector (1 x ic) which has all elements are one
         Tensor sum_multiplier{1, 1, ic, 1}; // 1 X ic vector
         sum_multiplier.allocate();
-        float* pSum_multiple_data = sum_multiplier.cpu_data();
-        set_memory(sum_multiplier.WholeSize(), 1, pSum_multiple_data);
+        float* pSum_multiple_data = sum_multiplier.getCPUData();
+        set_memory(sum_multiplier.getWholeSize(), 1, pSum_multiple_data);
 
         for (int b = 0; b < batchSize_; ++b) {
             float* curPDstData = pDstData + b*size3D;

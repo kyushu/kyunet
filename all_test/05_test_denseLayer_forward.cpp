@@ -58,7 +58,7 @@ int main(int argc, char const *argv[])
     net.initialize();
 
 
-    int denseLayerSrcSize = pInputLayer->pDst_->Size3D();
+    int denseLayerSrcSize = pInputLayer->pDst_->getSize3D();
     fprintf(stderr, "denseLayerSrcSize: %d\n", denseLayerSrcSize);
 
     // Load data to input layer
@@ -78,8 +78,8 @@ int main(int argc, char const *argv[])
     }
 
     // Display Dense layer information
-    int weightsize3D = pDenseLayer->pW_->Size3D();
-    int weightWholeSize = pDenseLayer->pW_->WholeSize();
+    int weightsize3D = pDenseLayer->pW_->getSize3D();
+    int weightWholeSize = pDenseLayer->pW_->getWholeSize();
     if (pDenseLayer->Type() == LayerType::FullConnected)
     {
         fprintf(stderr, "Dense Layer type is correct\n");
@@ -152,7 +152,7 @@ int main(int argc, char const *argv[])
 
     // PRINT TEST RESULT
     fprintf(stderr, "Source of Dense Layer\n");
-    float* pSrcData = pInputLayer->pDst_->cpu_data();
+    float* pSrcData = pInputLayer->pDst_->getCPUData();
     // fprintf(stderr, "%.1f ", pSrcData[i]);
     for (int b = 0; b < batchSize; ++b)
     {
@@ -176,29 +176,29 @@ int main(int argc, char const *argv[])
 
     fprintf(stderr, "\n\n");
     fprintf(stderr, "Weight of Dense Layer\n");
-    for (int i = 0; i < pDenseLayer->pW_->Width(); ++i)
+    for (int i = 0; i < pDenseLayer->pW_->getWidth(); ++i)
     {
         fprintf(stderr, "%d   ", i);
     }
     fprintf(stderr, "\n");
-    for (int i = 0; i < pDenseLayer->pW_->WholeSize(); ++i)
+    for (int i = 0; i < pDenseLayer->pW_->getWholeSize(); ++i)
     {
-        if (i > 0 && (i % pDenseLayer->pW_->Width() == 0))
+        if (i > 0 && (i % pDenseLayer->pW_->getWidth() == 0))
         {
             fprintf(stderr, "\n");
         }
-        float* pWData = pDenseLayer->pW_->cpu_data();
+        float* pWData = pDenseLayer->pW_->getCPUData();
         fprintf(stderr, "%.1f ", pWData[i]);
     }
     fprintf(stderr, "\n\n");
     fprintf(stderr, "Bias of Dense Layer\n");
-    for (int i = 0; i < pDenseLayer->pB_->WholeSize(); ++i)
+    for (int i = 0; i < pDenseLayer->pB_->getWholeSize(); ++i)
     {
-        if (i > 0 && (i % pDenseLayer->pB_->Width() == 0))
+        if (i > 0 && (i % pDenseLayer->pB_->getWidth() == 0))
         {
             fprintf(stderr, "\n");
         }
-        float* pBData = pDenseLayer->pB_->cpu_data();
+        float* pBData = pDenseLayer->pB_->getCPUData();
         fprintf(stderr, "%.1f ", pBData[i]);
     }
     fprintf(stderr, "\n\n");
@@ -208,14 +208,14 @@ int main(int argc, char const *argv[])
 
 
     fprintf(stderr, "Dense Layer Forward Result: \n");
-    int denseLayer_output_size = pDenseLayer->pDst_->Size3D();
-    for (int i = 0; i < pDenseLayer->pDst_->WholeSize(); ++i)
+    int denseLayer_output_size = pDenseLayer->pDst_->getSize3D();
+    for (int i = 0; i < pDenseLayer->pDst_->getWholeSize(); ++i)
     {
         if (i > 0 && (i % denseLayer_output_size == 0))
         {
             fprintf(stderr, "\n");
         }
-        float* pDstData = pDenseLayer->pDst_->cpu_data();
+        float* pDstData = pDenseLayer->pDst_->getCPUData();
         fprintf(stderr, "%.1f\t", pDstData[i]);
     }
     fprintf(stderr, "\n\n");

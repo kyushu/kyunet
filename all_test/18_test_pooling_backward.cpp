@@ -16,7 +16,7 @@ int main(int argc, char const *argv[])
     int channel = 1;
 
 
-    /*Configure Net*/
+    /* Configure Net */
     Net net;
     // Input layer
     InputLayer* pInLayer = (InputLayer *)net.addInputLayer("input", batchSize, height, width, channel);
@@ -56,7 +56,7 @@ int main(int argc, char const *argv[])
     net.initialize();
 
     /* Generate pseudo Data */
-    float* pInData = pInLayer->pDst_->cpu_data();
+    float* pInData = pInLayer->pDst_->getCPUData();
 
     for (int b = 0; b < batchSize; ++b)
     {
@@ -77,56 +77,65 @@ int main(int argc, char const *argv[])
     fprintf(stderr, "############ [Input Data] ##########\n");
     print_matrix(batchSize, channel, height, width, pInData);
 
+    /* Forward pass*/
     net.Forward();
 
-
+    /* Display relative value in matrix form */
     fprintf(stderr, "############ [Conv-Weight] ############\n");
-    float* pConv_WData = pConvLayer->pW_->cpu_data();
-    int fh = pConvLayer->pW_->Height();
-    int fw = pConvLayer->pW_->Width();
-    int fc = pConvLayer->pW_->Channel();
+    float* pConv_WData = pConvLayer->pW_->getCPUData();
+    int fh = pConvLayer->pW_->getHeight();
+    int fw = pConvLayer->pW_->getWidth();
+    int fc = pConvLayer->pW_->getChannel();
     print_matrix(1, fc, fh, fw, pConv_WData);
 
     fprintf(stderr, "############ [Conv-TmpCol] ############\n");
-    float* pConv_TmpColData = pConvLayer->pTmpCol_->cpu_data();
-    int tmpcol_c = pConvLayer->pTmpCol_->Channel();
-    int tmpcol_h = pConvLayer->pTmpCol_->Height();
-    int tmpcol_w = pConvLayer->pTmpCol_->Width();
+    float* pConv_TmpColData = pConvLayer->pTmpCol_->getCPUData();
+    int tmpcol_c = pConvLayer->pTmpCol_->getChannel();
+    int tmpcol_h = pConvLayer->pTmpCol_->getHeight();
+    int tmpcol_w = pConvLayer->pTmpCol_->getWidth();
     print_matrix(1, tmpcol_c, tmpcol_h, tmpcol_w, pConv_TmpColData);
 
     fprintf(stderr, "############ [Conv-Output] ############\n");
-    float* pConv_DstData = pConvLayer->pDst_->cpu_data();
-    int conv_wholeSize = pConvLayer->pDst_->WholeSize();
-    int conv_oh = pConvLayer->pDst_->Height();
-    int conv_ow = pConvLayer->pDst_->Width();
-    int conv_oc = pConvLayer->pDst_->Channel();
+    float* pConv_DstData = pConvLayer->pDst_->getCPUData();
+    int conv_wholeSize = pConvLayer->pDst_->getWholeSize();
+    int conv_oh = pConvLayer->pDst_->getHeight();
+    int conv_ow = pConvLayer->pDst_->getWidth();
+    int conv_oc = pConvLayer->pDst_->getChannel();
     print_matrix(batchSize, conv_oc, conv_oh, conv_ow, pConv_DstData);
 
     fprintf(stderr, "############ [Pooling Output] ############\n");
-    float* pPooling_DstData = pPoolingLayer->pDst_->cpu_data();
-    int pool_wholeSize = pPoolingLayer->pDst_->WholeSize();
-    int pool_oh = pPoolingLayer->pDst_->Height();
-    int pool_ow = pPoolingLayer->pDst_->Width();
-    int pool_oc = pPoolingLayer->pDst_->Channel();
+    float* pPooling_DstData = pPoolingLayer->pDst_->getCPUData();
+    int pool_wholeSize = pPoolingLayer->pDst_->getWholeSize();
+    int pool_oh = pPoolingLayer->pDst_->getHeight();
+    int pool_ow = pPoolingLayer->pDst_->getWidth();
+    int pool_oc = pPoolingLayer->pDst_->getChannel();
     print_matrix(batchSize, pool_oc, pool_oh, pool_ow, pPooling_DstData);
 
 
 
-    // set pseudo pgDst
-    float* pgDstData = pPoolingLayer->pgDst_->cpu_data();
-    for (int i = 0; i < pPoolingLayer->pgDst_->WholeSize(); ++i)
+    /* Set pseudo pgDst value of Pooling layer */
+    float* pgDstData = pPoolingLayer->pgDst_->getCPUData();
+    for (int i = 0; i < pPoolingLayer->pgDst_->getWholeSize(); ++i)
     {
         float fval = (float(std::rand() % 100) / 100 - 0.5);
             pgDstData[i] = fval;
     }
+    /* Display pseudo pgDst in matrix form */
     fprintf(stderr, "############ [grad output of pooling] ############\n");
     print_matrix(batchSize, pool_oc, pool_oh, pool_ow, pgDstData);
 
 
+    /*
+     * This Net contains inputLayer -> ConvLayer -> PoolingLayer
+     * For checking the backward function of poolingLayer
+     * we just need to execute the Backward() of PoolingLayer
+     * and check the gradient Tensor of the prvious layer of PoolingLayer
+     */
     pPoolingLayer->Backward();
 
+    /* Display gradient data from poolingLayer */
     fprintf(stderr, "############ [Conv-Gradient] ############\n");
-    float* pConv_gDstData = pConvLayer->pgDst_->cpu_data();
+    float* pConv_gDstData = pConvLayer->pgDst_->getCPUData();
     print_matrix(batchSize, conv_oc, conv_oh, conv_ow, pConv_gDstData);
 
     return 0;

@@ -16,8 +16,8 @@ namespace mkt {
     void Sigmoid_Act::Forward(Tensor &src, Tensor &dst) {
 
         // Check size
-        int srcWholeSize = src.WholeSize();
-        int dstWholeSize = src.WholeSize();
+        int srcWholeSize = src.getWholeSize();
+        int dstWholeSize = src.getWholeSize();
         CHECK_EQ(srcWholeSize, dstWholeSize, __func__);
         // if (!Check_EQ(srcWholeSize, dstWholeSize))
         // {
@@ -26,8 +26,8 @@ namespace mkt {
         // }
 
         // Get data memory
-        float* pSrcData = src.cpu_data();
-        float* pDstData = dst.cpu_data();
+        float* pSrcData = src.getCPUData();
+        float* pDstData = dst.getCPUData();
 
         for (int i = 0; i < dstWholeSize; ++i)
         {

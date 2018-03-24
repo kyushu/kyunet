@@ -50,9 +50,9 @@ namespace mkt {
 }
 
 
-#ifndef NDEBUG
+#ifdef DEBUG_LOG
 #   define MKT_Assert(Expr, Msg) \
-    __M_Assert(#Expr, Expr, __FILE__, __LINE__, Msg)
+    __M_Assert(#Expr, Expr, __FILE__, __LINE__, Msg);
 #else
 #   define MKT_Assert(Expr, Msg) ; // no value = do nothing
 #endif

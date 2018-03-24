@@ -31,40 +31,25 @@ namespace mkt {
         dilation_w_{1},
         Layer(LayerType::Convolution, actType, weightInitType, biasInitType)
     {
+        MKT_Assert(fc_ > 0, "fc_ = 0");
+        MKT_Assert(fh_ > 0, "fh_ = 0");
+        MKT_Assert(fw_ > 0, "fw_ = 0");
+        MKT_Assert(stride_h_ > 0, "stride_h_ = 0");
+        MKT_Assert(stride_w_ > 0, "stride_w_ = 0");
+
+
         id_ = id;
-        batchSize_ = prevLayer->pDst_->NumOfData();
-        int ih = prevLayer->pDst_->Height();
-        int iw = prevLayer->pDst_->Width();
-        int ic = prevLayer->pDst_->Channel();
-        // int size3D = prevLayer->pDst_->getSize3D();
+        batchSize_ = prevLayer->pDst_->getNumOfData();
+        int ih = prevLayer->pDst_->getHeight();
+        int iw = prevLayer->pDst_->getWidth();
+        int ic = prevLayer->pDst_->getChannel();
+        // int size3D = prevLayer->pDst_->getgetSize3D();
 
         pPrevLayer_ = prevLayer;
 
         oc_ = fc_;
-        // calculate pDst size: ow_ = (iw_ - fw_ +2padding_)/stride_ +1
-        // switch(padding_type_) {
-        //     case PaddingType::valid:
-        //         ow_ = static_cast<int>( static_cast<float>(iw - fw_ + 2*pad_w_) / stride_w_) + 1;
-        //         oh_ = static_cast<int>( static_cast<float>(ih - fh_ + 2*pad_h_) / stride_h_) + 1;
 
-        //         break;
-        //     case PaddingType::same:
-
-        //         pad_w_ = static_cast<int>( ((iw-1)*stride_w_ + fw_ - iw) * 0.5 );
-        //         ow_    = static_cast<int>( static_cast<float>(iw - fw_ + (2*pad_w_)) / stride_w_ )  + 1;
-        //         MKT_Assert(iw_ == ow_, "iw != ow");
-
-        //         pad_h_ = static_cast<int>( ((ih-1)*stride_h_ + fh_ - ih) * 0.5 );
-        //         oh_    = static_cast<int>( static_cast<float>(ih - fh_ + (2*pad_h_)) / stride_h_ ) + 1;
-        //         MKT_Assert(ih_ == oh_, "ih != oh");
-
-        //         break;
-        //     default:
-        //         ow_ = static_cast<int>( static_cast<float>(iw - fw_) / stride_w_)  + 1;
-        //         oh_ = static_cast<int>( static_cast<float>(ih - fh_) / stride_h_)  + 1;
-        //         break;
-        // }
-
+        // Calculate oh, ow by input and filter dimension
         calcOutputSize(ic, ih, iw);
 
         pDst_ = new Tensor{batchSize_, oh_, ow_, oc_};
@@ -77,20 +62,21 @@ namespace mkt {
         pgB_  = new Tensor{1, 1, 1, oc_};
 
 
-        pTmpCol_ = new Tensor{1, pW_->Size2D()*ic, pDst_->Size2D(), 1};
+        pTmpCol_ = new Tensor{1, pW_->getSize2D()*ic, pDst_->getSize2D(), 1};
 
         // Activator
         applyActivator();
     }
 
     // construct with LayerParams
-    ConvLayer::ConvLayer(Layer* prevLayer, std::string id, LayerParams params):Layer(LayerType::Convolution) {
+    ConvLayer::ConvLayer(Layer* prevLayer, std::string id, LayerParams params):Layer(LayerType::Convolution)
+    {
         id_ = id;
 
-        batchSize_ = prevLayer->pDst_->NumOfData();
-        int ih = prevLayer->pDst_->Height();
-        int iw = prevLayer->pDst_->Width();
-        int ic = prevLayer->pDst_->Channel();
+        batchSize_ = prevLayer->pDst_->getNumOfData();
+        int ih = prevLayer->pDst_->getHeight();
+        int iw = prevLayer->pDst_->getWidth();
+        int ic = prevLayer->pDst_->getChannel();
 
         pPrevLayer_ = prevLayer;
 
@@ -115,7 +101,14 @@ namespace mkt {
         dilation_w_ = params.dilation_w;
 
         oc_ = fc_;
-        // Calculate oh, ow by fh, fw
+
+        MKT_Assert(fc_ > 0, "fc_ = 0");
+        MKT_Assert(fh_ > 0, "fh_ = 0");
+        MKT_Assert(fw_ > 0, "fw_ = 0");
+        MKT_Assert(stride_h_ > 0, "stride_h_ = 0");
+        MKT_Assert(stride_w_ > 0, "stride_w_ = 0");
+
+        // Calculate oh, ow by input and filter dimension
         calcOutputSize(ic, ih, iw);
 
         pDst_ = new Tensor{batchSize_, oh_, ow_, oc_};
@@ -128,7 +121,7 @@ namespace mkt {
         pgB_  = new Tensor{1, 1, 1, oc_};
 
 
-        pTmpCol_ = new Tensor{1, pW_->Size2D()*ic, pDst_->Size2D(), 1};
+        pTmpCol_ = new Tensor{1, pW_->getSize2D()*ic, pDst_->getSize2D(), 1};
 
         // Activator
         applyActivator();
@@ -148,9 +141,10 @@ namespace mkt {
         initWeightTensor();
         initBiasTensor();
 
-        initGradOutputTensor();
+        initGradTensor();
         initGradWeightTensor();
         initGradBiasTensor();
+
 
         // temporary memory for im2col and col2im
         pTmpCol_->allocate();
@@ -162,26 +156,26 @@ namespace mkt {
 
         Tensor* pSrc = pPrevLayer_->pDst_;
 
-        float* pSrcData = pSrc->cpu_data();
-        float* pDstData = pDst_->cpu_data();
-        float* pWData = pW_->cpu_data();
-        float* pTmpColData = pTmpCol_->cpu_data();
+        float* pSrcData = pSrc->getCPUData();
+        float* pDstData = pDst_->getCPUData();
+        float* pWData = pW_->getCPUData();
+        float* pTmpColData = pTmpCol_->getCPUData();
 
-        int ic = pSrc->Channel();
-        int iw = pSrc->Width();
-        int ih = pSrc->Height();
-        int src_size3D = pSrc->Size3D();
-        int src_wholeSize = pSrc->WholeSize();
+        int ic = pSrc->getChannel();
+        int iw = pSrc->getWidth();
+        int ih = pSrc->getHeight();
+        int src_size3D = pSrc->getSize3D();
+        int src_wholeSize = pSrc->getWholeSize();
 
-        int batchSize = pDst_->NumOfData();
-        int oc = pDst_->Channel();
-        int oh = pDst_->Height();
-        int ow = pDst_->Width();
-        int dst_wholeSize = pDst_->WholeSize();
+        int batchSize = pDst_->getNumOfData();
+        int oc = pDst_->getChannel();
+        int oh = pDst_->getHeight();
+        int ow = pDst_->getWidth();
+        int dst_wholeSize = pDst_->getWholeSize();
 
-        int fh = pW_->Height();
-        int fw = pW_->Width();
-        int filter_wholeSize = pW_->WholeSize();
+        int fh = pW_->getHeight();
+        int fw = pW_->getWidth();
+        int filter_wholeSize = pW_->getWholeSize();
 
         fprintf(stderr, "src_wholeSize: %d\n", src_wholeSize);
         fprintf(stderr, "dst_wholeSize: %d\n", dst_wholeSize);
@@ -225,11 +219,11 @@ namespace mkt {
                                          |4|
 
             Conver src from image to column vector
-            im2col(src) =   | s0   s1  s3  s4 |
-                            | s1   s2  s4  s5 |  src Channel 0
-                            | s3   s4  s6  s7 |
-                            | s4   s5  s7  s8 |____________
-                            | s9  s10 s12 s13 |
+            im2col(src) =   | s00 s01 s03 s04 |
+                            | s01 s02 s04 s05 |  src Channel 0
+                            | s03 s04 s06 s07 |
+                            | s04 s05 s07 s08 |____________
+                            | s09 s10 s12 s13 |
                             | s10 s11 s13 s14 |  src Channel 1
                             | s12 s13 s15 s16 |
                             | s13 s14 s16 s17 |____________
@@ -309,9 +303,9 @@ namespace mkt {
 
             mkt::gemm_cpu(
                 CblasNoTrans, CblasNoTrans,                          /* trans_A, trans_B*/
-                pW_->Channel(), pDst_->Size2D(), pW_->Size2D()*ic,   /* M,       N, K*/
+                pW_->getChannel(), pDst_->getSize2D(), pW_->getSize2D()*ic,   /* M,       N, K*/
                 1.0f,                                                /* ALPHA */
-                pWData, pW_->Size2D()*ic,                            /* A,       lda(K)*/
+                pWData, pW_->getSize2D()*ic,                            /* A,       lda(K)*/
                 pTmpColData,   oh*ow,                                /* B,       ldb(N)*/
                 1.0f,                                                /* BETA */
                 pDstData, oh*ow                                      /* C,       ldc(N)*/
@@ -330,6 +324,7 @@ namespace mkt {
 
     }
     void ConvLayer::Backward() {
+
         // backpropagation from dst.grad_data to src.grad_data
         // Step 1. dst_grad X weight
         /*
@@ -383,13 +378,13 @@ namespace mkt {
             Left-Bottom of src_grad_data      Right-bottom of src_grad_data
 
         */
-        float* pWData = pW_->cpu_data();
-        float* pgDstData = pgDst_->cpu_data();
-        float* pTmpColData = pTmpCol_->cpu_data();
+        float* pWData = pW_->getCPUData();
+        float* pgDstData = pgDst_->getCPUData();
+        float* pTmpColData = pTmpCol_->getCPUData();
 
         int m = oc_; // num of filter
-        int n = pW_->Size2D() * pW_->NumOfData();
-        int k = pgDst_->Size2D();
+        int n = pW_->getSize2D() * pW_->getNumOfData();
+        int k = pgDst_->getSize2D();
         mkt::gemm_cpu(
             CblasTrans, CblasNoTrans,               // trans_a, trans_b
             n, k, m,            // M, N, K
@@ -401,10 +396,10 @@ namespace mkt {
         );
 
         Tensor* pgSrc = pPrevLayer_->pgDst_;
-        float* pgSrcData = pgSrc->cpu_data();
-        int ic = pgSrc->Channel();
-        int ih = pgSrc->Height();
-        int iw = pgSrc->Width();
+        float* pgSrcData = pgSrc->getCPUData();
+        int ic = pgSrc->getChannel();
+        int ih = pgSrc->getHeight();
+        int iw = pgSrc->getWidth();
 
         mkt::col2im_cpu(
             pTmpColData,
@@ -426,11 +421,11 @@ namespace mkt {
 
                 pad_w_ = static_cast<int>( ((iw-1)*stride_w_ + fw_ - iw) * 0.5 );
                 ow_    = static_cast<int>( static_cast<float>(iw - fw_ + (2*pad_w_)) / stride_w_ )  + 1;
-                MKT_Assert(iw_ == ow_, "iw != ow");
+                MKT_Assert(iw == ow_, "iw != ow");
 
                 pad_h_ = static_cast<int>( ((ih-1)*stride_h_ + fh_ - ih) * 0.5 );
                 oh_    = static_cast<int>( static_cast<float>(ih - fh_ + (2*pad_h_)) / stride_h_ ) + 1;
-                MKT_Assert(ih_ == oh_, "ih != oh");
+                MKT_Assert(ih == oh_, "ih != oh");
 
                 break;
             default:
@@ -441,13 +436,13 @@ namespace mkt {
     }
 
     // Getter
-    int ConvLayer::getFilterHeight() {
+    int ConvLayer::getFiltergetHeight() {
         return fh_;
     }
-    int ConvLayer::getFilterWidth() {
+    int ConvLayer::getFiltergetWidth() {
         return fw_;
     }
-    int ConvLayer::getFilterChannel() {
+    int ConvLayer::getFiltergetChannel() {
         return fc_;
     }
 }

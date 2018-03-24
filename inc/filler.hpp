@@ -16,16 +16,16 @@ namespace mkt {
 
         void operator() (Tensor &x) {
 
-            int in = x.NumOfData() * x.Size2D();
-            int out = x.Size2D() * x.Channel();
-            float* xData = x.cpu_data();
+            int in = x.getNumOfData() * x.getSize2D();
+            int out = x.getSize2D() * x.getChannel();
+            float* xData = x.getCPUData();
             if (distri_ == Distribution::NORM)
             {
                 float sigma = 2.0f / (in + out);
                 fprintf(stderr, "sigma=%f\n", sigma);
                 std::default_random_engine generator;
                 std::normal_distribution<float> distribution(0,sigma);
-                for (int i = 0; i < x.WholeSize(); ++i)
+                for (int i = 0; i < x.getWholeSize(); ++i)
                 {
                     xData[i] = distribution(generator);
                 }
@@ -35,7 +35,7 @@ namespace mkt {
 
                 std::default_random_engine generator;
                 std::uniform_real_distribution<float> distribution(0,sigma);
-                for (int i = 0; i < x.WholeSize(); ++i)
+                for (int i = 0; i < x.getWholeSize(); ++i)
                 {
                     xData[i] = distribution(generator);
                 }
@@ -52,16 +52,16 @@ namespace mkt {
         ~HeInit(){};
 
         void operator() (Tensor &x) {
-            int in = x.NumOfData() * x.Size2D();
-            int out = x.Size2D() * x.Channel();
-            float* xData = x.cpu_data();
+            int in = x.getNumOfData() * x.getSize2D();
+            int out = x.getSize2D() * x.getChannel();
+            float* xData = x.getCPUData();
             if (distri_ == Distribution::NORM)
             {
                 float sigma = 2.0f / (in);
 
                 std::default_random_engine generator;
                 std::normal_distribution<float> distribution(0,sigma);
-                for (int i = 0; i < x.WholeSize(); ++i)
+                for (int i = 0; i < x.getWholeSize(); ++i)
                 {
                     xData[i] = distribution(generator);
                 }
@@ -71,7 +71,7 @@ namespace mkt {
 
                 std::default_random_engine generator;
                 std::uniform_real_distribution<float> distribution(0,sigma);
-                for (int i = 0; i < x.WholeSize(); ++i)
+                for (int i = 0; i < x.getWholeSize(); ++i)
                 {
                     xData[i] = distribution(generator);
                 }

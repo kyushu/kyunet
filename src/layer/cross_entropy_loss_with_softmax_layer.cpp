@@ -6,12 +6,12 @@ namespace mkt {
             Layer* prevLayer,
             std::string id): Layer(LayerType::Softmax)
         {
-            batchSize_ = prevLayer->pDst_->NumOfData();
+            batchSize_ = prevLayer->pDst_->getNumOfData();
             pPrevLayer_ = prevLayer;
 
-            int ih = prevLayer->pDst_->Height();
-            int iw = prevLayer->pDst_->Width();
-            int ic = prevLayer->pDst_->Channel();
+            int ih = prevLayer->pDst_->getHeight();
+            int iw = prevLayer->pDst_->getWidth();
+            int ic = prevLayer->pDst_->getChannel();
 
             /**************************************************
              * Now i just fix the input height and width is 1
@@ -69,9 +69,9 @@ namespace mkt {
          *********************************************************************/
         void CrossEntropyLossWithSoftmaxLayer::LoadLabel(int num, const int* label) {
 
-            CHECK_EQ(pLabel_->WholeSize(), num, __FILE__);
+            CHECK_EQ(pLabel_->getWholeSize(), num, __FILE__);
 
-            float* pLabelData = pLabel_->cpu_data();
+            float* pLabelData = pLabel_->getCPUData();
 
             for (int i = 0; i < num; ++i)
             {
@@ -93,12 +93,12 @@ namespace mkt {
 
             softmaxLayer_.Forward();
 
-            int dim = softmaxLayer_.pDst_->Size3D();
-            int size2D = softmaxLayer_.pDst_->Size2D();
-            int numClass = softmaxLayer_.pDst_->Channel();
+            int dim = softmaxLayer_.pDst_->getSize3D();
+            int size2D = softmaxLayer_.pDst_->getSize2D();
+            int numClass = softmaxLayer_.pDst_->getChannel();
 
-            const float* pTruth_label = pLabel_->cpu_data();
-            const float* prob_data = softmaxLayer_.pDst_->cpu_data();
+            const float* pTruth_label = pLabel_->getCPUData();
+            const float* prob_data = softmaxLayer_.pDst_->getCPUData();
             float loss = 0;
 
             for (int b = 0; b < batchSize_; ++b)
@@ -113,7 +113,7 @@ namespace mkt {
                 }
             }
 
-            pDst_->cpu_data()[0] = loss / batchSize_ * size2D;
+            pDst_->getCPUData()[0] = loss / batchSize_ * size2D;
         }
 
 
@@ -124,19 +124,19 @@ namespace mkt {
          ****************************************************/
         void CrossEntropyLossWithSoftmaxLayer::Backward() {
 
-            int wholeSize = softmaxLayer_.pDst_->WholeSize();
-            int dim = softmaxLayer_.pDst_->Size3D();
-            int size2D = softmaxLayer_.pDst_->Size2D();
-            float* prob = softmaxLayer_.pDst_->cpu_data();
+            int wholeSize = softmaxLayer_.pDst_->getWholeSize();
+            int dim = softmaxLayer_.pDst_->getSize3D();
+            int size2D = softmaxLayer_.pDst_->getSize2D();
+            float* prob = softmaxLayer_.pDst_->getCPUData();
 
-            float* pSrc_dif = pPrevLayer_->pgDst_->cpu_data();
+            float* pSrc_dif = pPrevLayer_->pgDst_->getCPUData();
 
             if (pSrc_dif)
             {
                 // pSrc_dif = prob = exp(xj) / sum(exp(xi))
                 mem_copy_cpu(wholeSize, prob, pSrc_dif);
 
-                const float* pTruth_label = pLabel_->cpu_data();
+                const float* pTruth_label = pLabel_->getCPUData();
                 for (int b = 0; b < batchSize_; ++b)
                 {
                     for (int i = 0; i < size2D; ++i)

@@ -48,7 +48,7 @@ int main(int argc, char const *argv[])
     /********************************
      * Fed Pseudo data to input layer
      ********************************/
-    float* pInData = pInputLayer->pDst_->cpu_data();
+    float* pInData = pInputLayer->pDst_->getCPUData();
     for (int i = 0; i < batchSize * height * width * channel; ++i)
     {
         pInData[i] = testData[i];
@@ -59,7 +59,7 @@ int main(int argc, char const *argv[])
      *******************/
     // Display data
     fprintf(stderr, "Input Data\n");
-    int inWholeSize = pInputLayer->pDst_->WholeSize();
+    int inWholeSize = pInputLayer->pDst_->getWholeSize();
     print_matrix(batchSize, channel, height, width, pInData);
 
 
@@ -72,14 +72,14 @@ int main(int argc, char const *argv[])
      * Check Dst data of softmax layer
      **********************************/
     fprintf(stderr, "Dst data (probability) of Softmax Layer\n");
-    int s_dst_c = pSoftmaxLayer->pDst_->Channel();
-    int s_dst_h = pSoftmaxLayer->pDst_->Height();
-    int s_dst_w = pSoftmaxLayer->pDst_->Width();
-    print_matrix(2, s_dst_c, s_dst_h, s_dst_w, pSoftmaxLayer->pDst_->cpu_data());
+    int s_dst_c = pSoftmaxLayer->pDst_->getChannel();
+    int s_dst_h = pSoftmaxLayer->pDst_->getHeight();
+    int s_dst_w = pSoftmaxLayer->pDst_->getWidth();
+    print_matrix(2, s_dst_c, s_dst_h, s_dst_w, pSoftmaxLayer->pDst_->getCPUData());
 
     float sum = 0;
-    float* softmax_dst_data = pSoftmaxLayer->pDst_->cpu_data();
-    int sm_size3D = pSoftmaxLayer->pDst_->Size3D();
+    float* softmax_dst_data = pSoftmaxLayer->pDst_->getCPUData();
+    int sm_size3D = pSoftmaxLayer->pDst_->getSize3D();
     for (int b = 0; b < batchSize; ++b)
     {
         fprintf(stderr, "batch: %d\n", b);

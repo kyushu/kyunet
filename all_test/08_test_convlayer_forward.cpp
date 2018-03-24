@@ -39,17 +39,17 @@ int main(int argc, char const *argv[])
 
     // Set pseudo data
     Tensor* pInputTensor = pInputLayer->pDst_;
-    float* pInDstData = pInputTensor->cpu_data();
-    for (int i = 0; i < pInputTensor->WholeSize(); ++i)
+    float* pInDstData = pInputTensor->getCPUData();
+    for (int i = 0; i < pInputTensor->getWholeSize(); ++i)
     {
         float fval = (float(std::rand() % 10));
         pInDstData[i] = fval;
     }
 
     // input
-    int ih = pInputTensor->Height();
-    int iw = pInputTensor->Width();
-    int ic = pInputTensor->Channel();
+    int ih = pInputTensor->getHeight();
+    int iw = pInputTensor->getWidth();
+    int ic = pInputTensor->getChannel();
     fprintf(stderr, "Input\n");
     for (int b = 0; b < batchSize; ++b)
     {
@@ -72,10 +72,10 @@ int main(int argc, char const *argv[])
 
     // weight
    Tensor *pW = pConvLayer->pW_;
-   float* pWData = pW->cpu_data();
-   int fh = pW->Height();
-   int fw = pW->Width();
-   int fc = pW->Channel();
+   float* pWData = pW->getCPUData();
+   int fh = pW->getHeight();
+   int fw = pW->getWidth();
+   int fc = pW->getChannel();
    fprintf(stderr, "Weight\n");
    for (int c = 0; c < fc; ++c)
    {
@@ -93,12 +93,12 @@ int main(int argc, char const *argv[])
 
     // output
     Tensor *pDst = pConvLayer->pDst_;
-    float* pDstData = pDst->cpu_data();
-    int batchsize = pDst->NumOfData();
-    int wholeSize = pDst->WholeSize();
-    int oh = pDst->Height();
-    int ow = pDst->Width();
-    int oc = pDst->Channel();
+    float* pDstData = pDst->getCPUData();
+    int batchsize = pDst->getNumOfData();
+    int wholeSize = pDst->getWholeSize();
+    int oh = pDst->getHeight();
+    int ow = pDst->getWidth();
+    int oc = pDst->getChannel();
     fprintf(stderr, "Output\n");
     for (int b = 0; b < batchsize; ++b)
     {

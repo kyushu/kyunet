@@ -75,14 +75,14 @@ namespace mkt {
         void cleanData();
 
         // Getter
-        float* cpu_data();
-        int NumOfData();
-        int Channel();
-        int Width();
-        int Height();
-        int Size2D();
-        int Size3D();
-        int WholeSize();
+        float* getCPUData();
+        int getNumOfData();
+        int getChannel();
+        int getWidth();
+        int getHeight();
+        int getSize2D();
+        int getSize3D();
+        int getWholeSize();
 
 
     };

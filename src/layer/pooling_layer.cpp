@@ -22,10 +22,10 @@ namespace mkt {
     {
         id_ = id;
 
-        batchSize_ = prevLayer->pDst_->NumOfData();
-        int ih = prevLayer->pDst_->Height();
-        int iw = prevLayer->pDst_->Width();
-        int ic = prevLayer->pDst_->Channel();
+        batchSize_ = prevLayer->pDst_->getNumOfData();
+        int ih = prevLayer->pDst_->getHeight();
+        int iw = prevLayer->pDst_->getWidth();
+        int ic = prevLayer->pDst_->getChannel();
 
         pPrevLayer_ = prevLayer;
 
@@ -57,10 +57,10 @@ namespace mkt {
 
         id_ = id;
 
-        batchSize_ = prevLayer->pDst_->NumOfData();
-        int ih = prevLayer->pDst_->Height();
-        int iw = prevLayer->pDst_->Width();
-        int ic = prevLayer->pDst_->Channel();
+        batchSize_ = prevLayer->pDst_->getNumOfData();
+        int ih = prevLayer->pDst_->getHeight();
+        int iw = prevLayer->pDst_->getWidth();
+        int ic = prevLayer->pDst_->getChannel();
 
         pPrevLayer_ = prevLayer;
 
@@ -107,9 +107,9 @@ namespace mkt {
 
     // Initialization
     void PoolingLayer::initialize() {
-        initOutputTensor();
 
-        initGradOutputTensor();
+        initOutputTensor();
+        initGradTensor();
 
         if (type_ == PoolingMethodType::MAX)
         {
@@ -122,19 +122,19 @@ namespace mkt {
 
         Tensor* pSrc = pPrevLayer_->pDst_;
 
-        float* pSrcData = pSrc->cpu_data();
-        int src_size2d = pSrc->Size2D();
-        int ih = pSrc->Height();
-        int iw = pSrc->Width();
+        float* pSrcData = pSrc->getCPUData();
+        int src_size2d = pSrc->getSize2D();
+        int ih = pSrc->getHeight();
+        int iw = pSrc->getWidth();
 
-        float* pDstData = pDst_->cpu_data();
-        int dst_size2D = pDst_->Size2D();
+        float* pDstData = pDst_->getCPUData();
+        int dst_size2D = pDst_->getSize2D();
 
 
         switch (type_) {
             case PoolingMethodType::MAX:
             {
-                float* pMaskData = pMask->cpu_data();
+                float* pMaskData = pMask->getCPUData();
 
                 for (int b = 0; b < batchSize_; ++b) {
                     for (int c = 0; c < oc_; ++c) {
@@ -222,17 +222,17 @@ namespace mkt {
 
     void PoolingLayer::Backward() {
 
-        float* pgDstData = pgDst_->cpu_data();
-        int dst_size2D = pgDst_->Size2D();
-        float* pgSrcData = pPrevLayer_->pgDst_->cpu_data();
-        int ih = pPrevLayer_->pgDst_->Height();
-        int iw = pPrevLayer_->pgDst_->Width();
-        int src_size2d = pPrevLayer_->pgDst_->Size2D();
+        float* pgDstData = pgDst_->getCPUData();
+        int dst_size2D = pgDst_->getSize2D();
+        float* pgSrcData = pPrevLayer_->pgDst_->getCPUData();
+        int ih = pPrevLayer_->pgDst_->getHeight();
+        int iw = pPrevLayer_->pgDst_->getWidth();
+        int src_size2d = pPrevLayer_->pgDst_->getSize2D();
 
         switch(type_) {
             case PoolingMethodType::MAX:
             {
-                float* pMaskData = pMask->cpu_data();
+                float* pMaskData = pMask->getCPUData();
 
                 for (int b = 0; b < batchSize_; ++b) {
                     for (int c = 0; c < oc_; ++c) {
@@ -289,10 +289,10 @@ namespace mkt {
     }
 
     // Getter Function
-    int PoolingLayer::getFilterHeight() {
+    int PoolingLayer::getFiltergetHeight() {
         return fh_;
     }
-    int PoolingLayer::getFilterWidth() {
+    int PoolingLayer::getFiltergetWidth() {
         return fw_;
     }
 

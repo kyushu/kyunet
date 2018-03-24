@@ -94,8 +94,8 @@ void test_flatten_image() {
 
     // Get InputLayer
     InputLayer* pInput = net.InputLayer();
-    const float *pdata = pInput->pDst_->cpu_data();
-    int size3D = pInput->pDst_->Size3D();
+    const float *pdata = pInput->pDst_->getCPUData();
+    int size3D = pInput->pDst_->getSize3D();
     fprintf(stderr, "size3D: %d\n", size3D);
 
     // Add data
@@ -169,8 +169,8 @@ void test_add_batch_image() {
      * Verify
      **********************************************/
     InputLayer* pInput = net.InputLayer();
-    const float *pdata = pInput->pDst_->cpu_data();
-    int size3D = pInput->pDst_->Size3D();
+    const float *pdata = pInput->pDst_->getCPUData();
+    int size3D = pInput->pDst_->getSize3D();
     fprintf(stderr, "size3D: %d\n", size3D);
 
     unsigned char* pImg = new unsigned char[size3D];

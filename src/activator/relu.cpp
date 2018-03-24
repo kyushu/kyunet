@@ -11,8 +11,8 @@ namespace mkt {
     void Relu_Act::Forward(Tensor &src, Tensor &dst) {
 
         // Check size
-        int srcWholeSize = src.WholeSize();
-        int dstWholeSize = src.WholeSize();
+        int srcWholeSize = src.getWholeSize();
+        int dstWholeSize = src.getWholeSize();
         CHECK_EQ(srcWholeSize, dstWholeSize, __func__);
         // if (!Check_EQ(srcWholeSize, dstWholeSize))
         // {
@@ -21,8 +21,8 @@ namespace mkt {
         // }
 
         // Get data memory
-        float* pSrcData = src.cpu_data();
-        float* pDstData = dst.cpu_data();
+        float* pSrcData = src.getCPUData();
+        float* pDstData = dst.getCPUData();
 
         //
         for (int i = 0; i < dstWholeSize; ++i)
@@ -35,11 +35,11 @@ namespace mkt {
 
     void Relu_Act::Backward(Tensor &src, Tensor &src_grad, Tensor &dst_grad) {
 
-        float* pSrcData = src.cpu_data();
-        float* pSrcGradData = src_grad.cpu_data();
-        float* pDstGradData = dst_grad.cpu_data();
+        float* pSrcData = src.getCPUData();
+        float* pSrcGradData = src_grad.getCPUData();
+        float* pDstGradData = dst_grad.getCPUData();
 
-        int wholeSize = src.WholeSize();
+        int wholeSize = src.getWholeSize();
         for (int i = 0; i < wholeSize; ++i)
         {
             pSrcGradData[i] = pDstGradData[i] *

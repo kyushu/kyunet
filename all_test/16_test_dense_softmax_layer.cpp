@@ -56,7 +56,7 @@ int main(int argc, char const *argv[])
     /********************************
      * Fed Pseudo data to input layer
      ********************************/
-    float* pInData = pInputLayer->pDst_->cpu_data();
+    float* pInData = pInputLayer->pDst_->getCPUData();
     for (int i = 0; i < batchSize * height * width * channel; ++i)
     {
         pInData[i] = testData[i];
@@ -65,8 +65,8 @@ int main(int argc, char const *argv[])
     /*********************************************
      * Set initial value of weight of Dense layer
      *********************************************/
-    int weight_wholeSize = pDenseLayer->pW_->WholeSize();
-    float* pWData = pDenseLayer->pW_->cpu_data();
+    int weight_wholeSize = pDenseLayer->pW_->getWholeSize();
+    float* pWData = pDenseLayer->pW_->getCPUData();
     for (int i = 0; i < weight_wholeSize; ++i)
     {
        pWData[i] = static_cast<float>(std::rand() % 100) / 100 - 0.5;
@@ -77,7 +77,7 @@ int main(int argc, char const *argv[])
      *******************/
     // Display data
     fprintf(stderr, "Input Data\n");
-    int inWholeSize = pInputLayer->pDst_->WholeSize();
+    int inWholeSize = pInputLayer->pDst_->getWholeSize();
     print_matrix(batchSize, channel, height, width, pInData);
 
     /*******************
@@ -85,10 +85,10 @@ int main(int argc, char const *argv[])
      *******************/
     // Display weight
     fprintf(stderr, "weight of Dense Layer\n");
-    int fc = pDenseLayer->pW_->Channel();
-    int fh = pDenseLayer->pW_->Height();
-    int fw = pDenseLayer->pW_->Width();
-    print_matrix(1, fc, fh, fw, pDenseLayer->pW_->cpu_data());
+    int fc = pDenseLayer->pW_->getChannel();
+    int fh = pDenseLayer->pW_->getHeight();
+    int fw = pDenseLayer->pW_->getWidth();
+    print_matrix(1, fc, fh, fw, pDenseLayer->pW_->getCPUData());
 
     /***************
      * Test Forward
@@ -99,25 +99,25 @@ int main(int argc, char const *argv[])
      * Check Dst data of Dense Layer
      ********************************/
     fprintf(stderr, "Dst Data (logits) of Dense Layer\n");
-    int fc_dst_c = pDenseLayer->pDst_->Channel();
-    int fc_dst_h = pDenseLayer->pDst_->Height();
-    int fc_dst_w = pDenseLayer->pDst_->Width();
-    int fc_dst_size2D = pDenseLayer->pDst_->Size2D();
-    int fc_dst_size3D = pDenseLayer->pDst_->Size3D();
-    print_matrix(batchSize, fc_dst_c, fc_dst_h, fc_dst_w, pDenseLayer->pDst_->cpu_data());
+    int fc_dst_c = pDenseLayer->pDst_->getChannel();
+    int fc_dst_h = pDenseLayer->pDst_->getHeight();
+    int fc_dst_w = pDenseLayer->pDst_->getWidth();
+    int fc_dst_size2D = pDenseLayer->pDst_->getSize2D();
+    int fc_dst_size3D = pDenseLayer->pDst_->getSize3D();
+    print_matrix(batchSize, fc_dst_c, fc_dst_h, fc_dst_w, pDenseLayer->pDst_->getCPUData());
 
     /**********************************
      * Check Dst data of softmax layer
      **********************************/
     fprintf(stderr, "Dst data (probability) of Softmax Layer\n");
-    int s_dst_c = pSoftmaxLayer->pDst_->Channel();
-    int s_dst_h = pSoftmaxLayer->pDst_->Height();
-    int s_dst_w = pSoftmaxLayer->pDst_->Width();
-    print_matrix(2, s_dst_c, s_dst_h, s_dst_w, pSoftmaxLayer->pDst_->cpu_data());
+    int s_dst_c = pSoftmaxLayer->pDst_->getChannel();
+    int s_dst_h = pSoftmaxLayer->pDst_->getHeight();
+    int s_dst_w = pSoftmaxLayer->pDst_->getWidth();
+    print_matrix(2, s_dst_c, s_dst_h, s_dst_w, pSoftmaxLayer->pDst_->getCPUData());
 
     float sum = 0;
-    float* softmax_dst_data = pSoftmaxLayer->pDst_->cpu_data();
-    int sm_size3D = pSoftmaxLayer->pDst_->Size3D();
+    float* softmax_dst_data = pSoftmaxLayer->pDst_->getCPUData();
+    int sm_size3D = pSoftmaxLayer->pDst_->getSize3D();
     for (int b = 0; b < batchSize; ++b)
     {
         fprintf(stderr, "batch: %d\n", b);

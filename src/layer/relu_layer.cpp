@@ -11,13 +11,13 @@ namespace mkt {
 
         id_ = id;
 
-        batchSize_ = prevLayer->pDst_->NumOfData();
+        batchSize_ = prevLayer->pDst_->getNumOfData();
 
         pPrevLayer_ = prevLayer;
 
-        int ih = prevLayer->pDst_->Height();
-        int iw = prevLayer->pDst_->Width();
-        int ic = prevLayer->pDst_->Channel();
+        int ih = prevLayer->pDst_->getHeight();
+        int iw = prevLayer->pDst_->getWidth();
+        int ic = prevLayer->pDst_->getChannel();
 
         oh_ = ih;
         ow_ = iw;
@@ -33,7 +33,7 @@ namespace mkt {
     void ReluLayer::initialize() {
         initOutputTensor();
 
-        initGradOutputTensor();
+        initGradTensor();
     };
 
 

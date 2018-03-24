@@ -5,13 +5,13 @@ namespace mkt {
     // Constructor
     LossLayer::LossLayer(Layer* prevLayer, std::string id, int numClass): Layer(LayerType::Softmax) {
 
-        batchSize_ = prevLayer->pDst_->NumOfData();
+        batchSize_ = prevLayer->pDst_->getNumOfData();
 
         pPrevLayer_ = prevLayer;
 
-        int ih = prevLayer->pDst_->Height();
-        int iw = prevLayer->pDst_->Width();
-        int ic = prevLayer->pDst_->Channel();
+        int ih = prevLayer->pDst_->getHeight();
+        int iw = prevLayer->pDst_->getWidth();
+        int ic = prevLayer->pDst_->getChannel();
 
         oh_ = 1;
         ow_ = 1;

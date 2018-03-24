@@ -56,24 +56,24 @@ namespace mkt {
 
 
         mktLog(1, "pDst_.adr: %p\n", pDst_);
-        if (pDst_) {mktLog(1, "pDst_->pData.adr: %p\n", pDst_->cpu_data());}
+        if (pDst_) {mktLog(1, "pDst_->pData.adr: %p\n", pDst_->getCPUData());}
         delete pDst_;
         mktLog(1, "--------------------- Layer Destructor pDst_\n");
 
         mktLog(1, "pgDst_.adr: %p\n", pgDst_);
-        if (pgDst_) {mktLog(1, "pgDst_->pData.adr: %p\n", pgDst_->cpu_data());}
+        if (pgDst_) {mktLog(1, "pgDst_->pData.adr: %p\n", pgDst_->getCPUData());}
         delete pgDst_;
         mktLog(1, "--------------------- Layer Destructor pgDst_\n");
 
 
         mktLog(1, "pW_.adr: %p\n", pW_);
-        if (pW_) {mktLog(1, "pW_->pData.adr: %p\n", pW_->cpu_data());}
+        if (pW_) {mktLog(1, "pW_->pData.adr: %p\n", pW_->getCPUData());}
         delete pW_;
         mktLog(1, "--------------------- Layer Destructor pW_\n");
 
 
         mktLog(1, "pB_.adr: %p\n", pB_);
-        if (pB_) {mktLog(1, "pB_->pData.adr: %p\n", pB_->cpu_data());}
+        if (pB_) {mktLog(1, "pB_->pData.adr: %p\n", pB_->getCPUData());}
         delete pB_;
         mktLog(1, "--------------------- Layer Destructor pB_\n");
 
@@ -85,21 +85,18 @@ namespace mkt {
     };
 
 
-    // ##################################
-    // Init Function
+    /***********************************
+     * Init Function
+     ***********************************/
+    // Tensor for forward pass
     void Layer::initOutputTensor() {
         pDst_->allocate();
     }
-
-    void Layer::initGradOutputTensor() {
-        pgDst_->allocate();
-    }
-
     void Layer::initWeightTensor() {
 
         pW_->allocate();
-        int weight_wholeSize = pW_->WholeSize();
-        float* pWData = pW_->cpu_data();
+        int weight_wholeSize = pW_->getWholeSize();
+        float* pWData = pW_->getCPUData();
         switch (weightInitType_) {
             case InitializerType::ZERO:
             {
@@ -115,7 +112,7 @@ namespace mkt {
             {
                 for (int i = 0; i < weight_wholeSize; ++i)
                 {
-                    pWData[i] = float(i);
+                    pWData[i] = float(i+1);
                 }
                 break;
             }
@@ -146,33 +143,36 @@ namespace mkt {
         }
     }
 
+    // Tensor for backpropagation (gradient)
+    void Layer::initGradTensor() {
+        pgDst_->allocate();
+        std::fill_n(pgDst_->getCPUData(), pgDst_->getWholeSize(), 0.0f);
+    }
     void Layer::initGradWeightTensor() {
         pgW_->allocate();
-        std::fill_n(pgW_->cpu_data(), pgW_->WholeSize(), 0.0f);
+        std::fill_n(pgW_->getCPUData(), pgW_->getWholeSize(), 0.0f);
     }
-
 
     void Layer::initBiasTensor() {
         pB_-> allocate();
-        std::fill_n(pB_->cpu_data(), pB_->WholeSize(), 0.0f);
+        std::fill_n(pB_->getCPUData(), pB_->getWholeSize(), 0.0f);
     }
 
     void Layer::initGradBiasTensor() {
         pgB_->allocate();
-        std::fill_n(pgB_->cpu_data(), pgB_->WholeSize(), 0.0f);
+        std::fill_n(pgB_->getCPUData(), pgB_->getWholeSize(), 0.0f);
     }
 
     // ##################################
     // void Layer::addBias() {
-    //     for (int i = 0; i < pDst_->NumOfData(); ++i)
+    //     for (int i = 0; i < pDst_->getNumOfData(); ++i)
     //     {
-    //         int numData = i * pDst_->Size3D();
-    //         axpy(pDst_->Size3D(), 1.0, pB_->cpu_data(), pDst_->cpu_data()+numData);
+    //         int numData = i * pDst_->getSize3D();
+    //         axpy(pDst_->getSize3D(), 1.0, pB_->getCPUData(), pDst_->getCPUData()+numData);
     //     }
     // }
 
     void Layer::applyActivator() {
-        fprintf(stderr, "apply activator\n");
         switch (activationType_) {
             case ActivationType::Relu:
             fprintf(stderr, "relu\n");
@@ -207,13 +207,13 @@ namespace mkt {
         return batchSize_;
     }
 
-    int Layer::Output_Height() {
+    int Layer::Output_getHeight() {
         return oh_;
     }
-    int Layer::Output_Width() {
+    int Layer::Output_getWidth() {
         return ow_;
     }
-    int Layer::Output_Channel() {
+    int Layer::Output_getChannel() {
         return oc_;
     }
 

@@ -14,11 +14,11 @@ namespace mkt {
     {
         id_ = id;
 
-        batchSize_ = prevLayer->pDst_->NumOfData();
-        int h = prevLayer->pDst_->Height();
-        int w = prevLayer->pDst_->Width();
-        int c = prevLayer->pDst_->Channel();
-        int input_size3D = prevLayer->pDst_->Size3D();
+        batchSize_ = prevLayer->pDst_->getNumOfData();
+        int h = prevLayer->pDst_->getHeight();
+        int w = prevLayer->pDst_->getWidth();
+        int c = prevLayer->pDst_->getChannel();
+        int input_size3D = prevLayer->pDst_->getSize3D();
 
         pPrevLayer_ = prevLayer;
 
@@ -44,11 +44,11 @@ namespace mkt {
         InitializerType biasInitType
     ): unit_{unit}, Layer(LayerType::FullConnected, actType, weightInitType, biasInitType)
     {
-        batchSize_ = prevLayer->pDst_->NumOfData();
-        int h = prevLayer->pDst_->Height();
-        int w = prevLayer->pDst_->Width();
-        int c = prevLayer->pDst_->Channel();
-        int input_size3D = prevLayer->pDst_->Size3D();
+        batchSize_ = prevLayer->pDst_->getNumOfData();
+        int h = prevLayer->pDst_->getHeight();
+        int w = prevLayer->pDst_->getWidth();
+        int c = prevLayer->pDst_->getChannel();
+        int input_size3D = prevLayer->pDst_->getSize3D();
 
         pPrevLayer_ = prevLayer;
 
@@ -69,11 +69,11 @@ namespace mkt {
 
         id_ = id;
 
-        batchSize_ = prevLayer->pDst_->NumOfData();
-        int h = prevLayer->pDst_->Height();
-        int w = prevLayer->pDst_->Width();
-        int c = prevLayer->pDst_->Channel();
-        int input_size3D = prevLayer->pDst_->Size3D();
+        batchSize_ = prevLayer->pDst_->getNumOfData();
+        int h = prevLayer->pDst_->getHeight();
+        int w = prevLayer->pDst_->getWidth();
+        int c = prevLayer->pDst_->getChannel();
+        int input_size3D = prevLayer->pDst_->getSize3D();
 
         pPrevLayer_ = prevLayer;
 
@@ -104,7 +104,7 @@ namespace mkt {
         initWeightTensor();
         initBiasTensor();
 
-        initGradOutputTensor();
+        initGradTensor();
         initGradWeightTensor();
         initGradBiasTensor();
 
@@ -114,15 +114,15 @@ namespace mkt {
 
         Tensor* pSrc = pPrevLayer_->pDst_;
 
-        // int batchSize = pSrc->NumOfData();
+        // int batchSize = pSrc->getNumOfData();
 
-        float* pSrcData = pSrc->cpu_data();
-        int srcSize3D = pSrc->Size3D();
+        float* pSrcData = pSrc->getCPUData();
+        int srcSize3D = pSrc->getSize3D();
 
-        float* pDstData = pDst_->cpu_data();
-        int dstSize3D = pDst_->Size3D();
+        float* pDstData = pDst_->getCPUData();
+        int dstSize3D = pDst_->getSize3D();
 
-        float* pWData = pW_->cpu_data();
+        float* pWData = pW_->getCPUData();
 
         // 1. Rest data
         pDst_->cleanData();
@@ -177,11 +177,11 @@ namespace mkt {
     void DenseLayer::Backward() {
         fprintf(stderr, "DenseLayer backward not yet finish\n");
 
-        float* pWData = pW_->cpu_data();
-        int dstSize3D = pDst_->Size3D();
+        float* pWData = pW_->getCPUData();
+        int dstSize3D = pDst_->getSize3D();
 
-        float* pgDstData = pgDst_->cpu_data();
-        int gDst_size3D = pgDst_->Size3D();
+        float* pgDstData = pgDst_->getCPUData();
+        int gDst_size3D = pgDst_->getSize3D();
 
         // 1. Back from Activator first
         if (activationType_ != ActivationType::NONE)
@@ -199,12 +199,12 @@ namespace mkt {
          * C = pgWData    (N x K) = (Dst_Size3D x Src_Size3D)
          * C = A*B+C = (N xM) * (M x K) + (N x K) = (N x K) + (N x K)
          *************************************************************/
-        float* pgWData = pgW_->cpu_data();
+        float* pgWData = pgW_->getCPUData();
 
-        float* pSrcData = pPrevLayer_->pDst_->cpu_data();
-        int src_size3D = pPrevLayer_->pDst_->Size3D();
+        float* pSrcData = pPrevLayer_->pDst_->getCPUData();
+        int src_size3D = pPrevLayer_->pDst_->getSize3D();
 
-        int dst_size3D = pDst_->Size3D();
+        int dst_size3D = pDst_->getSize3D();
         // pgWData will be reset after update weight
         gemm_cpu(
             CblasTrans, CblasNoTrans,
@@ -218,7 +218,7 @@ namespace mkt {
 
 
         // 3. [Update gradient with respect to Bias]
-        float* pgBData = pgB_->cpu_data();
+        float* pgBData = pgB_->getCPUData();
         for (int i = 0; i < batchSize_; ++i)
         {
             axpy(dst_size3D, 1.0f, pgDstData + i * dst_size3D, pgBData);
@@ -249,8 +249,8 @@ namespace mkt {
          **********************************************************************************/
         if (pPrevLayer_->pgDst_)
         {
-            float* pSrc_gData = pPrevLayer_->pgDst_->cpu_data();
-            int srcSize3D = pPrevLayer_->pgDst_->Size3D();
+            float* pSrc_gData = pPrevLayer_->pgDst_->getCPUData();
+            int srcSize3D = pPrevLayer_->pgDst_->getSize3D();
 
             // pSrc_dif = pgDstData * pWdata + pSrc_dif
             gemm_cpu(

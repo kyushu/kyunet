@@ -53,9 +53,9 @@ namespace mkt {
 
         void calcOutputSize(int ic, int ih, int iw);
         // Getter Function
-        int getFilterHeight();
-        int getFilterWidth();
-        int getFilterChannel();
+        int getFiltergetHeight();
+        int getFiltergetWidth();
+        int getFiltergetChannel();
     };
 
 }

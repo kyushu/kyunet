@@ -212,18 +212,18 @@ namespace mkt {
         if (layers_.size() == 0) {
             return;
         }
-        else {
-            for (int i = 0; i < layers_.size(); ++i)
+
+        for (int i = 0; i < layers_.size(); ++i)
+        {
+            Layer* layer = layers_.at(i);
+            if (i == 0 && layer->Type() == LayerType::Input)
             {
-                Layer* layer = layers_.at(i);
-                if (i == 0 && layer->Type() == LayerType::Input)
-                {
-                    layer->initialize();
-                } else {
-                    layer->initialize();
-                }
+                layer->initialize();
+            } else {
+                layer->initialize();
             }
         }
+
     }
 
     /**************************
@@ -253,13 +253,16 @@ namespace mkt {
         if (layers_.size() == 0) {
             return;
         } else {
-            for (int i = 0; i < layers_.size(); ++i)
+            for (int i = layers_.size()-1; i > 0; --i)
             {
                 Layer* pLayer = layers_.at(i);
                 if (i == 0) {
                     MKT_Assert(pLayer->Type() == LayerType::Input, "The first layer is not InputLayer");
                 } else {
-                    pLayer->Backward();
+                    if (pLayer->pPrevLayer_->Type() != LayerType::Input)
+                    {
+                        pLayer->Backward();
+                    }
                 }
             }
         }
@@ -270,10 +273,10 @@ namespace mkt {
     OP_STATUS Net::add_data_from_file_list(std::vector<std::string> fileList) {
 
         int inSize = fileList.size();
-        int batchSize = pInputLayer_->pDst_->NumOfData();
-        int tensor_h = pInputLayer_->pDst_->Height();
-        int tensor_w = pInputLayer_->pDst_->Width();
-        int tensor_c = pInputLayer_->pDst_->Channel();
+        int batchSize = pInputLayer_->pDst_->getNumOfData();
+        int tensor_h = pInputLayer_->pDst_->getHeight();
+        int tensor_w = pInputLayer_->pDst_->getWidth();
+        int tensor_c = pInputLayer_->pDst_->getChannel();
 
         if (inSize != batchSize)
         {

@@ -27,10 +27,10 @@ int main(int argc, char const *argv[])
     // Set pseudo data
     // std::srand (time(NULL));
     Tensor* pInputTensor = pInputLayer->pDst_;
-    float* pInDstData = pInputTensor->cpu_data();
+    float* pInDstData = pInputTensor->getCPUData();
     for (int b = 0; b < batchSize; ++b)
     {
-        for (int i = 0; i < pInputTensor->WholeSize(); ++i)
+        for (int i = 0; i < pInputTensor->getWholeSize(); ++i)
         {
             float fval = (float(std::rand() % 100) / 100 - 0.5);
             pInDstData[i] = fval;
@@ -38,9 +38,9 @@ int main(int argc, char const *argv[])
     }
 
     // input
-    int ih = pInputTensor->Height();
-    int iw = pInputTensor->Width();
-    int ic = pInputTensor->Channel();
+    int ih = pInputTensor->getHeight();
+    int iw = pInputTensor->getWidth();
+    int ic = pInputTensor->getChannel();
     fprintf(stderr, "### input data ###\n");
     print_matrix(batchSize, ic, ih, iw, pInDstData);
 
@@ -50,16 +50,16 @@ int main(int argc, char const *argv[])
 
     // output
     Tensor *pDst = pPoolingLayer->pDst_;
-    float* pDstData = pDst->cpu_data();
-    int batchsize = pDst->NumOfData();
-    int wholeSize = pDst->WholeSize();
-    int oh = pDst->Height();
-    int ow = pDst->Width();
-    int oc = pDst->Channel();
+    float* pDstData = pDst->getCPUData();
+    int batchsize = pDst->getNumOfData();
+    int wholeSize = pDst->getWholeSize();
+    int oh = pDst->getHeight();
+    int ow = pDst->getWidth();
+    int oc = pDst->getChannel();
     print_matrix(batchSize, oc, oh, ow, pDstData);
 
     // set pgDst
-    float* pgDstData = pPoolingLayer->pgDst_->cpu_data();
+    float* pgDstData = pPoolingLayer->pgDst_->getCPUData();
     for (int i = 0; i < wholeSize; ++i)
     {
         float fval = (float(std::rand() % 100) / 100 - 0.5);
