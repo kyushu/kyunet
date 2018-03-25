@@ -41,8 +41,12 @@ namespace mkt {
      * Initialize
      */
     void SoftmaxLayer::initialize() {
-        initOutputTensor();
 
+        MKT_Assert(pDst_ != nullptr, "pDst_ is null");
+        MKT_Assert(pgDst_ != nullptr, "pgDst_ is null");
+        MKT_Assert(pScale_ != nullptr, "pScale_ is null");
+
+        initOutputTensor();
         initGradTensor();
 
         // tensor for Scale data

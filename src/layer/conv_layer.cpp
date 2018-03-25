@@ -137,6 +137,17 @@ namespace mkt {
     // Initialization
     void ConvLayer::initialize() {
 
+        MKT_Assert(pDst_ != nullptr, "pDst_ is null");
+        MKT_Assert(pgDst_ != nullptr, "pgDst_ is null");
+        MKT_Assert(pW_ != nullptr, "pW_ is null");
+        MKT_Assert(pgW_ != nullptr, "pgW_ is null");
+        MKT_Assert(pB_ != nullptr, "pB_ is null");
+        MKT_Assert(pgB_ != nullptr, "pgB_ is null");
+
+        MKT_Assert(pActivator_ != nullptr, "pActivator_ is null");
+
+        MKT_Assert(pTmpCol_ != nullptr, "pTmpCol_ is null");
+
         initOutputTensor();
         initWeightTensor();
         initBiasTensor();

@@ -51,7 +51,8 @@ namespace mkt {
     /**************************
      *  Configuration Function
      **************************/
-    Layer* Net::addInputLayer(std::string id, int batchSize, int h, int w, int c) {
+    Layer* Net::addInputLayer(std::string id, int batchSize, int h, int w, int c)
+    {
 
         pInputLayer_ = new InputLayer{id, batchSize, h, w, c};
         layers_.push_back(pInputLayer_);
@@ -60,14 +61,14 @@ namespace mkt {
 
     }
 
-    Layer* Net::addDenseLayer(Layer* prevLayer, std::string id, int unit, ActivationType activationType, InitializerType weightInitType, InitializerType biasInitType) {
+    Layer* Net::addDenseLayer(Layer* prevLayer, std::string id, int unit, ActivationType activationType, InitializerType weightInitType, InitializerType biasInitType)
+    {
 
         if (layers_.size() == 0)
         {
             fprintf(stderr, "please add input layer first\n");
             return nullptr;
         }
-
 
         // Instantiate Dense Layer
         DenseLayer* pDenseLayer = new DenseLayer{prevLayer, id, unit, activationType, weightInitType, biasInitType};
@@ -78,6 +79,23 @@ namespace mkt {
         return pDenseLayer;
     }
 
+    Layer* Net::addDenseLayer(Layer* prevLayer, std::string id, LayerParams params)
+    {
+        if (layers_.size() == 0)
+        {
+            fprintf(stderr, "please add input layer first\n");
+            return nullptr;
+        }
+        // Instantiate Dense Layer
+        DenseLayer* pDenseLayer = new DenseLayer{prevLayer, id, params};
+
+        // Add layer
+        layers_.push_back(pDenseLayer);
+
+        return pDenseLayer;
+    }
+
+    /* Convolution Layer */
     Layer* Net::addConvLayer(
         Layer* prevLayer,
         std::string id,
@@ -317,9 +335,13 @@ namespace mkt {
 
     }
 
-
+    /* Getter */
     InputLayer* Net::getInputLayer() {
         return pInputLayer_;
+    }
+
+    int Net::getNumOfLayer() {
+        return layers_.size();
     }
 
     // template class Net<float>;

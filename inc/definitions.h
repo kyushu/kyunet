@@ -71,11 +71,11 @@ namespace mkt {
     enum class ActivationType: int
     {
         NONE=0,
-        Sigmoid,
-        Tanh,
-        Relu,
-        LRelu,
-        Selu
+        SIGMOID,
+        //TANH,
+        RELU,
+        LRELU
+        //SELU
 
     };
 

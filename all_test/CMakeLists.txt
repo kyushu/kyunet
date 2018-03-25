@@ -93,6 +93,10 @@ find_package(OpenCV REQUIRED)
         add_executable(test_convLayer_backward 19_test_convLayer_backward.cpp)
         target_link_libraries(test_convLayer_backward libkyunet)
 
+        # 20_test_conv_pooling_dense_crossLoss
+        add_executable(test_conv_pooling_dense_crossLoss 20_test_conv_pooling_dense_crossLoss.cpp)
+        target_link_libraries(test_conv_pooling_dense_crossLoss libkyunet)
+
     else()
         message("OpenCV not found")
     endif()

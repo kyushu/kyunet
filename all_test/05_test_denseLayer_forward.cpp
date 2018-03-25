@@ -54,7 +54,7 @@ int main(int argc, char const *argv[])
 
     InitializerType weightInitType = InitializerType::ONE;
     InitializerType biasInitType = InitializerType::ZERO;
-    Layer* pDenseLayer = net.addDenseLayer(pInputLayer, "Layer1", 4, ActivationType::Relu, weightInitType, biasInitType);
+    Layer* pDenseLayer = net.addDenseLayer(pInputLayer, "Layer1", 4, ActivationType::RELU, weightInitType, biasInitType);
     net.initialize();
 
 
@@ -130,13 +130,10 @@ int main(int argc, char const *argv[])
         case ActivationType::NONE:
             fprintf(stderr, "NONE\n");
             break;
-        case ActivationType::Sigmoid:
+        case ActivationType::SIGMOID:
             fprintf(stderr, "Sigmoid\n");
             break;
-        case ActivationType::Tanh:
-            fprintf(stderr, "Tanh\n");
-            break;
-        case ActivationType::Relu:
+        case ActivationType::RELU:
             fprintf(stderr, "Relu\n");
             break;
         default:

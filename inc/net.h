@@ -56,6 +56,7 @@ namespace mkt {
         Layer* addInputLayer(std::string id, int batchSize, int h, int w, int c);
 
         Layer* addDenseLayer(Layer* prevLayer, std::string id, int unit, ActivationType activationType, InitializerType weightInitType, InitializerType biasInitType);
+        Layer* addDenseLayer(Layer* prevLayer, std::string id, LayerParams params);
 
         Layer* addConvLayer(Layer* prevLayer, std::string id, int kernel_Height, int kernel_width, int kernel_channel, int stride_h, int stride_w, int pad_h, int pad_w, PaddingType paddingType, ActivationType activationType, InitializerType weightInitType, InitializerType biasInitType);
         Layer* addConvLayer(Layer* prevLayer, std::string id, LayerParams params);
@@ -85,6 +86,7 @@ namespace mkt {
 
         // Getter
         InputLayer* getInputLayer();
+        int getNumOfLayer();
 
     };
 

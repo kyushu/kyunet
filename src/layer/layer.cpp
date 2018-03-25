@@ -174,11 +174,11 @@ namespace mkt {
 
     void Layer::applyActivator() {
         switch (activationType_) {
-            case ActivationType::Relu:
+            case ActivationType::RELU:
             fprintf(stderr, "relu\n");
                 pActivator_ = new Relu_Act{};
                 break;
-            case ActivationType::Sigmoid:
+            case ActivationType::SIGMOID:
                 fprintf(stderr, "sigmoid\n");
                 pActivator_ = new Sigmoid_Act{};
                 break;

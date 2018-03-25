@@ -108,11 +108,15 @@ namespace mkt {
     // Initialization
     void PoolingLayer::initialize() {
 
+        MKT_Assert(pDst_ != nullptr, "pDst_ is null");
+        MKT_Assert(pgDst_ != nullptr, "pgDst_ is null");
+
         initOutputTensor();
         initGradTensor();
 
         if (type_ == PoolingMethodType::MAX)
         {
+            MKT_Assert(pMask != nullptr, "pMask is null");
             pMask->allocate();
         }
     }

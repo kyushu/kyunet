@@ -42,7 +42,7 @@ int main(int argc, char const *argv[])
     InitializerType biasInitType = InitializerType::ZERO;
     int fc_unit = 16;
     fprintf(stderr, "fc_unit(num of class) = %d\n", fc_unit);
-    DenseLayer* pDenseLayer = (DenseLayer *)net.addDenseLayer(pInputLayer, "fc1", fc_unit, ActivationType::Relu, weightInitType, biasInitType);
+    DenseLayer* pDenseLayer = (DenseLayer *)net.addDenseLayer(pInputLayer, "fc1", fc_unit, ActivationType::RELU, weightInitType, biasInitType);
 
     // Softmax Layer
     Layer* pSoftmaxLayer = net.addSoftmaxLayer( pDenseLayer, "softmax1");

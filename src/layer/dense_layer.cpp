@@ -1,4 +1,5 @@
 #include "layer/dense_layer.h"
+#include "test_utils.hpp"
 
 namespace mkt {
 
@@ -92,6 +93,9 @@ namespace mkt {
 
         pB_   = new Tensor{1, 1, 1, unit_};
         pgB_  = new Tensor{1, 1, 1, unit_};
+
+        // Activator
+        applyActivator();
     }
 
     /* Destructor */
@@ -100,6 +104,16 @@ namespace mkt {
     }
 
     void DenseLayer::initialize() {
+
+        MKT_Assert(pDst_ != nullptr, "pDst_ is null");
+        MKT_Assert(pgDst_ != nullptr, "pgDst_ is null");
+        MKT_Assert(pW_ != nullptr, "pW_ is null");
+        MKT_Assert(pgW_ != nullptr, "pgW_ is null");
+        MKT_Assert(pB_ != nullptr, "pB_ is null");
+        MKT_Assert(pgB_ != nullptr, "pgB_ is null");
+
+        MKT_Assert(pActivator_ != nullptr, "pActivator_ is null");
+
         initOutputTensor();
         initWeightTensor();
         initBiasTensor();
@@ -107,7 +121,6 @@ namespace mkt {
         initGradTensor();
         initGradWeightTensor();
         initGradBiasTensor();
-
     }
 
     void DenseLayer::Forward() {
@@ -167,11 +180,15 @@ namespace mkt {
         // addBias();
 
         // 4. A = next layer input = activation(Z)
+        int fc_dst_c = pDst_->getChannel();
+        int fc_dst_h = pDst_->getHeight();
+        int fc_dst_w = pDst_->getWidth();
+        print_matrix(batchSize_, fc_dst_c, fc_dst_h, fc_dst_w, pDst_->getCPUData());
+
         if (activationType_ != ActivationType::NONE)
         {
             pActivator_->Forward(*pDst_, *pDst_);
         }
-
     }
 
     void DenseLayer::Backward() {

@@ -1,4 +1,5 @@
 
+
 #include "net.h"
 #include "test_utils.hpp"
 
@@ -47,7 +48,7 @@ int main(int argc, char const *argv[])
     }
 
     /***************************
-     * load label to loss layer
+     * load label to loss layer:
      ***************************/
     pCrossEntropyLayer->LoadLabel(batchSize, label);
 
