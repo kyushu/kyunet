@@ -142,31 +142,37 @@ namespace mkt {
 
         /********************************************************************
          * For example: M=3, N=16, K=9
+         *
+         * For Dense layer, Size2D = Size3D (Channel = 1)
+         *
          * 2. Z =             A(x)      x                B(Weight)
          *                                                (N=16)
          *                                             (oh*ow*oc = 2*2*4 = 16)
          *                 (K = 9)
          *             (ih*iw*ic = 3*3*3 = 9)
-         *                                           |w00_0, ...,  w0_8|
-         *                                           |w01_0, ...,  w1_8|
-         *      (M)     | x0, ...,  x8|              |w02_0, ...,  w2_8|     |z0 , ..., z15|
-         * (batch_size) | x9, ..., x16| x trapnspos( |w03_0, ...,  w3_8| ) = |z16, ..., z31|
-         *              |x17, ..., x24|              |w04_0, ...,  w4_8|     |z32, ..., z47|
-         *                                           |                 |
-         *                                           |                 |
-         *                                           |                 |
-         *                                           |w15_0, ..., w15_8|
-         *                                                     ||
-         *                                                    (16)
-         *                                              |w00, ...,  w15|
-         *                                              |w16, ...,  w31|
-         *                                              |w32, ...,  w47|
-         *                                              |w48, ...,  w63| (9)
-         *                                              |w64, ...,  w79|
-         *                                              |w80, ...,  w95|
-         *                                              |w96, ..., w111|
-         *                                              |w112,..., w127|
-         *
+         *                                           |w_00_00, ...,  w_0_08|
+         *                                           |w_01_00, ...,  w_1_08|
+         *      (M)     | x0, ...,  x8|              |w_02_00, ...,  w_2_08|     |z0 , ..., z15|
+         * (batch_size) | x9, ..., x16| x trapnspos( |w_03_00, ...,  w_3_08| ) = |z16, ..., z31|
+         *              |x17, ..., x24|              |w_04_00, ...,  w_4_08|     |z32, ..., z47|
+         *                                           |                   |
+         *                                           |                   |
+         *                                           |                   |
+         *                                           |w_15_00, ..., w_15_08|
+         *                                                    ||
+         *                                                   (16)
+         *                                       |w_00_00, w_01_00, ..., w_15_00|
+         *                                       |w_00_01, w_01_01, ..., w_15_01|
+         *                                       |w_00_02, w_01_02, ..., w_15_02|
+         *                                       |w_00-03, w_01_03, ..., w_15_03| (9)
+         *                                       |w_00_04, w_01_04, ..., w_15_04|
+         *                                       |w_00_05, w_01_05, ..., w_15_05|
+         *                                       |w_00_06, w_01_06, ..., w_15_06|
+         *                                       |w_00_07, w_01_07, ..., w_15_07|
+         *                                       |w_00_08, w_01_08, ..., w_15_08|
+         * w_n1_n2
+         * n1: index of destination
+         * n2: index of source
          ********************************************************************/
         gemm_cpu(CblasNoTrans, CblasTrans,      /*trans_A, trans_B*/
             batchSize_, dstSize3D, srcSize3D,   /*M, N, K*/
@@ -192,7 +198,6 @@ namespace mkt {
     }
 
     void DenseLayer::Backward() {
-        fprintf(stderr, "DenseLayer backward not yet finish\n");
 
         float* pWData = pW_->getCPUData();
         int dstSize3D = pDst_->getSize3D();
@@ -206,14 +211,23 @@ namespace mkt {
             pActivator_->Backward(*pDst_, *pgDst_, *pgDst_);
         }
 
+        // 2. [Update gradient with respect to Bias]
+        // dL/db = d^(l+1)
+        float* pgBData = pgB_->getCPUData();
+        for (int i = 0; i < batchSize_; ++i)
+        {
+            axpy(dst_size3D, 1.0f, pgDstData + i * dst_size3D, pgBData);
+        }
 
-        // 2. [Update gradient with respect to Weight]
+        // 3. [Update gradient with respect to Weight]
         /*************************************************************
+         * dL/dw = d^(l+1) * src_data
+         * For Dense layer, Size2D = Size3D (Channel = 1)
          *
          * A = pgDstData (M x N) = (Batch_size x Dst_Size3D)
          * B = pSrcData  (M x K) = (Batch_size x Src_Size3D)
-         * T(A) =        (N x M) = (Dst_Size3D x Batch_size)
-         * C = pgWData    (N x K) = (Dst_Size3D x Src_Size3D)
+         * Tranpose(A) = (N x M) = (Dst_Size3D x Batch_size)
+         * C = pgWData   (N x K) = (Dst_Size3D x Src_Size3D)
          * C = A*B+C = (N xM) * (M x K) + (N x K) = (N x K) + (N x K)
          *************************************************************/
         float* pgWData = pgW_->getCPUData();
@@ -233,32 +247,23 @@ namespace mkt {
             pgWData, src_size3D
         );
 
-
-        // 3. [Update gradient with respect to Bias]
-        float* pgBData = pgB_->getCPUData();
-        for (int i = 0; i < batchSize_; ++i)
-        {
-            axpy(dst_size3D, 1.0f, pgDstData + i * dst_size3D, pgBData);
-        }
-
-
         // 4. [Update gradient with respect to data]
         /*********************************************************************************
          *
          * For example,
          * M = Batch Size = 3
-         * N = Dst_Size3D = 9
-         * K = Src_Size3D = 16
+         * N = Dst_Size2D = 9  (It's source size when forward)
+         * K = Src_Size2D = 16 (It's destination size when forward)
          *                                    (N=9)
-         *                       |w00_0, w00_1, w00_2, ...,  w0_8|
-         *                       |w01_0, w01_1, w01_3, ...,  w1_8|
-         *         (K=16)        |w02_0, w02_1, w02_3, ...,  w2_8|        (N=9)
-         *   |gz00, ..., gz15|   |w03_0, w03_1, w03_3, ...,  w3_8|   |gx00, ..., gx08|
-         *   |gz16, ..., gz31| = |w04_0, w04_1, w04_3, ...,  w4_8| = |gx09, ..., gx16|
-         *   |gz32, ..., gz47|   |              .                |   |gx17, ..., gx24|
-         *                       |              .                |
-         *                       |              .                |
-         *                       |w15_0, w15_1, w15_3, ..., w15_8|
+         *                       |w_00_0, w_00_01, w_00_02, ...,  w_00_08|
+         *                       |w_01_0, w_01_01, w_01_03, ...,  w_01_08|
+         *         (K=16)        |w_02_0, w_02_01, w_02_03, ...,  w_02_08|        (N=9)
+         *   |gz00, ..., gz15|   |w_03_0, w_03_01, w_03_03, ...,  w_03_08|   |gx00, ..., gx08|
+         *   |gz16, ..., gz31| = |w_04_0, w_04_01, w_04_03, ...,  w_04_08| = |gx09, ..., gx16|
+         *   |gz32, ..., gz47|   |                   .                   |   |gx17, ..., gx24|
+         *                       |                   .                   |
+         *                       |                   .                   |
+         *                       |w_15_00, w_15_01, w_15_03, ..., w_15_08|
          *
          * A = pgDstData (M x N)
          * B = pWdata    (N x K)

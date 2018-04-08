@@ -85,6 +85,7 @@ namespace mkt {
 
         Tensor* pB_;        // bias tensor
         Tensor* pgB_;       // derviate data of bias
+        bool bUseBias;
 
         Activator* pActivator_;
 
