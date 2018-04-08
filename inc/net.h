@@ -72,9 +72,10 @@ namespace mkt {
 
         Layer* addCrossEntropyLossWithSoftmaxLayer( Layer* prevLayer, std::string id);
 
-        // Initialize Function
-        void initialize();
-
+        /**
+         * Compile Function: allocate memory
+         */
+        void Compile();
         // Forward Function
         void Forward();
 

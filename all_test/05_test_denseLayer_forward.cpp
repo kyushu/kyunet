@@ -55,7 +55,7 @@ int main(int argc, char const *argv[])
     InitializerType weightInitType = InitializerType::ONE;
     InitializerType biasInitType = InitializerType::ZERO;
     Layer* pDenseLayer = net.addDenseLayer(pInputLayer, "Layer1", 4, ActivationType::RELU, weightInitType, biasInitType);
-    net.initialize();
+    net.Compile();
 
 
     int denseLayerSrcSize = pInputLayer->pDst_->getSize3D();

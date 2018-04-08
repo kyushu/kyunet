@@ -223,9 +223,9 @@ namespace mkt {
     }
 
     /**************************
-     *  Initializtion Function
+     *  Compile Function
      **************************/
-    void Net::initialize() {
+    void Net::Compile() {
 
         if (layers_.size() == 0) {
             return;

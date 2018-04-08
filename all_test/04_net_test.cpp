@@ -90,7 +90,7 @@ void test_flatten_image() {
     // Configure, initialize network
     Net net;
     net.addInputLayer("input", batchSize, height, width, channel);
-    net.initialize();
+    net.Compile();
 
     // Get InputLayer
     InputLayer* pInput = net.InputLayer();
@@ -148,7 +148,7 @@ void test_add_batch_image() {
      *  Step 2. Initialize Network
      *  Initialize Tensor by updated parameters
      **********************************************/
-    net.initialize();
+    net.Compile();
 
 
     /**********************************************

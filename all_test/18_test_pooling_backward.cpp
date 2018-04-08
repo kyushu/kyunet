@@ -53,7 +53,7 @@ int main(int argc, char const *argv[])
     PoolingLayer* pPoolingLayer = (PoolingLayer*)net.addPoolingLayer( pConvLayer, "Pooling", pool_params);
 
     /*Initialize Net*/
-    net.initialize();
+    net.Compile();
 
     /* Generate pseudo Data */
     float* pInData = pInLayer->pDst_->getCPUData();

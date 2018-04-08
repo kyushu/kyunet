@@ -51,7 +51,7 @@ int main(int argc, char const *argv[])
     /*****************************************
      * Initialize Net (allocate memory space)
      *****************************************/
-    net.initialize();
+    net.Compile();
 
     /********************************
      * Fed Pseudo data to input layer

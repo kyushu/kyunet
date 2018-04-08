@@ -35,7 +35,7 @@ int main(int argc, char const *argv[])
 
 
     // Net Initialization: memory allocation
-    net.initialize();
+    net.Compile();
 
     // Set pseudo data
     Tensor* pInputTensor = pInputLayer->pDst_;

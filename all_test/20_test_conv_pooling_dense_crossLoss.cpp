@@ -58,7 +58,7 @@ int main(int argc, char const *argv[])
     fprintf(stderr, "num of layer: %d\n", net.getNumOfLayer());
 
     /* Initialize Net (Allocate menory) */
-    net.initialize();
+    net.Compile();
 
     /*Set random pesudo input data */
     float* pInData = pInLayer->pDst_->getCPUData();
@@ -150,6 +150,11 @@ int main(int argc, char const *argv[])
 
     float* loss = pCrossEntropyLayer->pDst_->getCPUData();
     fprintf(stderr, "loss: %f\n", loss[0]);
+
+
+    fprintf(stderr, "################################################\n");
+    fprintf(stderr, "############ [Backpropagation] ############\n");
+    net.Backward();
 
     return 0;
 }

@@ -36,7 +36,7 @@ int main(int argc, char const *argv[])
     CrossEntropyLossWithSoftmaxLayer* pCrossEntropyLayer = (CrossEntropyLossWithSoftmaxLayer *)net.addCrossEntropyLossWithSoftmaxLayer(pInputLayer, "cross_entropy_loss");
 
 
-    net.initialize();
+    net.Compile();
 
     /********************************
      * load Pseudo data to input layer
