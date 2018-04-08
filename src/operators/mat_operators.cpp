@@ -24,11 +24,11 @@ namespace mkt {
         is set to RowMajor, or less than M when it is set to ColumnMajorOrder.
 
     General Matrix-Matrix multiplication (Row major)
-                       lda = K = h*w*c           ldb = N
+                       lda = K               ldb = N
                    ________________     _________________
                   |                |   |                 |
                   |                |   |                 |
-    M(batch size) |       A        | x |        B        | K
+                M |       A        | x |        B        | K
                   |                |   |                 |
                   |________________|   |_________________|
 
@@ -125,7 +125,7 @@ namespace mkt {
      * Eq 1. y = alpha * A * x + beta * y
      * Eq 2. y = alpha * transpose(A) * x + beta * y
      *
-     * A: mxn matrix
+     * A: MxN matrix
      * x: vector
      * y: vector
      */
