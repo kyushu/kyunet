@@ -27,9 +27,9 @@ int main(int argc, char const *argv[])
     int label[] = {0};
 
      /*************
-     * Config Net
+     * Config KyuNet
      *************/
-    Net net;
+    KyuNet net;
 
     InputLayer* pInputLayer = (InputLayer *)net.addInputLayer("input", batchSize, height, width, channel);
 

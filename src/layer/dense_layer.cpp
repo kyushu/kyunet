@@ -216,7 +216,7 @@ namespace mkt {
         float* pgBData = pgB_->getCPUData();
         for (int i = 0; i < batchSize_; ++i)
         {
-            axpy(dst_size3D, 1.0f, pgDstData + i * dst_size3D, pgBData);
+            axpy(gDst_size3D, 1.0f, pgDstData + i * gDst_size3D, pgBData);
         }
 
         // 3. [Update gradient with respect to Weight]

@@ -7,31 +7,31 @@ int main(int argc, char const *argv[])
     using namespace mkt;
 
     /* Parameters */
-    int batchSize = 1;
+    int batchSize = 3;
     int input_height = 7;
     int input_width = 7;
     int input_ch = 1;
 
     /* Configure Net */
-    Net net;
+    KyuNet net;
 
     // Input layer
     InputLayer* pInLayer = (InputLayer *)net.addInputLayer("input", batchSize, input_height, input_width, input_ch);
 
     // Convolution Layer 1
-    LayerParams parConv1;
-    parConv1.fc = 2;
-    parConv1.fh = 3;
-    parConv1.fw = 3;
-    parConv1.stride_h = 1;
-    parConv1.stride_w = 1;
-    parConv1.pad_h = 0;
-    parConv1.pad_w = 0;
-    parConv1.padding_type = PaddingType::VALID;
-    parConv1.actType = ActivationType::RELU;
-    parConv1.weight_init_type = InitializerType::HE_INIT_NORM;
-    parConv1.bias_init_type = InitializerType::ZERO;
-    ConvLayer* pConvLayer1 = (ConvLayer* )net.addConvLayer(pInLayer, "conv1", parConv1);
+    LayerParams conv1_par;
+    conv1_par.fc = 2;
+    conv1_par.fh = 3;
+    conv1_par.fw = 3;
+    conv1_par.stride_h = 1;
+    conv1_par.stride_w = 1;
+    conv1_par.pad_h = 0;
+    conv1_par.pad_w = 0;
+    conv1_par.padding_type = PaddingType::VALID;
+    conv1_par.actType = ActivationType::RELU;
+    conv1_par.weight_init_type = InitializerType::HE_INIT_NORM;
+    conv1_par.bias_init_type = InitializerType::ZERO;
+    ConvLayer* pConvLayer1 = (ConvLayer* )net.addConvLayer(pInLayer, "conv1", conv1_par);
 
     // Pooling Layer
     LayerParams pool_params;
@@ -41,7 +41,7 @@ int main(int argc, char const *argv[])
     pool_params.stride_w = 1;
     pool_params.pad_h = 0;
     pool_params.pad_w = 0;
-    pool_params.pooling_type = PoolingMethodType::AVG;
+    pool_params.pooling_type = PoolingMethodType::MAX;
     PoolingLayer* pPoolingLayer = (PoolingLayer*)net.addPoolingLayer( pConvLayer1, "Pooling1", pool_params);
 
     // Dense Layer
@@ -65,7 +65,7 @@ int main(int argc, char const *argv[])
     genRndPseudoData(pInData, batchSize, input_ch, input_height, input_width);
 
     /* load label to loss layer */
-    int label[] = {0};
+    int label[] = {0, 1, 2};
     pCrossEntropyLayer->LoadLabel(batchSize, label);
 
     /* Forward pass */

@@ -1,5 +1,9 @@
 # kyunet
 Implement a neural network framework from scratch for understanding.
 
-The project is on progress, you may check `alltest` to see what is finished and been tested
+[all_test]: function test
+[example]: example of any neural network implementation
+[inc]: header file
+[src]: cpp file
+
 

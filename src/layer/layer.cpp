@@ -217,6 +217,9 @@ namespace mkt {
         return oc_;
     }
 
+    Shape Layer::getWeightShape() {
+        return pW_->getShape();
+    }
 
     // template class Layer<float>;
 }

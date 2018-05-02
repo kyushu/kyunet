@@ -110,6 +110,7 @@ namespace mkt {
             for (int i = 0; i < size2D; ++i)
             {
                 const int label_value = static_cast<int>( pTruth_label[i + b*size2D]);
+                fprintf(stderr, "label_value[%d]: %d\n", (i + b*size2D), label_value);
                 CHECK_GE(label_value, 0, __func__);
                 CHECK_LT(label_value, numClass, __func__);
                 loss -= log( std::max(prob_data[i + label_value*size2D + b*dim], FLT_MIN) );
@@ -123,7 +124,7 @@ namespace mkt {
 
     /****************************************************
      * dloss/dx_j = exp(x_j) / sum(exp(x_i)) - 1, if j = k
-     *           = exp(x_j) / sum(exp(x_i))    , if j != k
+     *            = exp(x_j) / sum(exp(x_i))    , if j != k
      * k is the index of label which equal to 1
      ****************************************************/
     void CrossEntropyLossWithSoftmaxLayer::Backward() {

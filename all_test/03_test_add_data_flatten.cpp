@@ -88,7 +88,7 @@ void test_flatten_image() {
 
 
     // Configure, initialize network
-    Net net;
+    KyuNet net;
     net.addInputLayer("input", batchSize, height, width, channel);
     net.Compile();
 
@@ -139,9 +139,9 @@ void test_add_batch_image() {
     int num_iter = file_list.size() / batchSize;
 
 
-    Net net;
+    KyuNet net;
     /***********************************************
-     *  Step 1. Configure Network
+     *  Step 1. Configure KyuNetwork
      *  1. Add Layer with parameters
      *  2. Define cost function
      **********************************************/
@@ -149,7 +149,7 @@ void test_add_batch_image() {
 
 
     /***********************************************
-     *  Step 2. Initialize Network
+     *  Step 2. Initialize KyuNetwork
      *  1. Update parameter of Layer, Tensor
      *  2. Allocate memory space of Tensor
      **********************************************/

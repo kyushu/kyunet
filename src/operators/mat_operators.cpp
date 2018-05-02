@@ -33,8 +33,9 @@ namespace mkt {
                   |________________|   |_________________|
 
                                                 ||
+                                             ldc = N
                                         _________________
-                                       |     ldc = N     |
+                                       |                 |
                                        |                 |
                                        |        C        | M
                                        |                 |
@@ -166,12 +167,19 @@ namespace mkt {
     /******************
      * Result = aX + Y
      ******************/
-    int axpy(int n, float a, float *x, float *y)
+    void axpy(int n, float a, float *x, float *y)
     {
-        for (int i = 0; i < n; ++i)
-        {
+        for (int i = 0; i < n; ++i) {
             y[i] += a * x[i];
         }
+    }
+
+    void axpby(int n, float a, float *x, float b, float *y)
+    {
+        for (int i = 0; i < n; ++i) {
+            y[i] = a * x[i] + b * y[i];
+        }
+
     }
 
     /***************************************************************************
@@ -198,6 +206,8 @@ namespace mkt {
         const int dilation_h, const int dilation_w,
         float* data_col)
     {
+
+
         const int output_h = (height + 2 * pad_h - (dilation_h * (kernel_h - 1) + 1)) / stride_h + 1;
         const int output_w = (width + 2 * pad_w - (dilation_w * (kernel_w - 1) + 1)) / stride_w + 1;
         const int channel_size = height * width;

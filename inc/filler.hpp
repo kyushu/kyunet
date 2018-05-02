@@ -53,7 +53,7 @@ namespace mkt {
 
         void operator() (Tensor &x) {
             int in = x.getNumOfData() * x.getSize2D();
-            int out = x.getSize2D() * x.getChannel();
+            // int out = x.getSize2D() * x.getChannel();
             float* xData = x.getCPUData();
             if (distri_ == Distribution::NORM)
             {

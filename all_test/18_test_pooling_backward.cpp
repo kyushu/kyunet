@@ -16,8 +16,8 @@ int main(int argc, char const *argv[])
     int channel = 1;
 
 
-    /* Configure Net */
-    Net net;
+    /* Configure KyuNet */
+    KyuNet net;
     // Input layer
     InputLayer* pInLayer = (InputLayer *)net.addInputLayer("input", batchSize, height, width, channel);
     // Conv layer
@@ -52,7 +52,7 @@ int main(int argc, char const *argv[])
     pool_params.pooling_type = PoolingMethodType::AVG;
     PoolingLayer* pPoolingLayer = (PoolingLayer*)net.addPoolingLayer( pConvLayer, "Pooling", pool_params);
 
-    /*Initialize Net*/
+    /*Initialize KyuNet*/
     net.Compile();
 
     /* Generate pseudo Data */
@@ -126,7 +126,7 @@ int main(int argc, char const *argv[])
 
 
     /*
-     * This Net contains inputLayer -> ConvLayer -> PoolingLayer
+     * This KyuNet contains inputLayer -> ConvLayer -> PoolingLayer
      * For checking the backward function of poolingLayer
      * we just need to execute the Backward() of PoolingLayer
      * and check the gradient Tensor of the prvious layer of PoolingLayer

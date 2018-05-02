@@ -41,7 +41,7 @@ namespace mkt {
                     {
                         float rndVal = (rand() % 1000) / 1000.0f;
                         pData[w + h*width + c*(height*width) + b*(ch*height*width)] = rndVal;
-                        // fprintf(stderr, "data[%d]=%f\n", w + h*width + c*(height*width) + b*(channel*height*width), rndVal);
+                        fprintf(stderr, "data[%d]=%f\n", w + h*width + c*(height*width) + b*(ch*height*width), rndVal);
                     }
                 }
             }

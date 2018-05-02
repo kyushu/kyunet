@@ -93,8 +93,6 @@ namespace mkt {
         int size3D = pSrc->getSize3D();
 
         float* pDstData = pDst_->getCPUData();
-        fprintf(stderr, "pSrcData: %p\n", pSrcData);
-        fprintf(stderr, "pDstData: %p\n", pDstData);
         mem_copy_cpu(pSrc->getWholeSize(), pSrcData, pDstData);
         // Scale data is used to
         // 1. store the maximum value of softmax axis
@@ -230,7 +228,6 @@ namespace mkt {
         // the derivative of softmax
         // dai/daj = aj(1-aj), if i == j ; i, j in N(number of softmax data)
         // dai/daj = ai*aj    , if i != j ; i, j in N(number of softmax data)
-
 
     };
 }

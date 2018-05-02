@@ -27,6 +27,8 @@
 
 #include "stb_image.h"
 
+#include "solver/solver.h"
+
 #include "layer/layer.h"
 #include "layer/input_layer.h"
 #include "layer/dense_layer.h"
@@ -40,16 +42,19 @@
 
 namespace mkt {
 
-    class Net
+    class Solver;
+
+    class KyuNet
     {
     private:
         std::vector<Layer* > layers_;
         InputLayer* pInputLayer_;
+        Solver* pSolver;
 
     public:
         //==================================
-        Net();
-        ~Net();
+        KyuNet();
+        ~KyuNet();
         //==================================
 
         // Configuration Function
@@ -88,6 +93,8 @@ namespace mkt {
         // Getter
         InputLayer* getInputLayer();
         int getNumOfLayer();
+
+        std::vector<Layer*> getLayers();
 
     };
 

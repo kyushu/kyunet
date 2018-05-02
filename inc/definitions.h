@@ -23,6 +23,8 @@
 #ifndef MKT_DEFINITIONS_h
 #define MKT_DEFINITIONS_h
 
+#include <vector>
+
 namespace mkt {
 
     enum class OP_STATUS: char
@@ -110,7 +112,15 @@ namespace mkt {
         CblasNoTrans=0,
         CblasTrans
     };
-}
+
+    enum class RegularizationType:int
+    {
+        L1,
+        L2
+    };
+
+    typedef std::vector<int> Shape;
+} // namespace mkt
 
 
 

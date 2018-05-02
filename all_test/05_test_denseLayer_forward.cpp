@@ -49,7 +49,7 @@ int main(int argc, char const *argv[])
                           9,3, 1,5, 8,7};
 
     // Configure, initialize network
-    Net net;
+    KyuNet net;
     InputLayer* pInputLayer = (InputLayer *)net.addInputLayer("input", batchSize, height, width, channel);
 
     InitializerType weightInitType = InitializerType::ONE;

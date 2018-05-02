@@ -18,13 +18,13 @@ using namespace mkt;
 int main(int argc, char const *argv[])
 {
 
-    // Net Configuration
+    // KyuNet Configuration
     int batchSize = 1;
     int height = 9;
     int width = 9;
     int channel = 1;
 
-    Net net;
+    KyuNet net;
     // Add Input Layer
     InputLayer* pInputLayer = (InputLayer *)net.addInputLayer("input", batchSize, height, width, channel);
 
@@ -34,7 +34,7 @@ int main(int argc, char const *argv[])
     Layer* pConvLayer = net.addConvLayer(pInputLayer, "conv_1", 3, 3, 2, 1, 1, 0, 0, PaddingType::VALID, ActivationType::NONE, weightInitType, biasInitType);
 
 
-    // Net Initialization: memory allocation
+    // KyuNet Initialization: memory allocation
     net.Compile();
 
     // Set pseudo data

@@ -8,7 +8,7 @@ using namespace mkt;
 int main(int argc, char const *argv[])
 {
 
-    // Net Configuration
+    // KyuNet Configuration
     int batchSize = 2;
     int height = 4;
     int width = 4;
@@ -16,12 +16,12 @@ int main(int argc, char const *argv[])
 
 
 
-    // Config Net
-    Net net;
+    // Config KyuNet
+    KyuNet net;
     InputLayer* pInputLayer = (InputLayer *)net.addInputLayer("input", batchSize, height, width, channel);
     Layer *pPoolingLayer = net.addPoolingLayer( pInputLayer, "Pooling", 2, 2, 1, 1, 0, 0, PoolingMethodType::MAX);
 
-    // initialize Net (allocate memory space)
+    // initialize KyuNet (allocate memory space)
     net.Compile();
 
     // Set pseudo data

@@ -18,7 +18,8 @@ namespace mkt {
         float *C, int ldc);
 
     //
-    int axpy(int n, float a, float *x, float *y);
+    void axpy(int n, float a, float *x, float *y);
+    void axpby(int n, float a, float *x, float b, float *y);
 
     //
     void im2col_cpu(const float* data_im,

@@ -49,11 +49,19 @@ namespace mkt {
     {
         size2D_ = height_ * width_;
         size3D_ = size2D_ * channel_;
+        wholeSize_ = num_ * size3D_;
         // fprintf(stderr, "tensor construct num_: %d\n", num_);
         // fprintf(stderr, "tensor construct height_: %d\n", height);
         // fprintf(stderr, "tensor construct width_: %d\n", width_);
         // fprintf(stderr, "tensor construct channel_: %d\n", channel_);
     };
+
+    Tensor::Tensor(Shape shape) {
+        num_ = shape[0];
+        height_ = shape[1];
+        width_ = shape[2];
+        channel_ = shape[3];
+    }
 
     // Destructor
     Tensor::~Tensor(){
@@ -68,8 +76,9 @@ namespace mkt {
     void Tensor::allocate() {
 
         // fprintf(stderr, "init_type: %d\n", init_type);
-
-        wholeSize_ = num_ * size3D_;
+        // size2D_ = height_ * width_;
+        // size3D_ = size2D_ * channel_;
+        // wholeSize_ = num_ * size3D_;
 
         if (wholeSize_ == 0)
         {
@@ -89,6 +98,7 @@ namespace mkt {
 
         size2D_ = height_ * width_;
         size3D_ = size2D_ * channel_;
+        wholeSize_ = num_ * size3D_;
 
         if (pData_)
         {
@@ -225,6 +235,11 @@ namespace mkt {
 
     int Tensor::getWholeSize() {
         return wholeSize_;
+    }
+
+    Shape Tensor::getShape() {
+        Shape shape{num_, height_, width_, channel_};
+        return shape;
     }
 }
 

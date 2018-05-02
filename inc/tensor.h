@@ -52,6 +52,7 @@ namespace mkt {
     public:
         Tensor();
         Tensor(int num, int height, int width, int ch);
+        Tensor(Shape shape);
         ~Tensor();
 
         // TODO: Tensor CopyConstructor
@@ -75,6 +76,7 @@ namespace mkt {
         void cleanData();
 
         // Getter
+        Shape getShape();
         float* getCPUData();
         int getNumOfData();
         int getChannel();

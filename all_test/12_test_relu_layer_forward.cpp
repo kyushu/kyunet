@@ -8,20 +8,20 @@ using namespace mkt;
 int main(int argc, char const *argv[])
 {
 
-    // Net Configuration
+    // KyuNet Configuration
     int batchSize = 1;
     int height = 4;
     int width = 4;
     int channel = 3;
 
-    Net net;
+    KyuNet net;
 
     // Add Input Lauer
     InputLayer* pInputLayer = (InputLayer *)net.addInputLayer("input", batchSize, height, width, channel);
     // Add Rely Layer
     Layer* pReluLayer = net.addReluLayer(pInputLayer, "ReluLayer");
 
-    // Net Initialization: allocation memory space for each Tensor of layer
+    // KyuNet Initialization: allocation memory space for each Tensor of layer
     net.Compile();
 
     // Feed pseudo data

@@ -13,8 +13,8 @@ int main(int argc, char const *argv[])
     int input_width = 7;
     int input_ch = 1;
 
-    /* Configure Net */
-    Net net;
+    /* Configure KyuNet */
+    KyuNet net;
 
     // Input layer
     InputLayer* pInLayer = (InputLayer *)net.addInputLayer("input", batchSize, input_height, input_width, input_ch);
@@ -60,7 +60,7 @@ int main(int argc, char const *argv[])
     pool_params.pooling_type = PoolingMethodType::AVG;
     PoolingLayer* pPoolingLayer = (PoolingLayer*)net.addPoolingLayer( pConvLayer2, "Pooling", pool_params);
 
-    /* Initialize Net(Allocate memory) */
+    /* Initialize KyuNet(Allocate memory) */
     net.Compile();
 
 

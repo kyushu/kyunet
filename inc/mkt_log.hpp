@@ -102,7 +102,7 @@ template<typename T>
 static void CHECK_GE(T a, T b, const char* func) {
     // const char* file = __FILE__;
     // int line = __LINE__;
-    if (a > b)
+    if (a < b)
     {
         // std::cerr << a << "<" << b << "\n"
         //     << "Source:\t\t" << file << ", line " << line << "\n";

@@ -6,7 +6,7 @@ int main(int argc, char const *argv[])
 {
     using namespace mkt;
 
-    // Net Configuration
+    // KyuNet Configuration
     int batchSize = 2;
     int height = 3;
     int width = 4;
@@ -31,9 +31,9 @@ int main(int argc, char const *argv[])
 
 
     /*************
-     * Config Net
+     * Config KyuNet
      *************/
-    Net net;
+    KyuNet net;
     // Input Layer
     InputLayer* pInputLayer = (InputLayer *)net.addInputLayer("input", batchSize, height, width, channel);
 
@@ -49,7 +49,7 @@ int main(int argc, char const *argv[])
 
 
     /*****************************************
-     * Initialize Net (allocate memory space)
+     * Initialize KyuNet (allocate memory space)
      *****************************************/
     net.Compile();
 
