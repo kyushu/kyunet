@@ -3,7 +3,7 @@
 namespace mkt {
 
     // Constructor
-    LossLayer::LossLayer(Layer* prevLayer, std::string id, int numClass): Layer(LayerType::Softmax) {
+    LossLayer::LossLayer(Layer* prevLayer, std::string id, int numClass): Layer(LayerType::SOFTMAX) {
 
         batchSize_ = prevLayer->pDst_->getNumOfData();
 

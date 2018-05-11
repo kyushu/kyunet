@@ -11,7 +11,7 @@ namespace mkt {
         ActivationType actType,
         InitializerType weightInitType,
         InitializerType biasInitType
-    ): unit_{unit}, Layer(LayerType::FullConnected, actType, weightInitType, biasInitType)
+    ): unit_{unit}, Layer(LayerType::DENSE, actType, weightInitType, biasInitType)
     {
         id_ = id;
 
@@ -43,7 +43,7 @@ namespace mkt {
         ActivationType actType,
         InitializerType weightInitType,
         InitializerType biasInitType
-    ): unit_{unit}, Layer(LayerType::FullConnected, actType, weightInitType, biasInitType)
+    ): unit_{unit}, Layer(LayerType::DENSE, actType, weightInitType, biasInitType)
     {
         batchSize_ = prevLayer->pDst_->getNumOfData();
         int h = prevLayer->pDst_->getHeight();
@@ -66,7 +66,7 @@ namespace mkt {
         applyActivator();
     }
 
-    DenseLayer::DenseLayer(Layer* prevLayer, std::string id, LayerParams params):Layer(LayerType::FullConnected) {
+    DenseLayer::DenseLayer(Layer* prevLayer, std::string id, LayerParams params):Layer(LayerType::DENSE) {
 
         id_ = id;
 

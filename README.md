@@ -1,8 +1,8 @@
 # kyunet
-Implement a neural network framework from scratch for understanding.
+Implement a neural network framework from scratch for understanding and research.
 
 [all_test]: function test
-[example]: example of any neural network implementation
+[example]: example of neural network implementation
 [inc]: header file
 [src]: cpp file
 

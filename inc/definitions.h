@@ -36,16 +36,23 @@ namespace mkt {
 
     };
 
-    // Layer type
+    // Net Type
+    enum class NetType: int
+    {
+        TRAINING=0,
+        INFER
+    };
+    // Layer Type
     enum class LayerType:int
     {
-        Input = 0,
-        FullConnected,
-        Convolution,
-        Pooling,
-        Relu,
-        Sigmoid,
-        Softmax
+        INPUT = 0,
+        DENSE,
+        CONVOLUTION,
+        POOLING,
+        RELU,
+        SIGMOID,
+        SOFTMAX,
+        CROSS_LOSS_SOFTMAX
     };
 
     // Weight Initializer type
@@ -91,7 +98,7 @@ namespace mkt {
     // Loss function type
     enum class LossType: int
     {
-        cross_entropy_loss = 0
+        CROSS_ENTROPY_LOSS = 0
 
     };
 

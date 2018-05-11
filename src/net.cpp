@@ -243,7 +243,7 @@ namespace mkt {
         for (int i = 0; i < layers_.size(); ++i)
         {
             Layer* layer = layers_.at(i);
-            if (i == 0 && layer->getType() == LayerType::Input)
+            if (i == 0 && layer->getType() == LayerType::INPUT)
             {
                 layer->initialize();
             } else {
@@ -272,7 +272,7 @@ namespace mkt {
                 // fprintf(stderr, "forward: %d\n", i);
                 Layer* pLayer = layers_.at(i);
                 if (i == 0) {
-                    MKT_Assert(pLayer->getType() == LayerType::Input, "The first layer is not InputLayer");
+                    MKT_Assert(pLayer->getType() == LayerType::INPUT, "The first layer is not InputLayer");
                 } else {
                     pLayer->Forward();
                 }
@@ -292,7 +292,7 @@ namespace mkt {
             {
                 Layer* pLayer = layers_.at(i);
                 if (i == 0) {
-                    MKT_Assert(pLayer->getType() == LayerType::Input, "The first layer is not InputLayer");
+                    MKT_Assert(pLayer->getType() == LayerType::INPUT, "The first layer is not InputLayer");
                 } else {
                     // fprintf(stderr, "backward: %ld\n", i);
                     pLayer->Backward();

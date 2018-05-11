@@ -21,7 +21,7 @@ namespace mkt {
         stride_h_{stride_h}, stride_w_{stride_w},
         pad_h_{pad_h}, pad_w_{pad_w},
         type_{type},
-        Layer(LayerType::Pooling)
+        Layer(LayerType::POOLING)
     {
         id_ = id;
 
@@ -56,7 +56,7 @@ namespace mkt {
         }
     }
 
-    PoolingLayer::PoolingLayer(Layer* prevLayer, std::string id, LayerParams params):Layer(LayerType::Pooling) {
+    PoolingLayer::PoolingLayer(Layer* prevLayer, std::string id, LayerParams params):Layer(LayerType::POOLING) {
 
         id_ = id;
 

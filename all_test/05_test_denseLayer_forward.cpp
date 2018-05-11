@@ -80,7 +80,7 @@ int main(int argc, char const *argv[])
     // Display Dense layer information
     int weightsize3D = pDenseLayer->pW_->getSize3D();
     int weightWholeSize = pDenseLayer->pW_->getWholeSize();
-    if (pDenseLayer->getType() == LayerType::FullConnected)
+    if (pDenseLayer->getType() == LayerType::DENSE)
     {
         fprintf(stderr, "Dense Layer type is correct\n");
     }

@@ -218,12 +218,12 @@ int main(int argc, char const *argv[])
     // CrossEntropyWutgSoftmaxLayer
     CrossEntropyLossWithSoftmaxLayer* pCrossEntropyLayer = (CrossEntropyLossWithSoftmaxLayer *)net->addCrossEntropyLossWithSoftmaxLayer(pDenseLayer, "cross_entropy_loss");
 
+    SGDSolver* pSgdSolver = new SGDSolver{net};
+    net->addSolver(pSgdSolver);
+
     /* Initialize Net (Allocate menory) */
     net->Compile();
 
-    SGDSolver* pSgdSolver = new SGDSolver{net};
-    pSgdSolver->initialize();
-    net->addSolver(pSgdSolver);
     //////////////////////////////////////////////
 
 

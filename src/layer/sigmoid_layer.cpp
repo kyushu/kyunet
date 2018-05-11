@@ -5,7 +5,7 @@ namespace mkt {
     SigmoidLayer::SigmoidLayer(
         Layer* prevLayer,
         std::string id
-    ): Layer(LayerType::Sigmoid)
+    ): Layer(LayerType::SIGMOID)
     {
         id_ = id;
 

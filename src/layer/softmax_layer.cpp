@@ -6,12 +6,12 @@ namespace mkt {
 
 
     // Constructor with non parameter
-    SoftmaxLayer::SoftmaxLayer(): pScale_{nullptr}, Layer(LayerType::Softmax) {};
+    SoftmaxLayer::SoftmaxLayer(): pScale_{nullptr}, Layer(LayerType::SOFTMAX) {};
 
     SoftmaxLayer::SoftmaxLayer(
         Layer* prevLayer,
         std::string id
-    ): Layer(LayerType::Softmax)
+    ): Layer(LayerType::SOFTMAX)
     {
         id_ = id;
         batchSize_ = prevLayer->pDst_->getNumOfData();

@@ -6,7 +6,7 @@ namespace mkt {
         Layer* prevLayer,
         std::string id,
         float negative_slope
-    ): negative_slope_{negative_slope}, Layer(LayerType::Relu)
+    ): negative_slope_{negative_slope}, Layer(LayerType::RELU)
     {
 
         id_ = id;

@@ -6,7 +6,7 @@
 namespace mkt {
     CrossEntropyLossWithSoftmaxLayer::CrossEntropyLossWithSoftmaxLayer(
         Layer* prevLayer,
-        std::string id): Layer(LayerType::Softmax)
+        std::string id): Layer(LayerType::CROSS_LOSS_SOFTMAX)
     {
         batchSize_ = prevLayer->pDst_->getNumOfData();
         pPrevLayer_ = prevLayer;

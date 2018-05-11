@@ -6,7 +6,7 @@ namespace mkt {
     static int MAX_PIXEL_VALUE = 255;
 
     // Constructor
-    InputLayer::InputLayer(std::string id, int bSize, int h, int w, int c): Layer(LayerType::Input) {
+    InputLayer::InputLayer(std::string id, int bSize, int h, int w, int c): Layer(LayerType::INPUT) {
         id_ = id;
         // this->dh_ = h;
         // this->dw_ = w;

@@ -31,7 +31,7 @@ namespace mkt {
         padding_type_{paddingType},
         dilation_h_{1},
         dilation_w_{1},
-        Layer(LayerType::Convolution, actType, weightInitType, biasInitType)
+        Layer(LayerType::CONVOLUTION, actType, weightInitType, biasInitType)
     {
         MKT_Assert(fc_ > 0, "fc_ = 0");
         MKT_Assert(fh_ > 0, "fh_ = 0");
@@ -71,7 +71,7 @@ namespace mkt {
     }
 
     // construct with LayerParams
-    ConvLayer::ConvLayer(Layer* prevLayer, std::string id, LayerParams params):Layer(LayerType::Convolution)
+    ConvLayer::ConvLayer(Layer* prevLayer, std::string id, LayerParams params):Layer(LayerType::CONVOLUTION)
     {
         id_ = id;
 
