@@ -6,7 +6,7 @@ namespace mkt {
     static void print_matrix(int batchSize, int channel, int height, int width, float* pData) {
         int size2D = height*width;
         int size3D = height*width*channel;
-        fprintf(stderr, "batchSize: %d\tchannel:%d\theight:%d\twidth:%d\t\n", batchSize, channel, height, width);
+        fprintf(stderr, "[%s]  batchSize: %d\tchannel:%d\theight:%d\twidth:%d\t\n", __func__, batchSize, channel, height, width);
         for (int b = 0; b < batchSize; ++b)
         {
             fprintf(stderr, "batch: %d\n", b);

@@ -125,6 +125,12 @@ namespace mkt {
 
     void DenseLayer::Forward() {
 
+        // 1. Rest data
+        pDst_->resetData();
+        pgDst_->resetData();
+        pgW_->resetData();
+        pgB_->resetData();
+
         Tensor* pSrc = pPrevLayer_->pDst_;
 
         // int batchSize = pSrc->getNumOfData();
@@ -136,9 +142,6 @@ namespace mkt {
         int dstSize3D = pDst_->getSize3D();
 
         float* pWData = pW_->getCPUData();
-
-        // 1. Rest data
-        pDst_->cleanData();
 
         /********************************************************************
          * For example: M=3, N=16, K=9
@@ -189,7 +192,6 @@ namespace mkt {
         int fc_dst_c = pDst_->getChannel();
         int fc_dst_h = pDst_->getHeight();
         int fc_dst_w = pDst_->getWidth();
-        print_matrix(batchSize_, fc_dst_c, fc_dst_h, fc_dst_w, pDst_->getCPUData());
 
         if (activationType_ != ActivationType::NONE)
         {
@@ -252,8 +254,8 @@ namespace mkt {
          *
          * For example,
          * M = Batch Size = 3
-         * N = Dst_Size2D = 9  (It's source size when forward)
-         * K = Src_Size2D = 16 (It's destination size when forward)
+         * N = Dst_Size2D = 9  (previous layer output size)
+         * K = Src_Size2D = 16 (output size of this layer)
          *                                    (N=9)
          *                       |w_00_0, w_00_01, w_00_02, ...,  w_00_08|
          *                       |w_01_0, w_01_01, w_01_03, ...,  w_01_08|
@@ -285,7 +287,5 @@ namespace mkt {
                 pSrc_gData, src_size3D
             );
         }
-
-
     }
 }

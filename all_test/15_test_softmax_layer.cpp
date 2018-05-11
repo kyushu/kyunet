@@ -59,7 +59,7 @@ int main(int argc, char const *argv[])
      *******************/
     // Display data
     fprintf(stderr, "Input Data\n");
-    int inWholeSize = pInputLayer->pDst_->getWholeSize();
+    // int inWholeSize = pInputLayer->pDst_->getWholeSize();
     print_matrix(batchSize, channel, height, width, pInData);
 
 

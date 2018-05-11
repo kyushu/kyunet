@@ -16,7 +16,23 @@ INCLUDE_DIRECTORIES (
 
 message(STATUS ${PROJECT_SOURCE_DIR}/../inc/)
 
-file(GLOB SRC *.cpp)
+# file(GLOB SRC *.cpp)
+
+macro(add_example name)
+   add_executable(${name} ${name}.cpp)
+   target_link_libraries(${name} libkyunet )
+endmacro()
+
+macro(add_example_with_stb name)
+    add_executable(${name} ${name}.cpp ${stb_SRC})
+    target_link_libraries(${name} libkyunet )
+endmacro()
+
+macro(add_example_with_image_process name)
+    add_executable(${name} ${name}.cpp ${stb_SRC})
+    target_link_libraries(${name} ${OpenCV_LIBS} libkyunet )
+endmacro()
+
 find_package(OpenCV REQUIRED)
     if (OpenCV_FOUND)
         INCLUDE_DIRECTORIES(${OpenCV_INCLUDE_DIRS})
@@ -96,6 +112,10 @@ find_package(OpenCV REQUIRED)
         # 20_test_conv_pooling_dense_crossLoss
         add_executable(test_conv_pooling_dense_crossLoss 20_test_conv_pooling_dense_crossLoss.cpp)
         target_link_libraries(test_conv_pooling_dense_crossLoss libkyunet)
+
+
+        # 21_test_mnist_load_batch
+        add_example_with_image_process(21_test_mnist_load_batch)
 
     else()
         message("OpenCV not found")

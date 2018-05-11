@@ -25,18 +25,19 @@
 */
 
 #include "net.h"
+#include "solver/sgd_solver.h"
 
 namespace mkt {
 
     /****************
      *  constructor
      ****************/
-    KyuNet::KyuNet(): pInputLayer_{nullptr} {};
+    KyuNet::KyuNet(): pSolver_{nullptr}, pInputLayer_{nullptr} {};
 
     /**************
      *  Destructor
      **************/
-    KyuNet::~KyuNet(){
+    KyuNet::~KyuNet() {
 
         fprintf(stderr, "------------------- net destructor\n");
         fprintf(stderr, "layers.size(): %ld\n", layers_.size());
@@ -48,8 +49,15 @@ namespace mkt {
 
     };
 
+    /**
+     * Add Solver
+     */
+    void KyuNet::addSolver(Solver* pSolver) {
+        pSolver_ = pSolver;
+    }
+
     /**************************
-     *  Configuration Function
+     *  Add Layer Function
      **************************/
     Layer* KyuNet::addInputLayer(std::string id, int batchSize, int h, int w, int c)
     {
@@ -235,7 +243,7 @@ namespace mkt {
         for (int i = 0; i < layers_.size(); ++i)
         {
             Layer* layer = layers_.at(i);
-            if (i == 0 && layer->Type() == LayerType::Input)
+            if (i == 0 && layer->getType() == LayerType::Input)
             {
                 layer->initialize();
             } else {
@@ -244,10 +252,10 @@ namespace mkt {
         }
 
         // Initialize Solver
-        MKT_Assert(pSolver != nullptr, "Solver is not exist");
-        if (pSolver)
+        // MKT_Assert(pSolver != nullptr, "Solver is not exist");
+        if (pSolver_)
         {
-            pSolver->initialize();
+            pSolver_->initialize();
         }
 
     }
@@ -261,10 +269,10 @@ namespace mkt {
         } else {
             for (int i = 0; i < layers_.size(); ++i)
             {
-                fprintf(stderr, "forward: %d\n", i);
+                // fprintf(stderr, "forward: %d\n", i);
                 Layer* pLayer = layers_.at(i);
                 if (i == 0) {
-                    MKT_Assert(pLayer->Type() == LayerType::Input, "The first layer is not InputLayer");
+                    MKT_Assert(pLayer->getType() == LayerType::Input, "The first layer is not InputLayer");
                 } else {
                     pLayer->Forward();
                 }
@@ -282,15 +290,13 @@ namespace mkt {
             // for (int i = layers_.size()-1; i > 0; --i)
             for(size_t i = layers_.size(); i-- > 0; )
             {
-                fprintf(stderr, "backward: %d\n", i);
                 Layer* pLayer = layers_.at(i);
                 if (i == 0) {
-                    MKT_Assert(pLayer->Type() == LayerType::Input, "The first layer is not InputLayer");
+                    MKT_Assert(pLayer->getType() == LayerType::Input, "The first layer is not InputLayer");
                 } else {
-                    if (pLayer->pPrevLayer_->Type() != LayerType::Input)
-                    {
-                        pLayer->Backward();
-                    }
+                    // fprintf(stderr, "backward: %ld\n", i);
+                    pLayer->Backward();
+
                 }
             }
         }
@@ -299,70 +305,129 @@ namespace mkt {
     /**************************
      *  Update
      **************************/
-    void KyuNet::Update() {
-        pSolver.Update();
+    void KyuNet::Train() {
+        Forward();
+        Backward();
+
+        pSolver_->Update();
+
+        // Clean pgDst
+        // for (size_t i = 0; i < layers_.size(); ++i)
+        // {
+        //     Layer* pLayer = layers_.at(i);
+        //     if (pLayer->pDst_)  { pLayer->pDst_->cleanData();  }
+        //     if (pLayer->pgDst_) { pLayer->pgDst_->cleanData(); }
+        //     if (pLayer->pgW_)   { pLayer->pgW_->cleanData();   }
+
+        // }
     }
 
     // Add data Function
     OP_STATUS KyuNet::add_data_from_file_list(std::vector<std::string> fileList) {
 
-        int inSize = fileList.size();
+
+        int numImage = fileList.size();
         int batchSize = pInputLayer_->pDst_->getNumOfData();
         int tensor_h = pInputLayer_->pDst_->getHeight();
         int tensor_w = pInputLayer_->pDst_->getWidth();
         int tensor_c = pInputLayer_->pDst_->getChannel();
 
-        if (inSize != batchSize)
+        if (numImage != batchSize)
         {
             fprintf(stderr, "number of batchSize is not matched\n");
             return OP_STATUS::UNMATCHED_SIZE;
         }
 
+        // Load image from fileList
         for (int i = 0; i < fileList.size(); ++i)
         {
             std::string file = fileList.at(i);
+
+            // Load image from file to char memory array
             int w, h, c;
             unsigned char *pImg = stbi_load(file.c_str(), &w, &h, &c, 0);
 
-            if (pImg == nullptr)
-            {
-                fprintf(stderr, "no image\n");
-                return OP_STATUS::FAIL;
-            }
-            if (tensor_h != h)
-            {
-                fprintf(stderr, "tensor_h:%d != input_h:%d\n", tensor_h, h);
-                return OP_STATUS::UNMATCHED_SIZE;
-            }
-            if (tensor_w != w)
-            {
-                fprintf(stderr, "tensor_w: %d != input_w: %d\n", tensor_w, w);
-                return OP_STATUS::UNMATCHED_SIZE;
-            }
-            if (tensor_c != c)
-            {
-                fprintf(stderr, "tensor_c: %d != input_c: %d\n", tensor_c, c);
-                return OP_STATUS::UNMATCHED_SIZE;
-            }
+            // if (pImg == nullptr)
+            // {
+            //     fprintf(stderr, "no image\n");
+            //     return OP_STATUS::FAIL;
+            // }
+            MKT_Assert(pImg != nullptr, "can't open " + file);
 
-            pInputLayer_->FlattenImageToTensor(pImg, true);
+            // if (tensor_h != h)
+            // {
+            //     fprintf(stderr, "tensor_h:%d != input_h:%d\n", tensor_h, h);
+            //     return OP_STATUS::UNMATCHED_SIZE;
+            // }
+            MKT_Assert(tensor_h == h, "tensor_h("+ std::to_string(tensor_h) + ") != " + std::to_string(h));
+
+            // if (tensor_w != w)
+            // {
+            //     fprintf(stderr, "tensor_w: %d != input_w: %d\n", tensor_w, w);
+            //     return OP_STATUS::UNMATCHED_SIZE;
+            // }
+            MKT_Assert(tensor_w == w, "tensor_w("+ std::to_string(tensor_w) + ") != " + std::to_string(w));
+
+            // if (tensor_c != c)
+            // {
+            //     fprintf(stderr, "tensor_c: %d != input_c: %d\n", tensor_c, c);
+            //     return OP_STATUS::UNMATCHED_SIZE;
+            // }
+            MKT_Assert(tensor_c == c, "tensor_w("+ std::to_string(tensor_c) + ") != " + std::to_string(c));
+
+            pInputLayer_->addFlattenImageToTensor(pImg, i, true);
         }
 
         return OP_STATUS::SUCCESS;
     }
 
-    /* Getter */
-    InputLayer* KyuNet::getInputLayer() {
+    void KyuNet::addBatchLabels(std::string layer, std::vector<int> labels) {
+
+        CrossEntropyLossWithSoftmaxLayer *pCrossEntropyLayer = (CrossEntropyLossWithSoftmaxLayer *)layers_.back();
+
+        pCrossEntropyLayer->LoadLabel(labels);
+    }
+
+    /**
+     * Getter function
+     */
+    int KyuNet::getNumOfLayer() { return layers_.size(); }
+
+    const InputLayer* KyuNet::getInputLayer() {
         return pInputLayer_;
     }
 
-    int KyuNet::getNumOfLayer() {
-        return layers_.size();
-    }
-
-    std::vector<Layer*> KyuNet::getLayers() {
+    const std::vector<Layer*> KyuNet::getLayers() {
 
         return layers_;
+    }
+
+    /**
+     * Helper function
+     */
+    void KyuNet::deFlattenInputImage(unsigned char *pImg, int index, float max_pixel_value) {
+
+        int batchSize = pInputLayer_->pDst_->getNumOfData();
+        if (index < batchSize)
+        {
+            float* pInData = pInputLayer_->pDst_->getCPUData();
+            int size2D = pInputLayer_->pDst_->getSize2D();
+            int size3D = pInputLayer_->pDst_->getSize3D();
+            int channel = pInputLayer_->pDst_->getChannel();
+            int image_offset = index * size3D;
+
+            for (int i = 0; i < size3D; i+=channel)
+            {
+                int idx = int(i/channel);
+                for (int c = 0; c < channel; ++c)
+                {
+                    int pixel = int((pInData[image_offset + idx + size2D*c]/2.0f - 0.5) * max_pixel_value);
+                    pImg[i+c] = (unsigned)pixel;
+                }
+            }
+        } else {
+            MKT_Assert(index < batchSize, "index(" + std::to_string(index) + ") > " + std::to_string(batchSize));
+        }
     }
 
     // template class KyuNet<float>;

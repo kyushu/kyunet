@@ -7,11 +7,11 @@
 
 namespace mkt {
 
-    class SgdSolver: public Solver
+    class SGDSolver: public Solver
     {
     public:
-        SgdSolver(KyuNet* net);
-        ~SgdSolver();
+        SGDSolver(KyuNet* net);
+        ~SGDSolver();
 
         // Initialize Function
         void initialize();
@@ -20,8 +20,9 @@ namespace mkt {
         // update Function
         void Update();
 
-    private:
         std::vector<Tensor*> momentums_;
+    private:
+
 
 
     };

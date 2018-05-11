@@ -19,6 +19,7 @@ namespace mkt {
         void initialize();
 
         void LoadLabel(const int num, const int* label);
+        void LoadLabel(const std::vector<int>& labels);
 
         void Forward();
         void Backward();

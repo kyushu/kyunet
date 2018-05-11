@@ -48,7 +48,7 @@ namespace mkt {
       B B B B B B B B B
 
     */
-    void InputLayer::FlattenImageToTensor(unsigned char *pImg, bool bNormalize) {
+    void InputLayer::addFlattenImageToTensor(unsigned char *pImg, int index, bool bNormalize) {
 
         if (pDst_)
         {
@@ -59,7 +59,7 @@ namespace mkt {
 
             int size2D = pDst_->getSize2D();
             int size3D = pDst_->getSize3D();
-            float* ptr = pDst_->getCPUData() + pDst_->wrIdx_ * size3D;
+            float* ptr = pDst_->getCPUData() + index * size3D;
             // fprintf(stdout, "size2D: %d\n", size2D);
             for (int i = 0; i < size3D; i+=depth)
             {
@@ -70,7 +70,7 @@ namespace mkt {
                 }
             }
 
-            pDst_->wrIdx_++;
+            // pDst_->wrIdx_++;
         } else {
             // assert(this->pDst);
         }
@@ -78,7 +78,6 @@ namespace mkt {
 
     // For Debug
     void InputLayer::DeFlattenImage(const float* pData, int height, int width, int channel, unsigned char *pImg) {
-
 
         int size2D = height*width;
         int size3D = size2D * channel;

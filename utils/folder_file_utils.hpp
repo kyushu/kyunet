@@ -71,10 +71,10 @@ namespace mkt {
         }
     }
     static bool checkFolderRecursive(std::string target_folder) {
-        
-        std::vector<std::string> path_list = split(target_folder, '/');
+
+        std::vector<std::string> path_list = UTILS::split(target_folder, '/');
         std::string path = "";
-        for (int i = 0; i < path_list.size(); ++i)
+        for (size_t i = 0; i < path_list.size(); ++i)
         {
             path = path + path_list.at(i) + '/';
             if (!checkFolderExist(path))
@@ -106,9 +106,9 @@ namespace mkt {
 
     static bool createFolderRecursive(std::string target_folder) {
 
-        std::vector<std::string> path_list = split(target_folder, '/');
+        std::vector<std::string> path_list = UTILS::split(target_folder, '/');
         std::string path = "";
-        for (int i = 0; i < path_list.size(); ++i)
+        for (size_t i = 0; i < path_list.size(); ++i)
         {
             path = path + path_list.at(i) + '/';
             if (!checkFolderExist(path))

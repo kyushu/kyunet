@@ -1,5 +1,7 @@
 #include "layer/conv_layer.h"
 
+#include "test_utils.hpp"
+
 namespace mkt {
 
     // Constructor
@@ -159,11 +161,18 @@ namespace mkt {
 
         // temporary memory for im2col and col2im
         pTmpCol_->allocate();
+        std::fill_n(pTmpCol_->getCPUData(), pTmpCol_->getWholeSize(), 0.0f);
 
     }
 
     // Computation Function
     void ConvLayer::Forward() {
+
+        // Reset data
+        pDst_->resetData();
+        pgDst_->resetData();
+        pgW_->resetData();
+        pgB_->resetData();
 
         // Src
         Tensor* pSrc = pPrevLayer_->pDst_;
@@ -192,10 +201,6 @@ namespace mkt {
         int filter_wholeSize = pW_->getWholeSize();
 
         float* pTmpColData = pTmpCol_->getCPUData();
-
-        fprintf(stderr, "src_wholeSize: %d\n", src_wholeSize);
-        fprintf(stderr, "dst_wholeSize: %d\n", dst_wholeSize);
-        // fprintf(stderr, "filter_wholeSize: %d\n", filter_wholeSize);
 
         // 1. Z = WX
         for (int i = 0; i < batchSize_; ++i)
@@ -226,7 +231,7 @@ namespace mkt {
 
         // 2. Z = WX + Bias
         // addBias();
-        fprintf(stderr, "addBias is not implemented: %s, %d\n", __FILE__, __LINE__);
+        // fprintf(stderr, "addBias is not implemented: %s, %d\n", __FILE__, __LINE__);
 
         // 3. A = activation(Z) = the input of next layer
         if (activationType_ != ActivationType::NONE)
@@ -248,20 +253,20 @@ namespace mkt {
 
         // Gradient Src
         Tensor* pgSrc = pPrevLayer_->pgDst_;
-        float* pgSrcData = pgSrc->getCPUData();
-        int ic = pgSrc->getChannel();
-        int ih = pgSrc->getHeight();
-        int iw = pgSrc->getWidth();
-        int gsrc_size3D = pgSrc->getSize3D();
-
-        // Dst
-        float* pDstData = pDst_->getCPUData();
-        // int oc = pDst_->getChannel();
-        // int oh = pDst_->getHeight();
-        // int ow = pDst_->getWidth();
-        // int dst_size2D = pDst_->getSize2D();
-        // int dst_size3D = pDst_->getSize3D();
-        // int dst_wholeSize = pDst_->getWholeSize();
+        float* pgSrcData = nullptr;
+        int ic = 0;
+        int ih = 0;
+        int iw = 0;
+        int gsrc_size3D = 0;
+        if (pgSrc != nullptr)
+        {
+            pgSrcData = pgSrc->getCPUData();
+            pgSrcData = pgSrc->getCPUData();
+            ic = pgSrc->getChannel();
+            ih = pgSrc->getHeight();
+            iw = pgSrc->getWidth();
+            gsrc_size3D = pgSrc->getSize3D();
+        }
 
         // Gradient Dst
         float* pgDstData = pgDst_->getCPUData();
@@ -275,6 +280,9 @@ namespace mkt {
         int fc = pW_->getChannel();
         int filter_size2D = pW_->getSize2D();
         int num_in2filter = pW_->getSize2D() * pW_->getNumOfData();
+
+        // Gradient Weight
+        float* pgWData = pgW_->getCPUData();
 
         // bias
         float* pgBias = pgB_->getCPUData();
@@ -321,32 +329,33 @@ namespace mkt {
                 pgDstData + b*gdst_size3D, gdst_size2D, /* A,       lda(K)  */
                 pTmpColData, gdst_size2D,               /* B,       ldb(N)  */
                 1.0f,                                   /* BETA             */
-                pWData, num_in2filter                   /* C,       ldc(N)  */
+                pgWData, num_in2filter                  /* C,       ldc(N)  */
             );
-
 
             // 4. [Update gradient with respect to data]
-            mkt::gemm_cpu(
-                CblasTrans, CblasNoTrans,       // trans_a, trans_b
-                num_in2filter, gdst_size2D, fc, // M, N, K
-                1.0f,                           // Alpha
-                pWData, gdst_size2D,            // A,       lda
-                pgDstData, fc,                  // B,       lda
-                0,                              // Beta
-                pTmpColData, fc                 // C,       lda
-            );
-            mkt::col2im_cpu(
-                pTmpColData,
-                ic, ih, iw,
-                fh_, fw_,
-                pad_h_, pad_w_,
-                stride_h_, stride_w_,
-                dilation_h_, dilation_w_,
-                pgSrcData + b*gsrc_size3D);
+            pTmpCol_->resetData();
+            if (pgSrc != nullptr)
+            {
+                mkt::gemm_cpu(
+                    CblasTrans, CblasNoTrans,       // trans_a, trans_b
+                    num_in2filter, gdst_size2D, fc, // M, N, K
+                    1.0f,                           // Alpha
+                    pWData, gdst_size2D,            // A,       lda
+                    pgDstData, fc,                  // B,       lda
+                    0,                              // Beta
+                    pTmpColData, fc                 // C,       lda
+                );
+                mkt::col2im_cpu(
+                    pTmpColData,
+                    ic, ih, iw,
+                    fh_, fw_,
+                    pad_h_, pad_w_,
+                    stride_h_, stride_w_,
+                    dilation_h_, dilation_w_,
+                    pgSrcData + b*gsrc_size3D
+                );
+            }
         }
-
-
-
     }
 
     void ConvLayer::calcOutputSize(int ic, int ih, int iw) {
@@ -374,22 +383,16 @@ namespace mkt {
     }
 
     // Getter
-    int ConvLayer::getFiltergetHeight() {
-        return fh_;
-    }
-    int ConvLayer::getFiltergetWidth() {
-        return fw_;
-    }
-    int ConvLayer::getFiltergetChannel() {
-        return fc_;
-    }
+    int ConvLayer::getFiltergetHeight()  { return fh_; }
+    int ConvLayer::getFiltergetWidth()   { return fw_; }
+    int ConvLayer::getFiltergetChannel() { return fc_; }
 }
 
 
 
-/***** [ Forward  Pass] *****
+/* #### [ Forward  Pass] ####
  *
- * ##### Step 1. Im2col
+ * ### Step 1. Im2col ###
  * For example:
  *     src     =ih(3) * iw(3) * ic(3)
  *     filter  = ic(3) * fh(2) * fw(2) * fc(2)
@@ -397,31 +400,33 @@ namespace mkt {
  *     stride  = 1
  *     dst     = oh(2) * ow(2)
  *
- * src =   | 0 1 2 | |  9 10 11 | | 18 19 20 |
- *         | 3 4 5 | | 12 13 14 | | 21 22 23 |
- *         | 6 7 8 | | 15 16 17 | | 24 25 26 |
+              ch1         ch2         ch3
+ * src =   | 00 01 02 | | 09 10 11 | | 18 19 20 |
+ *         | 03 04 05 | | 12 13 14 | | 21 22 23 |
+ *         | 06 07 08 | | 15 16 17 | | 24 25 26 |
  *
  * According to the dimension of src and filter
- * The filter is
- * Filter_0    |w_0_0_0, w_0_0_1| |w_1_0_0, w_1_0_1| |w_2_0_0, w_2_0_1|
- *             |w_0_0_2, w_0_0_3| |w_1_0_2, w_1_0_3| |w_2_0_2, w_2_0_3|
- *                     s0                 s1                 s2
+ * The filter(weight_matrix) is
+ * Filter_0    |w_000, w_001| |w_100, w_101| |w_200, w_201|
+ *             |w_002, w_003| |w_102, w_103| |w_202, w_203|
  *
- * Filter_1    |w_0_1_0, w_0_0_1| |w_1_1_0, w_0_0_1| |w_2_1_0, w_0_0_1|
- *             |w_0_1_2, w_0_0_3| |w_1_1_2, w_0_0_3| |w_2_1_2, w_0_0_3|
+ * Filter_1    |w_010, w_001| |w_110, w001| |w_210, w_001|
+ *             |w_012, w_003| |w_112, w003| |w_212, w_003|
  *
- * w_i_f_c,
+ * w_ifc,
  * i=index of scr channel
  * f=index of filter
  * c=index of weight of filter
  *
  *
  * The first region of src which is applied to filter is
- * |0 1| convert to col vector= |0|
+ * |0 1| convert to column vector= |0|
  * |3 4|                        |1|
  *                              |3|
  *                              |4|
  *
+ * For the computation reason, we convert each receptive field(2d patch)
+ * of filter into col vector
  * Conver src from image to column vector
  * im2col(src) =   | s00 s01 s03 s04 |
  *                 | s01 s02 s04 s05 |  src Channel 0
@@ -442,41 +447,41 @@ namespace mkt {
  *                    |           |        |         |
  *             =   | patch_0 , patch_1, patch_2, patch_3 |
  *
- * im2col matrix = (ic*fh*fw) X (oh*ow)
+ * im2col matrix = (ic*fh*fw) by (oh*ow)
  *
  *
- * ##### Step 2. GEMM: kernel X im2col
- * For example: (same as above)
- *     src     = ih(3) * iw(3) * ic(3)
- *     filter  = ( ic(3) * fh(2) * fw(2) ) * fc(2)
+ * ### Step 2. GEMM: kernel X im2col ###
+ * All parameters follow above
+ *     src     = ih(3) x iw(3) x ic(3)
+ *     filter  = ( ic(3) * fh(2) * fw(2) ) x fc(2)
  *     padding = 0
  *     stride  = 1
  *     dst     = oh(2) X ow(2)
  *
- * 1. Convert filter from |w0,w1| to [w0, w1, w2, w3]
- *                        |w2,w3|
+ * 1. Next, we will onvert filter from |w0,w1| to [w0, w1, w2, w3] (row vector)
+ *                                     |w2,w3|
  *
  *     According to the dimension of src and filter
  *     The filter is
- *     Filter_0    |w_0_0_0, w_0_0_1| |w_1_0_0, w1_0_1| |w_2_0_0, w_2_0_1|
- *                 |w_0_0_2, w_0_0_3| |w_1_0_2, w1_0_3| |w_2_0_2, w_2_0_3|
+ *     Filter_0    |w_000, w_001| |w_100, w101| |w_200, w_201|
+ *                 |w_002, w_003| |w_102, w103| |w_202, w_203|
  *
- *     Filter_1    |w_0_1_0, w_0_0_1| |w_1_1_0, w0_0_1| |w_2_1_0, w_0_0_1|
- *                 |w_0_1_2, w_0_0_3| |w_1_1_2, w0_0_3| |w_2_1_2, w_0_0_3|
+ *     Filter_1    |w_010, w_001| |w_110, w001| |w_210, w_001|
+ *                 |w_012, w_003| |w_112, w003| |w_212, w_003|
  *
- *     w_i_f_c,
+ *     w_ifc,
  *     i=index of scr channel
  *     f=index of filter
  *     c=index of weight of filter
  *
- *     The filter matrix is
- *     | w_0_0_0, ..., w_0_0_3, w_1_0_4, ..., w_1_0_7, w_2_0_8, ..., w_2_0_11 | = filter 0 (F0)
- *     | w_0_1_0, ..., w_0_1_3, w_1_1_4, ..., w_1_1_7, w_2_1_8, ..., w_2_0_11 | = filter 1 (F1)
+ *     The filter matrix is converted to row vectors.
+ *     | w_000, ..., w_003, w_104, ..., w_107, w_208, ..., w_2011 | = filter 0 (F0)
+ *     | w_010, ..., w_013, w_114, ..., w_117, w_218, ..., w_2011 | = filter 1 (F1)
  *
- *     Weight matrix = oc X (fh*fw*ic)
+ *     filter matrix(Weight_matrix) = oc X (fh*fw*ic)
  *
  *
- * 2. Dst matrix = W X im2col(src) =
+ * 2. Dst matrix = Weight_matrix X im2col(src) =
  *                          (oh * ow)
  *                     |  s0  s1  s3  s4 |
  *                     |  s1  s2  s4  s5 |
@@ -495,10 +500,10 @@ namespace mkt {
 */
 
 
-/***** [ Backpropagation ] *****
+/* #### [ Backpropagation ] ####
  *
- * 4. [Update gradient with respect to data]
- * Step 1. dst_grad X weight
+ * For backpropagation, we have to update the gradient with respect to data(feature map), weight and bias
+ *
  *
  *
  * 1. w = [w0, w1, w2, w3]

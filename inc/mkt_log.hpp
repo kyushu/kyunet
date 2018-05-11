@@ -50,14 +50,15 @@ namespace mkt {
 }
 
 
-#ifdef DEBUG_LOG
+#ifdef MKTASSERT
 #   define MKT_Assert(Expr, Msg) \
     __M_Assert(#Expr, Expr, __FILE__, __LINE__, Msg);
 #else
 #   define MKT_Assert(Expr, Msg) ; // no value = do nothing
 #endif
 
-static void __M_Assert(const char* expr_str, bool expr, const char* file, int line, const char* msg)
+// static void __M_Assert(const char* expr_str, bool expr, const char* file, int line, const char* msg)
+static void __M_Assert(const char* expr_str, bool expr, const char* file, int line, const std::string& msg)
 {
     if (!expr)
     {
@@ -71,7 +72,7 @@ static void __M_Assert(const char* expr_str, bool expr, const char* file, int li
 
 
 template<typename T>
-static void CHECK_EQ(T a, T b, const char* func) {
+static void CHECK_EQ(T a, T b, const char* func, int line=-1) {
     // const char* file = __FILE__;
     // int line = __LINE__;
     if (a != b)
@@ -79,13 +80,13 @@ static void CHECK_EQ(T a, T b, const char* func) {
         // std::cerr << a << "!=" << b << "\n"
         //     << "Source:\t\t" << file << ", line " << line << "\n";
         std::cerr << a << "!=" << b << "\n"
-            << "Source:\t\t" << func << "\n";
+            << "Source:\t\t" << func <<  ", line: " << line << "\n";
         abort();
     }
 }
 
 template<typename T>
-static void CHECK_LT(T a, T b, const char* func) {
+static void CHECK_LT(T a, T b, const char* func, const int line=-1) {
     // const char* file = __FILE__;
     // int line = __LINE__;
     if (a > b)
@@ -93,13 +94,13 @@ static void CHECK_LT(T a, T b, const char* func) {
         // std::cerr << a << ">" << b << "\n"
         //     << "Source:\t\t" << file << ", line " << line << "\n";
         std::cerr << a << ">" << b << "\n"
-            << "Source:\t\t" << func << "\n";
+            << "Source:\t\t" << func << ", line: " << line << "\n";
         abort();
     }
 }
 
 template<typename T>
-static void CHECK_GE(T a, T b, const char* func) {
+static void CHECK_GE(T a, T b, const char* func, int line=-1) {
     // const char* file = __FILE__;
     // int line = __LINE__;
     if (a < b)
@@ -107,7 +108,7 @@ static void CHECK_GE(T a, T b, const char* func) {
         // std::cerr << a << "<" << b << "\n"
         //     << "Source:\t\t" << file << ", line " << line << "\n";
         std::cerr << a << "<" << b << "\n"
-            << "Source:\t\t" << func << "\n";
+            << "Source:\t\t" << func <<  ", line: " << line << "\n";
         abort();
     }
 }

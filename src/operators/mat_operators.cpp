@@ -165,7 +165,7 @@ namespace mkt {
     }
 
     /******************
-     * Result = aX + Y
+     * y = aX + Y
      ******************/
     void axpy(int n, float a, float *x, float *y)
     {

@@ -89,19 +89,19 @@ void test_flatten_image() {
 
     // Configure, initialize network
     KyuNet net;
-    net.addInputLayer("input", batchSize, height, width, channel);
+    InputLayer* pInput = (InputLayer *)net.addInputLayer("input", batchSize, height, width, channel);
     net.Compile();
 
     // Get InputLayer
-    InputLayer* pInput = net.getInputLayer();
-    const float *pdata = pInput->pDst_->getCPUData();
+    // InputLayer* pInput = net.getInputLayer();
+    // const float *pdata = pInput->pDst_->getCPUData();
     int size3D = pInput->pDst_->getSize3D();
     fprintf(stderr, "size3D: %d\n", size3D);
 
     // Add data
-    pInput->FlattenImageToTensor(s1, false);
-    pInput->FlattenImageToTensor(s2, false);
-    pInput->FlattenImageToTensor(s3, false);
+    pInput->addFlattenImageToTensor(s1, 0, false);
+    pInput->addFlattenImageToTensor(s2, 1, false);
+    pInput->addFlattenImageToTensor(s3, 2, false);
 
     // Verify data
     int wholeSize = pInput->pDst_->getWholeSize();
@@ -122,7 +122,7 @@ void test_add_batch_image() {
     std::vector<std::string> file_list;
     mkt::listdir(img_dir.c_str(), file_list);
     fprintf(stderr, "file_list.size(): %ld\n", file_list.size());
-    for (int i = 0; i < file_list.size(); ++i)
+    for (size_t i = 0; i < file_list.size(); ++i)
     {
         file_list.at(i) = img_dir + "/" + file_list.at(i);
     }
@@ -140,24 +140,25 @@ void test_add_batch_image() {
 
 
     KyuNet net;
-    /***********************************************
-     *  Step 1. Configure KyuNetwork
-     *  1. Add Layer with parameters
-     *  2. Define cost function
-     **********************************************/
+    /*************************************************
+     * Step 1. Configure KyuNetwork
+     * We will demonstrate how to add batch image data
+     * here, so we just add input layer
+     *************************************************/
     net.addInputLayer("input", batchSize, height, width, channel);
 
 
-    /***********************************************
-     *  Step 2. Initialize KyuNetwork
-     *  1. Update parameter of Layer, Tensor
-     *  2. Allocate memory space of Tensor
-     **********************************************/
+    /*****************************************************
+     * Step 2. Initialize KyuNetwork
+     * Compile will allocate memory space of tensor
+     * of each layer according to how they are configured
+     *****************************************************/
     net.Compile();
 
 
     /**********************************************
-     *  Step 3. Add batch data
+     * Step 3. Add batch data
+     * Load image from file to input layer
      *********************************************/
     for (int i = 0; i < 1; ++i)
     {
@@ -173,7 +174,7 @@ void test_add_batch_image() {
     /***********************************************
      * Verify
      **********************************************/
-    InputLayer* pInput = net.getInputLayer();
+    const InputLayer* pInput = net.getInputLayer();
     const float *pdata = pInput->pDst_->getCPUData();
     int size3D = pInput->pDst_->getSize3D();
     fprintf(stderr, "size3D: %d\n", size3D);
@@ -181,10 +182,12 @@ void test_add_batch_image() {
     unsigned char* pImg = new unsigned char[size3D];
     for (int i = 0; i < batchSize; ++i)
     {
-        pInput->DeFlattenImage(pdata, height, width, channel, pImg);
+        net.deFlattenInputImage(pImg, i);
+        // pInput->DeFlattenImage(pdata, height, width, channel, pImg);
 
         if (channel == 3)
         {
+            // Instantiate cv Mat with char array
             cv::Mat img_mat(height, width, CV_8UC3, pImg);
             cv::cvtColor(img_mat, img_mat, CV_RGB2BGR);
             printf("img_mat.col: %d, row: %d\n", img_mat.cols, img_mat.rows);
@@ -218,7 +221,7 @@ int main(int argc, char const *argv[])
     }
     std::string strOpt = argv[1];
     int option = 0;
-    if (has_only_digits(strOpt))
+    if (UTILS::has_only_digits(strOpt))
     {
         option = std::stoi(strOpt);
     }

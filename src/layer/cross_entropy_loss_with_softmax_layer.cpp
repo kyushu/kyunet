@@ -1,6 +1,8 @@
 #include "layer/cross_entropy_loss_with_softmax_layer.h"
 #include <cfloat>
 
+#include "test_utils.hpp"
+
 namespace mkt {
     CrossEntropyLossWithSoftmaxLayer::CrossEntropyLossWithSoftmaxLayer(
         Layer* prevLayer,
@@ -39,7 +41,7 @@ namespace mkt {
          */
 
         /*
-         * pLabel_ is a Tensor for sotring Label data
+         * pLabel_ is a Tensor for storing Label data
          * For now, the label data of Cross Entroyp Loss
          * is Scale Not One-Hot encoding vector
          */
@@ -71,15 +73,33 @@ namespace mkt {
      * There are 10 classes and batch size = 64, so there are 64 labels
      *  the range of each label is 0 ~ 9
      *********************************************************************/
-    void CrossEntropyLossWithSoftmaxLayer::LoadLabel(int num, const int* label) {
+    void CrossEntropyLossWithSoftmaxLayer::LoadLabel(int num, const int* pLabel) {
 
         CHECK_EQ(pLabel_->getWholeSize(), num, __FILE__);
+
+        int numClass = softmaxLayer_.pDst_->getChannel();
 
         float* pLabelData = pLabel_->getCPUData();
 
         for (int i = 0; i < num; ++i)
         {
-            pLabelData[i] = static_cast<float>( label[i] );
+            CHECK_LT(pLabel[i], numClass, __FILE__, __LINE__);
+            pLabelData[i] = static_cast<float>( pLabel[i] );
+        }
+    }
+
+    void CrossEntropyLossWithSoftmaxLayer::LoadLabel(const std::vector<int>& labels) {
+
+        CHECK_EQ(pLabel_->getWholeSize(), static_cast<int>(labels.size()), __FILE__);
+
+        int numClass = softmaxLayer_.pDst_->getChannel();
+
+        float* pLabelData = pLabel_->getCPUData();
+
+        for (size_t i = 0; i < labels.size(); ++i)
+        {
+            CHECK_LT(labels[i], numClass, __FILE__, __LINE__);
+            pLabelData[i] = static_cast<float>( labels[i] );
         }
     }
 
@@ -92,6 +112,9 @@ namespace mkt {
      *
      *****************************************************/
     void CrossEntropyLossWithSoftmaxLayer::Forward() {
+
+        // Reset Data
+        // pDst_->resetData();
 
         Tensor* pSrc = pPrevLayer_->pDst_;
 
@@ -110,22 +133,25 @@ namespace mkt {
             for (int i = 0; i < size2D; ++i)
             {
                 const int label_value = static_cast<int>( pTruth_label[i + b*size2D]);
-                fprintf(stderr, "label_value[%d]: %d\n", (i + b*size2D), label_value);
+                // fprintf(stderr, "label_value[%d]: %d\n", (i + b*size2D), label_value);
                 CHECK_GE(label_value, 0, __func__);
                 CHECK_LT(label_value, numClass, __func__);
+                // fprintf(stderr, "i: %d, label_value: %d, size2D: %d, b: %d, dim: %d\n", i, label_value, size2D, b, dim);
+                // fprintf(stderr, "prob_data[%d]: %f\n", i + label_value*size2D + b*dim, prob_data[i + label_value*size2D + b*dim]);
                 loss -= log( std::max(prob_data[i + label_value*size2D + b*dim], FLT_MIN) );
                 // fprintf(stderr, "[cross entropy loss forwartd]: prob_data[%d] = %f\n", i + label_value*size2D + b*dim, prob_data[i + label_value*size2D + b*dim]);
             }
         }
-
+        // fprintf(stderr, "loss - %f\n", loss);
         pDst_->getCPUData()[0] = loss / batchSize_ * size2D;
+        // fprintf(stderr, "%s:%d loss: %f\n", __FILE__, __LINE__, pDst_->getCPUData()[0]);
     }
 
 
     /****************************************************
      * dloss/dx_j = exp(x_j) / sum(exp(x_i)) - 1, if j = k
      *            = exp(x_j) / sum(exp(x_i))    , if j != k
-     * k is the index of label which equal to 1
+     * k is the index of label which equals to 1
      ****************************************************/
     void CrossEntropyLossWithSoftmaxLayer::Backward() {
 
@@ -152,7 +178,6 @@ namespace mkt {
                 }
             }
         }
-
     }
 }
 

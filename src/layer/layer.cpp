@@ -91,6 +91,7 @@ namespace mkt {
     // Tensor for forward pass
     void Layer::initOutputTensor() {
         pDst_->allocate();
+        std::fill_n(pDst_->getCPUData(), pDst_->getWholeSize(), 0.0f);
     }
     void Layer::initWeightTensor() {
 
@@ -175,11 +176,11 @@ namespace mkt {
     void Layer::applyActivator() {
         switch (activationType_) {
             case ActivationType::RELU:
-            fprintf(stderr, "relu\n");
+            fprintf(stderr, "file: %s func: %s relu\n", __FILE__, __func__);
                 pActivator_ = new Relu_Act{};
                 break;
             case ActivationType::SIGMOID:
-                fprintf(stderr, "sigmoid\n");
+                fprintf(stderr, "file: %s, func: %s: sigmoid\n", __FILE__, __func__);
                 pActivator_ = new Sigmoid_Act{};
                 break;
             default:
@@ -190,36 +191,15 @@ namespace mkt {
 
     //##################################
     // Getter Function
-    LayerType Layer::Type() {
-        return type_;
-    }
-    InitializerType Layer::Weight_Init_Type(){
-        return weightInitType_;
-    }
-    InitializerType Layer::Bias_Init_Type(){
-        return biasInitType_;
-    }
-    ActivationType Layer::Activation_Type() {
-        return activationType_;
-    }
-
-    int Layer::BatchSize() {
-        return batchSize_;
-    }
-
-    int Layer::Output_getHeight() {
-        return oh_;
-    }
-    int Layer::Output_getWidth() {
-        return ow_;
-    }
-    int Layer::Output_getChannel() {
-        return oc_;
-    }
-
-    Shape Layer::getWeightShape() {
-        return pW_->getShape();
-    }
+    LayerType       Layer::getType()             { return type_;           }
+    InitializerType Layer::getWeight_Init_Type() { return weightInitType_; }
+    InitializerType Layer::getBias_Init_Type()   { return biasInitType_;   }
+    ActivationType  Layer::getActivation_Type()  { return activationType_; }
+    int             Layer::getBatchSize()        { return batchSize_;      }
+    int             Layer::getOutput_Height()    { return oh_;             }
+    int             Layer::getOutput_Width()     { return ow_;             }
+    int             Layer::getOutput_Channel()   { return oc_;             }
+    Shape           Layer::getWeight_Shape()     { return pW_->getShape(); }
 
     // template class Layer<float>;
 }

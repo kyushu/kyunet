@@ -114,19 +114,19 @@ namespace mkt {
         void applyActivator();
 
         // Getter function
-        LayerType Type();
-        InitializerType Weight_Init_Type();
-        InitializerType Bias_Init_Type();
-        ActivationType Activation_Type();
-        int BatchSize();
-        int Output_getHeight();
-        int Output_getWidth();
-        int Output_getChannel();
-        int Filter_getHeight();
-        int Filter_getWidth();
-        int Filter_getChannel();
+        LayerType getType();
+        InitializerType getWeight_Init_Type();
+        InitializerType getBias_Init_Type();
+        ActivationType getActivation_Type();
+        int getBatchSize();
+        int getOutput_Height();
+        int getOutput_Width();
+        int getOutput_Channel();
+        // int Filter_getHeight();
+        // int Filter_getWidth();
+        // int Filter_getChannel();
 
-        Shape getWeightShape();
+        Shape getWeight_Shape();
 
 
 

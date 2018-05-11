@@ -3,7 +3,7 @@
 namespace mkt {
 
     // Constructor
-    Relu_Act::Relu_Act() {};
+    Relu_Act::Relu_Act():negative_slope_{0} {};
 
     // Destructor
     Relu_Act::~Relu_Act() {};

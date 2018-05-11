@@ -73,7 +73,7 @@ namespace mkt {
         OP_STATUS addData(std::vector<float> vImg);
 
         //
-        void cleanData();
+        void resetData();
 
         // Getter
         Shape getShape();

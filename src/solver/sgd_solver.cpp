@@ -1,26 +1,35 @@
 
 #include "solver/sgd_solver.h"
 
+#include "test_utils.hpp"
+
 namespace mkt {
 
     // Constructor
-    SgdSolver::SgdSolver(KyuNet* net): Solver(net) {
+    SGDSolver::SGDSolver(KyuNet* net): Solver(net) {
 
         // Initialize Momentum value matrix
         std::vector<Layer*> layers = net->getLayers();
         for (int i = 0; i < layers.size(); ++i)
         {
-            Shape shape = layers.at(i)->getWeightShape();
-            Tensor* tensor = new Tensor{shape};
-            momentums_.push_back(tensor);
+            if (layers[i]->pW_)
+            {
+                Shape shape = layers.at(i)->getWeight_Shape();
+                // momentums_.emplace_back(new Tensor{shape});
+                Tensor* pTensor = new Tensor{shape};
+                momentums_.push_back(pTensor);
+            } else {
+                Tensor* pTensor = new Tensor{1,1,1,1};
+                // momentums_.emplace_back(new Tensor{1,1,1,1});
+                momentums_.push_back(pTensor);
+            }
         }
-
     }
 
     // Destructor
-    SgdSolver::~SgdSolver(){}
+    SGDSolver::~SGDSolver(){}
 
-    void SgdSolver::initialize() {
+    void SGDSolver::initialize() {
 
         // allocate Tensor in momentums
         for (int i = 0; i < momentums_.size(); ++i)
@@ -30,7 +39,7 @@ namespace mkt {
     }
 
 
-    void SgdSolver::Update() {
+    void SGDSolver::Update() {
         /**
          * Origin SGD:
          * Wt+1 = Wt - alpha * gWt.
@@ -52,24 +61,35 @@ namespace mkt {
         // Start from the back of layers
         std::vector<Layer*> layers = pNet_->getLayers();
         for(size_t i = layers.size(); i-- > 0; ) {
+
             Layer* pLayer = layers.at(i);
-            size_t size = pLayer->pgW_->getWholeSize();
-            float* pgWData = pLayer->pgW_->getCPUData();
+            if (pLayer->pW_)
+            {
+                size_t size = pLayer->pgW_->getWholeSize();
+                float* pWData = pLayer->pW_->getCPUData();
+                float* pgWData = pLayer->pgW_->getCPUData();
 
-            // gWt_m = momentums[i]
-            float* pMomentumData = momentums_.at(i)->getCPUData();
-            axpby(
-                size,           // The size
-                0.005,           // a = learning rate
-                pgWData,        // x
-                0.9,            // b = fraction of momentum
-                pMomentumData   // y
-            );
+                // gWt_m = momentums[i]
+                float* pMomentumData = momentums_.at(i)->getCPUData();
 
-            // Copy gWt_m back to layer->pgW_
-            // we update pW_ = pW_ - pgW_
-            mem_copy_cpu(size, pMomentumData, pgWData);
+
+
+                // y = ax+by
+                // cur_update_value = fraction_momentum * pre_Momentum[i] + laerning_rate * pgW_[i]
+                axpby(
+                    size,           // The size
+                    0.0001/64.0f,           // a = learning rate
+                    pgWData,        // x
+                    0.9,            // b = fraction of momentum
+                    pMomentumData   // y
+                );
+
+                axpy(size, -1, pMomentumData, pWData);
+
+                // Copy gWt_m back to layer->pgW_
+                // we update pW_ = pW_ - pgW_
+                mem_copy_cpu(size, pMomentumData, pgWData);
+            }
         }
-
     }
 }

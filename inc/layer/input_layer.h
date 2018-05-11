@@ -16,7 +16,7 @@ namespace mkt {
 
         // Method
         void initialize();
-        void FlattenImageToTensor(unsigned char *pImg, bool bNormalize);
+        void addFlattenImageToTensor(unsigned char *pImg, int index, bool bNormalize);
         void DeFlattenImage(const float* pData, int height, int width, int channel, unsigned char *pImg);
 
         void Forward(){};

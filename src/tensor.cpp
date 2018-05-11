@@ -61,6 +61,10 @@ namespace mkt {
         height_ = shape[1];
         width_ = shape[2];
         channel_ = shape[3];
+
+         size2D_ = height_ * width_;
+        size3D_ = size2D_ * channel_;
+        wholeSize_ = num_ * size3D_;
     }
 
     // Destructor
@@ -198,44 +202,22 @@ namespace mkt {
     }
 
 
-    void Tensor::cleanData() {
-        std::memset(pData_, 0, wholeSize_ * sizeof(float));
+    void Tensor::resetData() {
+        // std::memset(pData_, 0, wholeSize_ * sizeof(float));
+        std::fill_n(pData_, wholeSize_, 0.0f);
     }
 
     /********************************
     ** Getter
     ********************************/
-    float* Tensor::getCPUData() {
-        return pData_;
-    }
-
-    int Tensor::getNumOfData() {
-        return num_;
-    }
-
-    int Tensor::getWidth() {
-        return width_;
-    }
-
-    int Tensor::getHeight() {
-        return height_;
-    }
-
-    int Tensor::getChannel() {
-        return channel_;
-    }
-
-    int Tensor::getSize2D() {
-        return size2D_;
-    }
-
-    int Tensor::getSize3D() {
-        return size3D_;
-    }
-
-    int Tensor::getWholeSize() {
-        return wholeSize_;
-    }
+    float* Tensor::getCPUData()   { return pData_; }
+    int    Tensor::getNumOfData() { return num_; }
+    int    Tensor::getWidth()     { return width_; }
+    int    Tensor::getHeight()    { return height_; }
+    int    Tensor::getChannel()   { return channel_; }
+    int    Tensor::getSize2D()    { return size2D_; }
+    int    Tensor::getSize3D()    { return size3D_; }
+    int    Tensor::getWholeSize() { return wholeSize_; }
 
     Shape Tensor::getShape() {
         Shape shape{num_, height_, width_, channel_};

@@ -1,6 +1,9 @@
 #include "layer/pooling_layer.h"
 #include <cfloat>
 
+#include "test_utils.hpp"
+
+
 namespace mkt {
 
     PoolingLayer::PoolingLayer(
@@ -124,8 +127,11 @@ namespace mkt {
     // Computation Function
     void PoolingLayer::Forward() {
 
-        Tensor* pSrc = pPrevLayer_->pDst_;
+        // Reset data
+        pDst_->resetData();
+        pgDst_->resetData();
 
+        Tensor* pSrc = pPrevLayer_->pDst_;
         float* pSrcData = pSrc->getCPUData();
         int src_size2d = pSrc->getSize2D();
         int ih = pSrc->getHeight();
@@ -133,7 +139,6 @@ namespace mkt {
 
         float* pDstData = pDst_->getCPUData();
         int dst_size2D = pDst_->getSize2D();
-
 
         switch (type_) {
             case PoolingMethodType::MAX:
@@ -288,7 +293,6 @@ namespace mkt {
                 break;
             default:
                 fprintf(stderr, "wrong pooling method\n");
-
         }
     }
 

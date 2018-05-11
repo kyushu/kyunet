@@ -66,13 +66,13 @@ int main(int argc, char const *argv[])
     {
         switch (i) {
             case 0:
-            pInputLayer->FlattenImageToTensor(s0, false);
+            pInputLayer->addFlattenImageToTensor(s0, i, false);
             break;
             case 1:
-            pInputLayer->FlattenImageToTensor(s1, false);
+            pInputLayer->addFlattenImageToTensor(s1, i, false);
             break;
             case 2:
-            pInputLayer->FlattenImageToTensor(s2, false);
+            pInputLayer->addFlattenImageToTensor(s2, i, false);
             break;
         }
     }
@@ -80,13 +80,13 @@ int main(int argc, char const *argv[])
     // Display Dense layer information
     int weightsize3D = pDenseLayer->pW_->getSize3D();
     int weightWholeSize = pDenseLayer->pW_->getWholeSize();
-    if (pDenseLayer->Type() == LayerType::FullConnected)
+    if (pDenseLayer->getType() == LayerType::FullConnected)
     {
         fprintf(stderr, "Dense Layer type is correct\n");
     }
 
     fprintf(stderr, "Dense Layer weight init type: \n");
-    switch (pDenseLayer->Weight_Init_Type())
+    switch (pDenseLayer->getWeight_Init_Type())
     {
         case InitializerType::NONE:
             fprintf(stderr, "NONE\n");
@@ -105,7 +105,7 @@ int main(int argc, char const *argv[])
             break;
     }
     fprintf(stderr, "Dense Layer bias init type: \n");
-    switch (pDenseLayer->Bias_Init_Type())
+    switch (pDenseLayer->getBias_Init_Type())
     {
         case InitializerType::NONE:
             fprintf(stderr, "NONE\n");
@@ -125,7 +125,7 @@ int main(int argc, char const *argv[])
     }
 
     fprintf(stderr, "Dense Layer activation type: \n");
-    ActivationType actType = pDenseLayer->Activation_Type();
+    ActivationType actType = pDenseLayer->getActivation_Type();
     switch (actType) {
         case ActivationType::NONE:
             fprintf(stderr, "NONE\n");

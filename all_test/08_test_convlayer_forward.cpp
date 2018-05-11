@@ -95,7 +95,7 @@ int main(int argc, char const *argv[])
     Tensor *pDst = pConvLayer->pDst_;
     float* pDstData = pDst->getCPUData();
     int batchsize = pDst->getNumOfData();
-    int wholeSize = pDst->getWholeSize();
+    // int wholeSize = pDst->getWholeSize();
     int oh = pDst->getHeight();
     int ow = pDst->getWidth();
     int oc = pDst->getChannel();

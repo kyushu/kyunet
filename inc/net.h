@@ -47,17 +47,22 @@ namespace mkt {
     class KyuNet
     {
     private:
-        std::vector<Layer* > layers_;
-        InputLayer* pInputLayer_;
-        Solver* pSolver;
+
+
 
     public:
+        std::vector<Layer* > layers_;
+        InputLayer* pInputLayer_;
+        Solver* pSolver_;
         //==================================
         KyuNet();
         ~KyuNet();
         //==================================
 
-        // Configuration Function
+        // Add Solver Function
+        void addSolver(Solver* pSolver);
+
+        // Add Layer Function
         Layer* addInputLayer(std::string id, int batchSize, int h, int w, int c);
 
         Layer* addDenseLayer(Layer* prevLayer, std::string id, int unit, ActivationType activationType, InitializerType weightInitType, InitializerType biasInitType);
@@ -87,14 +92,18 @@ namespace mkt {
         // Backward Function
         void Backward();
 
+        void Train();
+
         // Add Data Function
         OP_STATUS add_data_from_file_list(std::vector<std::string> fileList);
 
+        void addBatchLabels(std::string layer, std::vector<int> labels);
+        // Helper Function
+        void deFlattenInputImage(unsigned char *pImg, int index, float max_pixel_value=255.0f);
         // Getter
-        InputLayer* getInputLayer();
         int getNumOfLayer();
-
-        std::vector<Layer*> getLayers();
+        const InputLayer* getInputLayer();
+        const std::vector<Layer*> getLayers();
 
     };
 
