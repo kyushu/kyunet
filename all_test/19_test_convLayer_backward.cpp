@@ -61,7 +61,7 @@ int main(int argc, char const *argv[])
     PoolingLayer* pPoolingLayer = (PoolingLayer*)net.addPoolingLayer( pConvLayer2, "Pooling", pool_params);
 
     /* Initialize KyuNet(Allocate memory) */
-    net.Compile();
+    net.Compile(NetMode::TRAINING);
 
 
     /*Set random pesudo input data */

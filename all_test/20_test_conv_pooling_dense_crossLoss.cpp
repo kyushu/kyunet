@@ -93,7 +93,7 @@ int main(int argc, char const *argv[])
     fprintf(stderr, "num of layer: %d\n", net->getNumOfLayer());
 
     /* Initialize Net (Allocate menory) */
-    net->Compile();
+    net->Compile(NetMode::TRAINING);
 
     // /*Set random pesudo input data */
     float* pInData = pInLayer->pDst_->getCPUData();

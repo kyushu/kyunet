@@ -53,7 +53,7 @@ int main(int argc, char const *argv[])
     PoolingLayer* pPoolingLayer = (PoolingLayer*)net.addPoolingLayer( pConvLayer, "Pooling", pool_params);
 
     /*Initialize KyuNet*/
-    net.Compile();
+    net.Compile(NetMode::TRAINING);
 
     /* Generate pseudo Data */
     float* pInData = pInLayer->pDst_->getCPUData();

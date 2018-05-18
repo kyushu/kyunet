@@ -45,7 +45,7 @@ namespace mkt {
 
         ~ConvLayer();
 
-        void initialize();
+        void initialize(NetMode mode);
 
         // Computation Function
         void Forward();

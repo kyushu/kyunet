@@ -37,7 +37,7 @@ namespace mkt {
     };
 
     // Net Type
-    enum class NetType: int
+    enum class NetMode: int
     {
         TRAINING=0,
         INFER

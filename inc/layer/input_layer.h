@@ -15,7 +15,7 @@ namespace mkt {
         ~InputLayer();
 
         // Method
-        void initialize();
+        void initialize(NetMode mode);
         void addFlattenImageToTensor(unsigned char *pImg, int index, bool bNormalize);
         void DeFlattenImage(const float* pData, int height, int width, int channel, unsigned char *pImg);
 

@@ -100,7 +100,7 @@ KyuNet* configure_kyunet(int batchSize, int input_height, int input_width, int i
     CrossEntropyLossWithSoftmaxLayer* pCrossEntropyLayer = (CrossEntropyLossWithSoftmaxLayer *)net->addCrossEntropyLossWithSoftmaxLayer(pDenseLayer, "cross_entropy_loss");
 
     /* Initialize Net (Allocate menory) */
-    net->Compile();
+    net->Compile(NetMode::TRAINING);
 
     SGDSolver* pSgdSolver = new SGDSolver{net};
     pSgdSolver->initialize();
@@ -222,7 +222,7 @@ int main(int argc, char const *argv[])
     net->addSolver(pSgdSolver);
 
     /* Initialize Net (Allocate menory) */
-    net->Compile();
+    net->Compile(NetMode::TRAINING);
 
     //////////////////////////////////////////////
 

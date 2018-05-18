@@ -21,7 +21,7 @@ namespace mkt {
     };
 
 
-    void InputLayer::initialize() {
+    void InputLayer::initialize(NetMode mode) {
         initOutputTensor();
     }
 

@@ -90,7 +90,7 @@ void test_flatten_image() {
     // Configure, initialize network
     KyuNet net;
     InputLayer* pInput = (InputLayer *)net.addInputLayer("input", batchSize, height, width, channel);
-    net.Compile();
+    net.Compile(NetMode::TRAINING);
 
     // Get InputLayer
     // InputLayer* pInput = net.getInputLayer();
@@ -153,7 +153,7 @@ void test_add_batch_image() {
      * Compile will allocate memory space of tensor
      * of each layer according to how they are configured
      *****************************************************/
-    net.Compile();
+    net.Compile(NetMode::TRAINING);
 
 
     /**********************************************

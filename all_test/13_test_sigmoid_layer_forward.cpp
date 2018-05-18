@@ -22,7 +22,7 @@ int main(int argc, char const *argv[])
     Layer* pSigmoidLayer = net.addSigmoidLayer(pInputLayer, "ReluLayer");
 
     // KyuNet Initialization: allocation memory space for each Tensor of layer
-    net.Compile();
+    net.Compile(NetMode::TRAINING);
 
     // Feed pseudo data
     Tensor* pInputTensor = pInputLayer->pDst_;

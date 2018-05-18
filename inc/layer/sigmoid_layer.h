@@ -14,7 +14,7 @@ namespace mkt {
         SigmoidLayer(Layer* prevLayer, std::string id);
         ~SigmoidLayer();
 
-        void initialize();
+        void initialize(NetMode mode);
         // Computation Function
         void Forward();
         void Backward();

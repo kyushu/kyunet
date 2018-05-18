@@ -1,5 +1,5 @@
 /*
- * Cross_entropy_loss_with_softmax_layer is a wrapper of SoftmaxLayer and cross entropy loss
+ * Cross_entropy_loss_with_softmax_layer is a wrapper of SoftmaxLayer and cross entropy loss function
  */
 
 #ifndef _MKT_CROSS_ENTROPY_LOSS_WITH_SOFTMAX_LAYER
@@ -16,7 +16,7 @@ namespace mkt {
         CrossEntropyLossWithSoftmaxLayer(Layer* prevLayer, std::string id);
         ~CrossEntropyLossWithSoftmaxLayer();
 
-        void initialize();
+        void initialize(NetMode mode);
 
         void LoadLabel(const int num, const int* label);
         void LoadLabel(const std::vector<int>& labels);

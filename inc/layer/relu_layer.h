@@ -15,7 +15,7 @@ namespace mkt {
         ReluLayer(Layer* prevLayer, std::string id, float negative_slope = 0.0f);
         ~ReluLayer();
 
-        void initialize();
+        void initialize(NetMode mode);
         // Computation Function
         void Forward();
         void Backward();

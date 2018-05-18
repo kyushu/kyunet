@@ -85,7 +85,7 @@ namespace mkt {
         /**
          * Compile Function: allocate memory
          */
-        void Compile();
+        void Compile(NetMode mode);
         // Forward Function
         void Forward();
 

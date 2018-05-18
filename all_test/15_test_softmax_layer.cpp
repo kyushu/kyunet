@@ -43,7 +43,7 @@ int main(int argc, char const *argv[])
     /*****************************************
      * Initialize KyuNet (allocate memory space)
      *****************************************/
-    net.Compile();
+    net.Compile(NetMode::TRAINING);
 
     /********************************
      * Fed Pseudo data to input layer

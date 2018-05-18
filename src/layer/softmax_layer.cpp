@@ -32,6 +32,7 @@ namespace mkt {
         // pScale_ : for a plane of source data
         pScale_ = new Tensor{1, oh_, ow_, 1};
     };
+
     // Destructor
     SoftmaxLayer::~SoftmaxLayer(){
         delete pScale_;
@@ -40,7 +41,7 @@ namespace mkt {
     /*
      * Initialize
      */
-    void SoftmaxLayer::initialize() {
+    void SoftmaxLayer::initialize(NetMode mode) {
 
         MKT_Assert(pDst_ != nullptr, "pDst_ is null");
         MKT_Assert(pgDst_ != nullptr, "pgDst_ is null");

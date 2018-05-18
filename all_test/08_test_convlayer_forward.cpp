@@ -35,7 +35,7 @@ int main(int argc, char const *argv[])
 
 
     // KyuNet Initialization: memory allocation
-    net.Compile();
+    net.Compile(NetMode::TRAINING);
 
     // Set pseudo data
     Tensor* pInputTensor = pInputLayer->pDst_;

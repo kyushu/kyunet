@@ -96,7 +96,7 @@ namespace mkt {
         // TODO: copy constructor
 
         // Initialize Function
-        virtual void initialize()=0;
+        virtual void initialize(NetMode mode)=0;
 
         void initOutputTensor();
         void initGradTensor();

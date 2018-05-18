@@ -57,7 +57,7 @@ namespace mkt {
     }
 
     // Initialization
-    void CrossEntropyLossWithSoftmaxLayer::initialize() {
+    void CrossEntropyLossWithSoftmaxLayer::initialize(NetMode mode) {
 
         MKT_Assert(pDst_ != nullptr, "pDst_ is null");
         MKT_Assert(pLabel_ != nullptr, "pLabel_ is null");

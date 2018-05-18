@@ -233,7 +233,7 @@ namespace mkt {
     /**************************
      *  Compile Function
      **************************/
-    void KyuNet::Compile() {
+    void KyuNet::Compile(NetMode mode) {
 
         if (layers_.size() == 0) {
             return;
@@ -245,16 +245,18 @@ namespace mkt {
             Layer* layer = layers_.at(i);
             if (i == 0 && layer->getType() == LayerType::INPUT)
             {
-                layer->initialize();
+                layer->initialize(mode);
             } else {
-                layer->initialize();
+                layer->initialize(mode);
             }
         }
 
         // Initialize Solver
         // MKT_Assert(pSolver != nullptr, "Solver is not exist");
-        if (pSolver_)
+
+        if (mode == NetMode::TRAINING)
         {
+            MKT_Assert(pSolver_ != nullptr, "pSolver = nullptr");
             pSolver_->initialize();
         }
 

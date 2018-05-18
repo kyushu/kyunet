@@ -14,7 +14,7 @@ namespace mkt {
         SoftmaxLayer(Layer* prevLayer, std::string id);
         ~SoftmaxLayer();
 
-        void initialize();
+        void initialize(NetMode mode);
         void Reshape(int num, int height, int width, int ch);
 
         // Computation Function

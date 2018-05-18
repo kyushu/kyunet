@@ -22,7 +22,7 @@ int main(int argc, char const *argv[])
     Layer *pPoolingLayer = net.addPoolingLayer( pInputLayer, "Pooling", 2, 2, 1, 1, 0, 0, PoolingMethodType::MAX);
 
     // initialize KyuNet (allocate memory space)
-    net.Compile();
+    net.Compile(NetMode::TRAINING);
 
     // Set pseudo data
     // std::srand (time(NULL));

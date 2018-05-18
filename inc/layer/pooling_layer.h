@@ -29,7 +29,7 @@ namespace mkt {
 
         ~PoolingLayer();
 
-        void initialize();
+        void initialize(NetMode mode);
 
         // Computation Function
         void Forward();

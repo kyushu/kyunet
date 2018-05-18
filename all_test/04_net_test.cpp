@@ -148,7 +148,7 @@ void test_add_batch_image() {
      *  Step 2. Initialize KyuNetwork
      *  Initialize Tensor by updated parameters
      **********************************************/
-    net.Compile();
+    net.Compile(NetMode::TRAINING);
 
 
     /**********************************************
