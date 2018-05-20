@@ -24,21 +24,21 @@ int main(int argc, char const *argv[])
     int width = 9;
     int channel = 1;
 
-    KyuNet net;
+    KyuNet<float> net;
     // Add Input Layer
-    InputLayer* pInputLayer = (InputLayer *)net.addInputLayer("input", batchSize, height, width, channel);
+    InputLayer<float>* pInputLayer = (InputLayer<float> *)net.addInputLayer("input", batchSize, height, width, channel);
 
     // Add ConvLayer
     InitializerType weightInitType = InitializerType::TEST;
     InitializerType biasInitType = InitializerType::ZERO;
-    Layer* pConvLayer = net.addConvLayer(pInputLayer, "conv_1", 3, 3, 2, 1, 1, 0, 0, PaddingType::VALID, ActivationType::NONE, weightInitType, biasInitType);
+    Layer<float>* pConvLayer = net.addConvLayer(pInputLayer, "conv_1", 3, 3, 2, 1, 1, 0, 0, PaddingType::VALID, ActivationType::NONE, weightInitType, biasInitType);
 
 
     // KyuNet Initialization: memory allocation
     net.Compile(NetMode::TRAINING);
 
     // Set pseudo data
-    Tensor* pInputTensor = pInputLayer->pDst_;
+    Tensor<float>* pInputTensor = pInputLayer->pDst_;
     float* pInDstData = pInputTensor->getCPUData();
     for (int i = 0; i < pInputTensor->getWholeSize(); ++i)
     {
@@ -71,7 +71,7 @@ int main(int argc, char const *argv[])
     pConvLayer->Forward();
 
     // weight
-   Tensor *pW = pConvLayer->pW_;
+   Tensor<float> *pW = pConvLayer->pW_;
    float* pWData = pW->getCPUData();
    int fh = pW->getHeight();
    int fw = pW->getWidth();
@@ -92,7 +92,7 @@ int main(int argc, char const *argv[])
    fprintf(stderr, "\n");
 
     // output
-    Tensor *pDst = pConvLayer->pDst_;
+    Tensor<float> *pDst = pConvLayer->pDst_;
     float* pDstData = pDst->getCPUData();
     int batchsize = pDst->getNumOfData();
     // int wholeSize = pDst->getWholeSize();

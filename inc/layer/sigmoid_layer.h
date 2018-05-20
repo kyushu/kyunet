@@ -6,12 +6,13 @@
 
 namespace mkt {
 
-    class SigmoidLayer: public Layer
+    template<typename T>
+    class SigmoidLayer: public Layer<T>
     {
     private:
-        Sigmoid_Act sigmoid_act_;
+        Sigmoid_Act<T> sigmoid_act_;
     public:
-        SigmoidLayer(Layer* prevLayer, std::string id);
+        SigmoidLayer(Layer<T>* prevLayer, std::string id);
         ~SigmoidLayer();
 
         void initialize(NetMode mode);

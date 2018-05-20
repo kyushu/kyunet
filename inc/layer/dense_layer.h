@@ -5,7 +5,8 @@
 
 namespace mkt {
 
-    class DenseLayer: public Layer
+    template<typename T>
+    class DenseLayer: public Layer<T>
     {
 
     public:
@@ -13,7 +14,7 @@ namespace mkt {
 
         // Constructor with ID
         DenseLayer(
-            Layer* prevLayer,
+            Layer<T>* prevLayer,
             std::string id,
             int unit,
             ActivationType actType,
@@ -23,13 +24,13 @@ namespace mkt {
 
         // Constructor without ID
         DenseLayer(
-            Layer* prevLayer,
+            Layer<T>* prevLayer,
             int unit,
             ActivationType actType,
             InitializerType weightInitType,
             InitializerType biasInitType
         );
-        DenseLayer(Layer* prevLayer, std::string id, LayerParams params);
+        DenseLayer(Layer<T>* prevLayer, std::string id, LayerParams params);
 
         ~DenseLayer();
 

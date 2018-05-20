@@ -6,7 +6,8 @@
 
 
 namespace mkt {
-    class ConvLayer:public Layer
+    template<typename T>
+    class ConvLayer:public Layer<T>
     {
     public:
         int fh_; // filter height
@@ -22,11 +23,11 @@ namespace mkt {
         int dilation_h_;
         int dilation_w_;
 
-        Tensor* pTmpCol_;
+        Tensor<T>* pTmpCol_;
 
 
         ConvLayer(
-            Layer* prevLayer,
+            Layer<T>* prevLayer,
             std::string id,
             int fh,
             int fw,
@@ -41,7 +42,7 @@ namespace mkt {
             InitializerType biasInitType
         );
 
-        ConvLayer(Layer* prevLayer, std::string id, LayerParams params);
+        ConvLayer(Layer<T>* prevLayer, std::string id, LayerParams params);
 
         ~ConvLayer();
 

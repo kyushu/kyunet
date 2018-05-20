@@ -14,18 +14,18 @@ int main(int argc, char const *argv[])
     int width = 4;
     int channel = 3;
 
-    KyuNet net;
+    KyuNet<float> net;
 
     // Add Input Lauer
-    InputLayer* pInputLayer = (InputLayer *)net.addInputLayer("input", batchSize, height, width, channel);
+    InputLayer<float>* pInputLayer = (InputLayer<float> *)net.addInputLayer("input", batchSize, height, width, channel);
     // Add Rely Layer
-    Layer* pReluLayer = net.addReluLayer(pInputLayer, "ReluLayer");
+    Layer<float>* pReluLayer = net.addReluLayer(pInputLayer, "ReluLayer");
 
     // KyuNet Initialization: allocation memory space for each Tensor of layer
     net.Compile(NetMode::TRAINING);
 
     // Feed pseudo data
-    Tensor* pInputTensor = pInputLayer->pDst_;
+    Tensor<float>* pInputTensor = pInputLayer->pDst_;
     float* pInDstData = pInputTensor->getCPUData();
     fprintf(stderr, "Input data\n");
     for (int i = 0; i < pInputTensor->getWholeSize(); ++i)

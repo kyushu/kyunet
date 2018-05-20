@@ -6,9 +6,9 @@ using namespace mkt;
 int main(int argc, char const *argv[])
 {
 
-    mkt::Tensor tensor{1, 100, 100, 1};
+    mkt::Tensor<float> tensor{1, 100, 100, 1};
     tensor.allocate();
-    Xavier xavier{Distribution::UNIFORM};
+    Xavier<float> xavier{Distribution::UNIFORM};
     xavier(tensor);
 
     // Debug Display

@@ -48,10 +48,10 @@ int main(int argc, char const *argv[])
     int input_ch = 1;
 
     /* Configure Net */
-    KyuNet* net = new KyuNet{};
+    KyuNet<float>* net = new KyuNet<float>{};
 
     // Input layer
-    InputLayer* pInLayer = (InputLayer *)net->addInputLayer("input", batchSize, input_height, input_width, input_ch);
+    InputLayer<float>* pInLayer = (InputLayer<float> *)net->addInputLayer("input", batchSize, input_height, input_width, input_ch);
 
     // Convolution Layer 1
     LayerParams conv1_par;
@@ -66,7 +66,7 @@ int main(int argc, char const *argv[])
     conv1_par.actType = ActivationType::RELU;
     conv1_par.weight_init_type = InitializerType::HE_INIT_NORM;
     conv1_par.bias_init_type = InitializerType::ZERO;
-    ConvLayer* pConvLayer1 = (ConvLayer* )net->addConvLayer(pInLayer, "conv1", conv1_par);
+    ConvLayer<float>* pConvLayer1 = (ConvLayer<float>* )net->addConvLayer(pInLayer, "conv1", conv1_par);
 
     // Pooling Layer
     LayerParams pool_params;
@@ -77,7 +77,7 @@ int main(int argc, char const *argv[])
     pool_params.pad_h = 0;
     pool_params.pad_w = 0;
     pool_params.pooling_type = PoolingMethodType::MAX;
-    PoolingLayer* pPoolingLayer = (PoolingLayer*)net->addPoolingLayer( pConvLayer1, "Pooling1", pool_params);
+    PoolingLayer<float>* pPoolingLayer = (PoolingLayer<float>*)net->addPoolingLayer( pConvLayer1, "Pooling1", pool_params);
 
     // Dense Layer
     LayerParams dense_params;
@@ -85,10 +85,10 @@ int main(int argc, char const *argv[])
     dense_params.actType = ActivationType::RELU;
     dense_params.weight_init_type = InitializerType::HE_INIT_NORM;
     dense_params.bias_init_type = InitializerType::ZERO;
-    DenseLayer* pDenseLayer = (DenseLayer* )net->addDenseLayer(pPoolingLayer, "dense1", dense_params);
+    DenseLayer<float>* pDenseLayer = (DenseLayer<float>* )net->addDenseLayer(pPoolingLayer, "dense1", dense_params);
 
     // CrossEntropyWutgSoftmaxLayer
-    CrossEntropyLossWithSoftmaxLayer* pCrossEntropyLayer = (CrossEntropyLossWithSoftmaxLayer *)net->addCrossEntropyLossWithSoftmaxLayer(pDenseLayer, "cross_entropy_loss");
+    CrossEntropyLossWithSoftmaxLayer<float>* pCrossEntropyLayer = (CrossEntropyLossWithSoftmaxLayer<float> *)net->addCrossEntropyLossWithSoftmaxLayer(pDenseLayer, "cross_entropy_loss");
 
     fprintf(stderr, "num of layer: %d\n", net->getNumOfLayer());
 
@@ -183,7 +183,7 @@ int main(int argc, char const *argv[])
          * Display Probability
          */
         fprintf(stderr, "############ [Softmax Output](Probability) ############\n");
-        Layer* pSoftmaxLayer = &(pCrossEntropyLayer->softmaxLayer_);
+        Layer<float>* pSoftmaxLayer = &(pCrossEntropyLayer->softmaxLayer_);
         int s_dst_c = pSoftmaxLayer->pDst_->getChannel();
         int s_dst_h = pSoftmaxLayer->pDst_->getHeight();
         int s_dst_w = pSoftmaxLayer->pDst_->getWidth();

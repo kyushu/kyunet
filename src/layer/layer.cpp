@@ -6,8 +6,8 @@
 
 namespace mkt {
 
-
-    Layer::Layer(
+    template<typename T>
+    Layer<T>::Layer(
         LayerType type,
         ActivationType activationType,
         InitializerType weightInitType,
@@ -30,7 +30,8 @@ namespace mkt {
         pActivator_{nullptr}
     {};
 
-    Layer::~Layer() {
+    template<typename T>
+    Layer<T>::~Layer() {
         mktLog(1, "--------------------- Layer Destructor\n");
 
         pPrevLayer_ = nullptr;
@@ -71,79 +72,87 @@ namespace mkt {
      * Init Function
      ***********************************/
     // Tensor for forward pass
-    void Layer::initOutputTensor() {
+    template<typename T>
+    void Layer<T>::initOutputTensor() {
         pDst_->allocate();
-        std::fill_n(pDst_->getCPUData(), pDst_->getWholeSize(), 0.0f);
+        std::fill_n(pDst_->getCPUData(), pDst_->getWholeSize(), 0);
     }
-    void Layer::initWeightTensor() {
+
+    template<typename T>
+    void Layer<T>::initWeightTensor() {
 
         pW_->allocate();
         int weight_wholeSize = pW_->getWholeSize();
-        float* pWData = pW_->getCPUData();
+        T* pWData = pW_->getCPUData();
         switch (weightInitType_) {
             case InitializerType::ZERO:
             {
-                std::fill_n(pWData, weight_wholeSize, 0.0f);
+                std::fill_n(pWData, weight_wholeSize, 0);
                 break;
             }
             case InitializerType::ONE:
             {
-                std::fill_n(pWData, weight_wholeSize, 1.0f);
+                std::fill_n(pWData, weight_wholeSize, 1);
                 break;
             }
             case InitializerType::TEST:
             {
                 for (int i = 0; i < weight_wholeSize; ++i)
                 {
-                    pWData[i] = float(i+1);
+                    pWData[i] = static_cast<T>( (i+1) );
                 }
                 break;
             }
             case InitializerType::XAVIER_NORM:
             {
 
-                Xavier xavier{Distribution::NORM};
+                Xavier<T> xavier{Distribution::NORM};
                 xavier(*pW_);
                 break;
             }
             case InitializerType::XAVIER_UNIFORM:
             {
 
-                Xavier xavier{Distribution::UNIFORM};
+                Xavier<T> xavier{Distribution::UNIFORM};
                 xavier(*pW_);
                 break;
             }
             case InitializerType::HE_INIT_NORM:
             {
-                HeInit he{Distribution::NORM};
+                HeInit<T> he{Distribution::NORM};
                 he(*pW_);
                 break;
             }
             default:
-                HeInit he{Distribution::UNIFORM};
+                HeInit<T> he{Distribution::UNIFORM};
                 he(*pW_);
                 break;
         }
     }
 
     // Tensor for backpropagation (gradient)
-    void Layer::initGradTensor() {
+    template<typename T>
+    void Layer<T>::initGradTensor() {
         pgDst_->allocate();
-        std::fill_n(pgDst_->getCPUData(), pgDst_->getWholeSize(), 0.0f);
+        std::fill_n(pgDst_->getCPUData(), pgDst_->getWholeSize(), 0);
     }
-    void Layer::initGradWeightTensor() {
+
+    template<typename T>
+    void Layer<T>::initGradWeightTensor() {
         pgW_->allocate();
-        std::fill_n(pgW_->getCPUData(), pgW_->getWholeSize(), 0.0f);
+        std::fill_n(pgW_->getCPUData(), pgW_->getWholeSize(), 0);
     }
 
-    void Layer::initBiasTensor() {
+    template<typename T>
+    void Layer<T>::initBiasTensor() {
         pB_-> allocate();
-        std::fill_n(pB_->getCPUData(), pB_->getWholeSize(), 0.0f);
+        std::fill_n(pB_->getCPUData(), pB_->getWholeSize(), 0);
     }
 
-    void Layer::initGradBiasTensor() {
+    template<typename T>
+    void Layer<T>::initGradBiasTensor() {
         pgB_->allocate();
-        std::fill_n(pgB_->getCPUData(), pgB_->getWholeSize(), 0.0f);
+        std::fill_n(pgB_->getCPUData(), pgB_->getWholeSize(), 0);
     }
 
     // ##################################
@@ -155,15 +164,16 @@ namespace mkt {
     //     }
     // }
 
-    void Layer::applyActivator() {
+    template<typename T>
+    void Layer<T>::applyActivator() {
         switch (activationType_) {
             case ActivationType::RELU:
             fprintf(stderr, "file: %s func: %s relu\n", __FILE__, __func__);
-                pActivator_ = new Relu_Act{};
+                pActivator_ = new Relu_Act<T>{};
                 break;
             case ActivationType::SIGMOID:
                 fprintf(stderr, "file: %s, func: %s: sigmoid\n", __FILE__, __func__);
-                pActivator_ = new Sigmoid_Act{};
+                pActivator_ = new Sigmoid_Act<T>{};
                 break;
             default:
                 fprintf(stderr, "no activator\n");
@@ -173,15 +183,35 @@ namespace mkt {
 
     //##################################
     // Getter Function
-    LayerType       Layer::getType()             { return type_;           }
-    InitializerType Layer::getWeight_Init_Type() { return weightInitType_; }
-    InitializerType Layer::getBias_Init_Type()   { return biasInitType_;   }
-    ActivationType  Layer::getActivation_Type()  { return activationType_; }
-    int             Layer::getBatchSize()        { return batchSize_;      }
-    int             Layer::getOutput_Height()    { return oh_;             }
-    int             Layer::getOutput_Width()     { return ow_;             }
-    int             Layer::getOutput_Channel()   { return oc_;             }
-    Shape           Layer::getWeight_Shape()     { return pW_->getShape(); }
+    template<typename T>
+    LayerType       Layer<T>::getType()             { return type_;           }
 
-    // template class Layer<float>;
-}
+    template<typename T>
+    InitializerType Layer<T>::getWeight_Init_Type() { return weightInitType_; }
+
+    template<typename T>
+    InitializerType Layer<T>::getBias_Init_Type()   { return biasInitType_;   }
+
+    template<typename T>
+    ActivationType  Layer<T>::getActivation_Type()  { return activationType_; }
+
+    template<typename T>
+    int             Layer<T>::getBatchSize()        { return batchSize_;      }
+
+    template<typename T>
+    int             Layer<T>::getOutput_Height()    { return oh_;             }
+
+    template<typename T>
+    int             Layer<T>::getOutput_Width()     { return ow_;             }
+
+    template<typename T>
+    int             Layer<T>::getOutput_Channel()   { return oc_;             }
+
+    template<typename T>
+    Shape           Layer<T>::getWeight_Shape()     { return pW_->getShape(); }
+
+
+    // Explicitly instantiate the template, and its member definitions
+    template class Layer<float>;
+
+} // namespace mkt

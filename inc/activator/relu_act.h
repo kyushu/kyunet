@@ -6,7 +6,8 @@
 
 namespace mkt {
 
-    class Relu_Act: public Activator
+    template<typename T>
+    class Relu_Act: public Activator<T>
     {
     private:
         float negative_slope_;
@@ -14,8 +15,8 @@ namespace mkt {
         Relu_Act();
         ~Relu_Act();
 
-        void Forward(Tensor &src, Tensor &dst);
-        void Backward(Tensor &src, Tensor &src_grad, Tensor &dst_grad);
+        void Forward(Tensor<T> *src, Tensor<T> *dst);
+        void Backward(Tensor<T> *src, Tensor<T> *src_grad, Tensor<T> *dst_grad);
 
     };
 }

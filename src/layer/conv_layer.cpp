@@ -5,8 +5,9 @@
 namespace mkt {
 
     // Constructor
-    ConvLayer::ConvLayer(
-        Layer* prevLayer,
+    template<typename T>
+    ConvLayer<T>::ConvLayer(
+        Layer<T>* prevLayer,
         std::string id,
         int fh,
         int fw,
@@ -31,7 +32,7 @@ namespace mkt {
         padding_type_{paddingType},
         dilation_h_{1},
         dilation_w_{1},
-        Layer(LayerType::CONVOLUTION, actType, weightInitType, biasInitType)
+        Layer<T>(LayerType::CONVOLUTION, actType, weightInitType, biasInitType)
     {
         MKT_Assert(fc_ > 0, "fc_ = 0");
         MKT_Assert(fh_ > 0, "fh_ = 0");
@@ -40,52 +41,53 @@ namespace mkt {
         MKT_Assert(stride_w_ > 0, "stride_w_ = 0");
 
 
-        id_ = id;
-        batchSize_ = prevLayer->pDst_->getNumOfData();
+        this->id_ = id;
+        this->batchSize_ = prevLayer->pDst_->getNumOfData();
         int ih = prevLayer->pDst_->getHeight();
         int iw = prevLayer->pDst_->getWidth();
         int ic = prevLayer->pDst_->getChannel();
         // int size3D = prevLayer->pDst_->getgetSize3D();
 
-        pPrevLayer_ = prevLayer;
+        this->pPrevLayer_ = prevLayer;
 
-        oc_ = fc_;
+        this->oc_ = fc_;
 
         // Calculate oh, ow by input and filter dimension
         calcOutputSize(ic, ih, iw);
 
-        pDst_ = new Tensor{batchSize_, oh_, ow_, oc_};
-        pgDst_ = new Tensor{batchSize_, oh_, ow_, oc_};
+        this->pDst_ = new Tensor<T>{this->batchSize_, this->oh_, this->ow_, this->oc_};
+        this->pgDst_ = new Tensor<T>{this->batchSize_, this->oh_, this->ow_, this->oc_};
 
-        pW_   = new Tensor{ic, fh_, fw_, fc_};
-        pgW_  = new Tensor{ic, fh_, fw_, fc_};
+        this->pW_   = new Tensor<T>{ic, fh_, fw_, fc_};
+        this->pgW_  = new Tensor<T>{ic, fh_, fw_, fc_};
 
-        pB_   = new Tensor{1, 1, 1, oc_};
-        pgB_  = new Tensor{1, 1, 1, oc_};
+        this->pB_   = new Tensor<T>{1, 1, 1, this->oc_};
+        this->pgB_  = new Tensor<T>{1, 1, 1, this->oc_};
 
 
-        pTmpCol_ = new Tensor{1, pW_->getSize2D()*ic, pDst_->getSize2D(), 1};
+        this->pTmpCol_ = new Tensor<T>{1, this->pW_->getSize2D()*ic, this->pDst_->getSize2D(), 1};
 
         // Activator
-        applyActivator();
+        this->applyActivator();
     }
 
     // construct with LayerParams
-    ConvLayer::ConvLayer(Layer* prevLayer, std::string id, LayerParams params):Layer(LayerType::CONVOLUTION)
+    template<typename T>
+    ConvLayer<T>::ConvLayer(Layer<T>* prevLayer, std::string id, LayerParams params):Layer<T>(LayerType::CONVOLUTION)
     {
-        id_ = id;
+        this->id_ = id;
 
-        batchSize_ = prevLayer->pDst_->getNumOfData();
+        this->batchSize_ = prevLayer->pDst_->getNumOfData();
         int ih = prevLayer->pDst_->getHeight();
         int iw = prevLayer->pDst_->getWidth();
         int ic = prevLayer->pDst_->getChannel();
 
-        pPrevLayer_ = prevLayer;
+        this->pPrevLayer_ = prevLayer;
 
         // Parameter setting
-        activationType_ = params.actType;
-        weightInitType_ = params.weight_init_type;
-        biasInitType_   = params.bias_init_type;
+        this->activationType_ = params.actType;
+        this->weightInitType_ = params.weight_init_type;
+        this->biasInitType_   = params.bias_init_type;
 
         fc_ = params.fc;
         fh_ = params.fh;
@@ -102,7 +104,7 @@ namespace mkt {
         dilation_h_ = params.dilation_h;
         dilation_w_ = params.dilation_w;
 
-        oc_ = fc_;
+        this->oc_ = fc_;
 
         MKT_Assert(fc_ > 0, "fc_ = 0");
         MKT_Assert(fh_ > 0, "fh_ = 0");
@@ -113,70 +115,73 @@ namespace mkt {
         // Calculate oh, ow by input and filter dimension
         calcOutputSize(ic, ih, iw);
 
-        pDst_ = new Tensor{batchSize_, oh_, ow_, oc_};
-        pgDst_ = new Tensor{batchSize_, oh_, ow_, oc_};
+        this->pDst_ = new Tensor<T>{this->batchSize_, this->oh_, this->ow_, this->oc_};
+        this->pgDst_ = new Tensor<T>{this->batchSize_, this->oh_, this->ow_, this->oc_};
 
-        pW_   = new Tensor{ic, fh_, fw_, fc_};
-        pgW_  = new Tensor{ic, fh_, fw_, fc_};
+        this->pW_   = new Tensor<T>{ic, fh_, fw_, fc_};
+        this->pgW_  = new Tensor<T>{ic, fh_, fw_, fc_};
 
-        pB_   = new Tensor{1, 1, 1, oc_};
-        pgB_  = new Tensor{1, 1, 1, oc_};
+        this->pB_   = new Tensor<T>{1, 1, 1, this->oc_};
+        this->pgB_  = new Tensor<T>{1, 1, 1, this->oc_};
 
 
-        pTmpCol_ = new Tensor{1, pW_->getSize2D()*ic, pDst_->getSize2D(), 1};
+        pTmpCol_ = new Tensor<T>{1, this->pW_->getSize2D()*ic, this->pDst_->getSize2D(), 1};
 
         // Activator
-        applyActivator();
+        this->applyActivator();
     }
 
     // Destructor
-    ConvLayer::~ConvLayer() {
+    template<typename T>
+    ConvLayer<T>::~ConvLayer() {
         fprintf(stderr, "---------------------- ConvLayer Destructor\n");
         delete pTmpCol_;
     }
 
 
     // Initialization
-    void ConvLayer::initialize(NetMode mode) {
+    template<typename T>
+    void ConvLayer<T>::initialize(NetMode mode) {
 
-        MKT_Assert(pDst_ != nullptr, "pDst_ is null");
-        MKT_Assert(pgDst_ != nullptr, "pgDst_ is null");
-        MKT_Assert(pW_ != nullptr, "pW_ is null");
-        MKT_Assert(pgW_ != nullptr, "pgW_ is null");
-        MKT_Assert(pB_ != nullptr, "pB_ is null");
-        MKT_Assert(pgB_ != nullptr, "pgB_ is null");
+        MKT_Assert(this->pDst_ != nullptr, "pDst_ is null");
+        MKT_Assert(this->pgDst_ != nullptr, "pgDst_ is null");
+        MKT_Assert(this->pW_ != nullptr, "pW_ is null");
+        MKT_Assert(this->pgW_ != nullptr, "pgW_ is null");
+        MKT_Assert(this->pB_ != nullptr, "pB_ is null");
+        MKT_Assert(this->pgB_ != nullptr, "pgB_ is null");
 
-        MKT_Assert(pActivator_ != nullptr, "pActivator_ is null");
+        MKT_Assert(this->pActivator_ != nullptr, "pActivator_ is null");
 
         MKT_Assert(pTmpCol_ != nullptr, "pTmpCol_ is null");
 
-        initOutputTensor();
-        initWeightTensor();
-        initBiasTensor();
+        this->initOutputTensor();
+        this->initWeightTensor();
+        this->initBiasTensor();
 
-        initGradTensor();
-        initGradWeightTensor();
-        initGradBiasTensor();
+        this->initGradTensor();
+        this->initGradWeightTensor();
+        this->initGradBiasTensor();
 
 
         // temporary memory for im2col and col2im
         pTmpCol_->allocate();
-        std::fill_n(pTmpCol_->getCPUData(), pTmpCol_->getWholeSize(), 0.0f);
+        std::fill_n(pTmpCol_->getCPUData(), pTmpCol_->getWholeSize(), 0);
 
     }
 
     // Computation Function
-    void ConvLayer::Forward() {
+    template<typename T>
+    void ConvLayer<T>::Forward() {
 
         // Reset data
-        pDst_->resetData();
-        pgDst_->resetData();
-        pgW_->resetData();
-        pgB_->resetData();
+        this->pDst_->resetData();
+        this->pgDst_->resetData();
+        this->pgW_->resetData();
+        this->pgB_->resetData();
 
         // Src
-        Tensor* pSrc = pPrevLayer_->pDst_;
-        float* pSrcData = pSrc->getCPUData();
+        Tensor<T>* pSrc = this->pPrevLayer_->pDst_;
+        T* pSrcData = pSrc->getCPUData();
         int ic = pSrc->getChannel();
         int iw = pSrc->getWidth();
         int ih = pSrc->getHeight();
@@ -184,26 +189,26 @@ namespace mkt {
         int src_wholeSize = pSrc->getWholeSize();
 
         // Dst
-        float* pDstData = pDst_->getCPUData();
-        int oc = pDst_->getChannel();
-        int oh = pDst_->getHeight();
-        int ow = pDst_->getWidth();
-        int dst_size2D = pDst_->getSize2D();
-        int dst_size3D = pDst_->getSize3D();
-        int dst_wholeSize = pDst_->getWholeSize();
+        T* pDstData = this->pDst_->getCPUData();
+        int oc = this->pDst_->getChannel();
+        int oh = this->pDst_->getHeight();
+        int ow = this->pDst_->getWidth();
+        int dst_size2D = this->pDst_->getSize2D();
+        int dst_size3D = this->pDst_->getSize3D();
+        int dst_wholeSize = this->pDst_->getWholeSize();
 
         // Weight
-        float* pWData = pW_->getCPUData();
-        int fh = pW_->getHeight();
-        int fw = pW_->getWidth();
-        int fc = pW_->getChannel();
-        int filter_size2D = pW_->getSize2D();
-        int filter_wholeSize = pW_->getWholeSize();
+        T* pWData = this->pW_->getCPUData();
+        int fh = this->pW_->getHeight();
+        int fw = this->pW_->getWidth();
+        int fc = this->pW_->getChannel();
+        int filter_size2D = this->pW_->getSize2D();
+        int filter_wholeSize = this->pW_->getWholeSize();
 
-        float* pTmpColData = pTmpCol_->getCPUData();
+        T* pTmpColData = pTmpCol_->getCPUData();
 
         // 1. Z = WX
-        for (int i = 0; i < batchSize_; ++i)
+        for (int i = 0; i < this->batchSize_; ++i)
         {
 
             // Step 1. im to column
@@ -221,7 +226,7 @@ namespace mkt {
                 CblasNoTrans, CblasNoTrans,         /* trans_A, trans_B */
                 fc, dst_size2D, filter_size2D*ic,   /* M,       N, K    */
                 1.0f,                               /* ALPHA            */
-                pWData, pW_->getSize2D()*ic,        /* A,       lda(K)  */
+                pWData, this->pW_->getSize2D()*ic,        /* A,       lda(K)  */
                 pTmpColData,   oh*ow,               /* B,       ldb(N)  */
                 1.0f,                               /* BETA             */
                 pDstData + i*dst_size3D, oh*ow      /* C,       ldc(N)  */
@@ -234,17 +239,19 @@ namespace mkt {
         // fprintf(stderr, "addBias is not implemented: %s, %d\n", __FILE__, __LINE__);
 
         // 3. A = activation(Z) = the input of next layer
-        if (activationType_ != ActivationType::NONE)
+        if (this->activationType_ != ActivationType::NONE)
         {
-            pActivator_->Forward(*pDst_, *pDst_);
+            this->pActivator_->Forward(this->pDst_, this->pDst_);
         }
 
     }
-    void ConvLayer::Backward() {
+
+    template<typename T>
+    void ConvLayer<T>::Backward() {
 
         // Src
-        Tensor* pSrc = pPrevLayer_->pDst_;
-        float* pSrcData = pSrc->getCPUData();
+        Tensor<T>* pSrc = this->pPrevLayer_->pDst_;
+        T* pSrcData = pSrc->getCPUData();
         // int ic = pSrc->getChannel();
         // int iw = pSrc->getWidth();
         // int ih = pSrc->getHeight();
@@ -252,8 +259,8 @@ namespace mkt {
         // int src_wholeSize = pSrc->getWholeSize();
 
         // Gradient Src
-        Tensor* pgSrc = pPrevLayer_->pgDst_;
-        float* pgSrcData = nullptr;
+        Tensor<T>* pgSrc = this->pPrevLayer_->pgDst_;
+        T* pgSrcData = nullptr;
         int ic = 0;
         int ih = 0;
         int iw = 0;
@@ -269,37 +276,37 @@ namespace mkt {
         }
 
         // Gradient Dst
-        float* pgDstData = pgDst_->getCPUData();
-        int gdst_size2D = pgDst_->getSize2D();
-        int gdst_size3D = pgDst_->getSize3D();
+        T* pgDstData = this->pgDst_->getCPUData();
+        int gdst_size2D = this->pgDst_->getSize2D();
+        int gdst_size3D = this->pgDst_->getSize3D();
 
         // Weight
-        float* pWData = pW_->getCPUData();
-        int fh = pW_->getHeight();
-        int fw = pW_->getWidth();
-        int fc = pW_->getChannel();
-        int filter_size2D = pW_->getSize2D();
-        int num_in2filter = pW_->getSize2D() * pW_->getNumOfData();
+        T* pWData = this->pW_->getCPUData();
+        int fh = this->pW_->getHeight();
+        int fw = this->pW_->getWidth();
+        int fc = this->pW_->getChannel();
+        int filter_size2D = this->pW_->getSize2D();
+        int num_in2filter = this->pW_->getSize2D() * this->pW_->getNumOfData();
 
         // Gradient Weight
-        float* pgWData = pgW_->getCPUData();
+        T* pgWData = this->pgW_->getCPUData();
 
         // bias
-        float* pgBias = pgB_->getCPUData();
+        T* pgBias = this->pgB_->getCPUData();
 
-        float* pTmpColData = pTmpCol_->getCPUData();
+        T* pTmpColData = pTmpCol_->getCPUData();
 
 
 
         // 1. Back from Activator first
-        if (activationType_ != ActivationType::NONE)
+        if (this->activationType_ != ActivationType::NONE)
         {
-            pActivator_->Backward(*pDst_, *pgDst_, *pgDst_);
+            this->pActivator_->Backward(this->pDst_, this->pgDst_, this->pgDst_);
         }
 
         // 2. [Update gradient with respect to Bias]
-        float* pCh_grad = nullptr;
-        for (int b = 0; b < batchSize_; ++b)
+        T* pCh_grad = nullptr;
+        for (int b = 0; b < this->batchSize_; ++b)
         {
             for (int c = 0; c < fc; ++c)
             {
@@ -311,7 +318,7 @@ namespace mkt {
             }
         }
 
-        for (int b = 0; b < batchSize_; ++b)
+        for (int b = 0; b < this->batchSize_; ++b)
         {
             // 3. [Update gradient with respect to Weight]
             mkt::im2col_cpu(pSrcData + b*src_size3D,
@@ -358,35 +365,46 @@ namespace mkt {
         }
     }
 
-    void ConvLayer::calcOutputSize(int ic, int ih, int iw) {
+    template<typename T>
+    void ConvLayer<T>::calcOutputSize(int ic, int ih, int iw) {
         switch(padding_type_) {
             case PaddingType::VALID:
-                ow_ = static_cast<int>( static_cast<float>(iw - fw_ + 2*pad_w_) / stride_w_) + 1;
-                oh_ = static_cast<int>( static_cast<float>(ih - fh_ + 2*pad_h_) / stride_h_) + 1;
+                this->ow_ = static_cast<int>( static_cast<float>(iw - fw_ + 2*pad_w_) / stride_w_) + 1;
+                this->oh_ = static_cast<int>( static_cast<float>(ih - fh_ + 2*pad_h_) / stride_h_) + 1;
                 break;
             case PaddingType::SAME:
 
                 pad_w_ = static_cast<int>( ((iw-1)*stride_w_ + fw_ - iw) * 0.5 );
-                ow_    = static_cast<int>( static_cast<float>(iw - fw_ + (2*pad_w_)) / stride_w_ )  + 1;
-                MKT_Assert(iw == ow_, "iw != ow");
+                this->ow_    = static_cast<int>( static_cast<float>(iw - fw_ + (2*pad_w_)) / stride_w_ )  + 1;
+                MKT_Assert(iw == this->ow_, "iw != ow");
 
                 pad_h_ = static_cast<int>( ((ih-1)*stride_h_ + fh_ - ih) * 0.5 );
-                oh_    = static_cast<int>( static_cast<float>(ih - fh_ + (2*pad_h_)) / stride_h_ ) + 1;
-                MKT_Assert(ih == oh_, "ih != oh");
+                this->oh_    = static_cast<int>( static_cast<float>(ih - fh_ + (2*pad_h_)) / stride_h_ ) + 1;
+                MKT_Assert(ih == this->oh_, "ih != oh");
 
                 break;
             default:
-                ow_ = static_cast<int>( static_cast<float>(iw - fw_) / stride_w_)  + 1;
-                oh_ = static_cast<int>( static_cast<float>(ih - fh_) / stride_h_)  + 1;
+                this->ow_ = static_cast<int>( static_cast<float>(iw - fw_) / stride_w_)  + 1;
+                this->oh_ = static_cast<int>( static_cast<float>(ih - fh_) / stride_h_)  + 1;
                 break;
         }
     }
 
     // Getter
-    int ConvLayer::getFiltergetHeight()  { return fh_; }
-    int ConvLayer::getFiltergetWidth()   { return fw_; }
-    int ConvLayer::getFiltergetChannel() { return fc_; }
-}
+    template<typename T>
+    int ConvLayer<T>::getFiltergetHeight()  { return fh_; }
+
+    template<typename T>
+    int ConvLayer<T>::getFiltergetWidth()   { return fw_; }
+
+    template<typename T>
+    int ConvLayer<T>::getFiltergetChannel() { return fc_; }
+
+
+    // Explicitly instantiate the template, and its member definitions
+    template class ConvLayer<float>;
+
+} // namespace mkt
 
 
 

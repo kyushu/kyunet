@@ -42,8 +42,10 @@
 
 namespace mkt {
 
+    template<typename T>
     class Solver;
 
+    template<typename T>
     class KyuNet
     {
     private:
@@ -51,36 +53,39 @@ namespace mkt {
 
 
     public:
-        std::vector<Layer* > layers_;
-        InputLayer* pInputLayer_;
-        Solver* pSolver_;
+        std::vector<Layer<T>* > layers_;
+        InputLayer<T>* pInputLayer_;
+        Solver<T>* pSolver_;
         //==================================
         KyuNet();
         ~KyuNet();
         //==================================
 
         // Add Solver Function
-        void addSolver(Solver* pSolver);
+        void addSolver(Solver<T>* pSolver);
 
         // Add Layer Function
-        Layer* addInputLayer(std::string id, int batchSize, int h, int w, int c);
+        Layer<T>* addInputLayer(std::string id, int batchSize, int h, int w, int c);
 
-        Layer* addDenseLayer(Layer* prevLayer, std::string id, int unit, ActivationType activationType, InitializerType weightInitType, InitializerType biasInitType);
-        Layer* addDenseLayer(Layer* prevLayer, std::string id, LayerParams params);
+        Layer<T>* addDenseLayer(Layer<T>* prevLayer, std::string id, int unit, ActivationType activationType, InitializerType weightInitType, InitializerType biasInitType);
 
-        Layer* addConvLayer(Layer* prevLayer, std::string id, int kernel_Height, int kernel_width, int kernel_channel, int stride_h, int stride_w, int pad_h, int pad_w, PaddingType paddingType, ActivationType activationType, InitializerType weightInitType, InitializerType biasInitType);
-        Layer* addConvLayer(Layer* prevLayer, std::string id, LayerParams params);
+        Layer<T>* addDenseLayer(Layer<T>* prevLayer, std::string id, LayerParams params);
 
-        Layer* addReluLayer(Layer* prevLayer, std::string id);
+        Layer<T>* addConvLayer(Layer<T>* prevLayer, std::string id, int kernel_Height, int kernel_width, int kernel_channel, int stride_h, int stride_w, int pad_h, int pad_w, PaddingType paddingType, ActivationType activationType, InitializerType weightInitType, InitializerType biasInitType);
 
-        Layer* addSigmoidLayer(Layer* prevLayer, std::string id);
+        Layer<T>* addConvLayer(Layer<T>* prevLayer, std::string id, LayerParams params);
 
-        Layer* addPoolingLayer( Layer* prevLayer, std::string id, int kernel_Height, int kernel_width, int stride_h, int stride_w, int pad_h, int pad_w, PoolingMethodType type);
-        Layer* addPoolingLayer( Layer* prevLayer, std::string id, LayerParams params);
+        Layer<T>* addReluLayer(Layer<T>* prevLayer, std::string id);
 
-        Layer* addSoftmaxLayer( Layer* prevLayer, std::string id);
+        Layer<T>* addSigmoidLayer(Layer<T>* prevLayer, std::string id);
 
-        Layer* addCrossEntropyLossWithSoftmaxLayer( Layer* prevLayer, std::string id);
+        Layer<T>* addPoolingLayer( Layer<T>* prevLayer, std::string id, int kernel_Height, int kernel_width, int stride_h, int stride_w, int pad_h, int pad_w, PoolingMethodType type);
+
+        Layer<T>* addPoolingLayer( Layer<T>* prevLayer, std::string id, LayerParams params);
+
+        Layer<T>* addSoftmaxLayer( Layer<T>* prevLayer, std::string id);
+
+        Layer<T>* addCrossEntropyLossWithSoftmaxLayer( Layer<T>* prevLayer, std::string id);
 
         /**
          * Compile Function: allocate memory
@@ -99,11 +104,11 @@ namespace mkt {
 
         void addBatchLabels(std::string layer, std::vector<int> labels);
         // Helper Function
-        void deFlattenInputImage(unsigned char *pImg, int index, float max_pixel_value=255.0f);
+        void deFlattenInputImage(unsigned char *pImg, int index, int max_pixel_value=255);
         // Getter
         int getNumOfLayer();
-        const InputLayer* getInputLayer();
-        const std::vector<Layer*> getLayers();
+        const InputLayer<T>* getInputLayer();
+        const std::vector<Layer<T>*> getLayers();
 
     };
 

@@ -3,70 +3,72 @@
 
 namespace mkt {
 
-
-
     // Constructor with non parameter
-    SoftmaxLayer::SoftmaxLayer(): pScale_{nullptr}, Layer(LayerType::SOFTMAX) {};
+    template<typename T>
+    SoftmaxLayer<T>::SoftmaxLayer(): pScale_{nullptr}, Layer<T>(LayerType::SOFTMAX) {};
 
-    SoftmaxLayer::SoftmaxLayer(
-        Layer* prevLayer,
+    template<typename T>
+    SoftmaxLayer<T>::SoftmaxLayer(
+        Layer<T>* prevLayer,
         std::string id
-    ): Layer(LayerType::SOFTMAX)
+    ): Layer<T>(LayerType::SOFTMAX)
     {
-        id_ = id;
-        batchSize_ = prevLayer->pDst_->getNumOfData();
+        this->id_ = id;
+        this->batchSize_ = prevLayer->pDst_->getNumOfData();
 
-        pPrevLayer_ = prevLayer;
+        this->pPrevLayer_ = prevLayer;
 
         int ih = prevLayer->pDst_->getHeight();
         int iw = prevLayer->pDst_->getWidth();
         int ic = prevLayer->pDst_->getChannel();
 
-        oh_ = ih;
-        ow_ = iw;
-        oc_ = ic;
+        this->oh_ = ih;
+        this->ow_ = iw;
+        this->oc_ = ic;
 
-        pDst_  = new Tensor{batchSize_, oh_, ow_, oc_};
-        pgDst_ = new Tensor{batchSize_, oh_, ow_, oc_};
+        this->pDst_  = new Tensor<T>{ this->batchSize_, this->oh_, this->ow_, this->oc_ };
+        this->pgDst_ = new Tensor<T>{ this->batchSize_, this->oh_, this->ow_, this->oc_ };
 
         // pScale_ : for a plane of source data
-        pScale_ = new Tensor{1, oh_, ow_, 1};
+        pScale_ = new Tensor<T>{ 1, this->oh_, this->ow_, 1 };
     };
 
     // Destructor
-    SoftmaxLayer::~SoftmaxLayer(){
+    template<typename T>
+    SoftmaxLayer<T>::~SoftmaxLayer(){
         delete pScale_;
     };
 
     /*
      * Initialize
      */
-    void SoftmaxLayer::initialize(NetMode mode) {
+    template<typename T>
+    void SoftmaxLayer<T>::initialize(NetMode mode) {
 
-        MKT_Assert(pDst_ != nullptr, "pDst_ is null");
-        MKT_Assert(pgDst_ != nullptr, "pgDst_ is null");
+        MKT_Assert(this->pDst_ != nullptr, "pDst_ is null");
+        MKT_Assert(this->pgDst_ != nullptr, "pgDst_ is null");
         MKT_Assert(pScale_ != nullptr, "pScale_ is null");
 
-        initOutputTensor();
-        initGradTensor();
+        this->initOutputTensor();
+        this->initGradTensor();
 
         // tensor for Scale data
         pScale_->allocate();
     };
 
-    void SoftmaxLayer::Reshape(int num, int height, int width, int ch) {
-        batchSize_ = num;
-        oh_ = height;
-        ow_ = width;
-        oc_ = ch;
+    template<typename T>
+    void SoftmaxLayer<T>::Reshape(int num, int height, int width, int ch) {
+        this->batchSize_ = num;
+        this->oh_ = height;
+        this->ow_ = width;
+        this->oc_ = ch;
 
-        if (pDst_)
+        if (this->pDst_)
         {
-            // delete pDst_;
-            pDst_->Reshape(num, height, width, ch);
+            this->pDst_->Reshape(num, height, width, ch);
         } else {
-            pDst_ = new Tensor{batchSize_, oh_, ow_, oc_};
-            pDst_->allocate();
+            this->pDst_ = new Tensor<T>{ this->batchSize_, this->oh_, this->ow_, this->oc_ };
+            this->pDst_->allocate();
         }
 
         if (pScale_)
@@ -74,7 +76,7 @@ namespace mkt {
             // delete pScale_;
             pScale_->Reshape(num, height, width, ch);
         } else {
-            pScale_ = new Tensor{1, oh_, ow_, 1};
+            pScale_ = new Tensor<T>{ 1, this->oh_, this->ow_, 1 };
             pScale_->allocate();
         }
 
@@ -83,31 +85,32 @@ namespace mkt {
     /*
      * Computation Function
      */
-    void SoftmaxLayer::Forward() {
+    template<typename T>
+    void SoftmaxLayer<T>::Forward() {
 
         // For now we just use the channel as softmax axis
-        Tensor* pSrc = pPrevLayer_->pDst_;
+        Tensor<T>* pSrc = this->pPrevLayer_->pDst_;
 
-        float* pSrcData = pSrc->getCPUData();
+        T* pSrcData = pSrc->getCPUData();
         int ic = pSrc->getChannel();
         int size2D = pSrc->getSize2D();
         int size3D = pSrc->getSize3D();
 
-        float* pDstData = pDst_->getCPUData();
+        T* pDstData = this->pDst_->getCPUData();
         mem_copy_cpu(pSrc->getWholeSize(), pSrcData, pDstData);
         // Scale data is used to
         // 1. store the maximum value of softmax axis
         // 2. store summation of exp(data)
-        float* pScaleData = pScale_->getCPUData();
+        T* pScaleData = pScale_->getCPUData();
 
         // sum_multiplier is a Row vector (1 x ic) which has all elements are one
-        Tensor sum_multiplier{1, 1, ic, 1}; // 1 X ic vector
+        Tensor<T> sum_multiplier{ 1, 1, ic, 1 }; // 1 X ic vector
         sum_multiplier.allocate();
-        float* pSum_multiple_data = sum_multiplier.getCPUData();
+        T* pSum_multiple_data = sum_multiplier.getCPUData();
         set_memory(sum_multiplier.getWholeSize(), 1, pSum_multiple_data);
 
-        for (int b = 0; b < batchSize_; ++b) {
-            float* curPDstData = pDstData + b*size3D;
+        for (int b = 0; b < this->batchSize_; ++b) {
+            T* curPDstData = pDstData + b*size3D;
 
             // Copy one source data (previouse feature data)
             mem_copy_cpu(size2D, (pSrcData + b*size3D), pScaleData);
@@ -224,11 +227,16 @@ namespace mkt {
         }
     };
 
-    void SoftmaxLayer::Backward() {
+    template<typename T>
+    void SoftmaxLayer<T>::Backward() {
 
         // the derivative of softmax
         // dai/daj = aj(1-aj), if i == j ; i, j in N(number of softmax data)
         // dai/daj = ai*aj    , if i != j ; i, j in N(number of softmax data)
-
+        fprintf(stderr, "%s, %s, %d not yet implemented\n", __FILE__, __func__, __LINE__);
     };
-}
+
+    // Explicitly instantiate the template, and its member definitions
+    template class SoftmaxLayer<float>;
+
+} // namespace mkt

@@ -5,7 +5,8 @@
 
 namespace mkt {
 
-    class InputLayer: public Layer
+    template<typename T>
+    class InputLayer: public Layer<T>
     {
     // private:
     //     LayerType type;
@@ -17,7 +18,7 @@ namespace mkt {
         // Method
         void initialize(NetMode mode);
         void addFlattenImageToTensor(unsigned char *pImg, int index, bool bNormalize);
-        void DeFlattenImage(const float* pData, int height, int width, int channel, unsigned char *pImg);
+        void DeFlattenImage(const T* pData, int height, int width, int channel, unsigned char *pImg);
 
         void Forward(){};
         void Backward(){};

@@ -127,6 +127,8 @@ namespace mkt {
     };
 
     typedef std::vector<int> Shape;
+
+
 } // namespace mkt
 
 

@@ -4,148 +4,154 @@
 namespace mkt {
 
     // Constructor with ID
-    DenseLayer::DenseLayer(
-        Layer* prevLayer,
+    template<typename T>
+    DenseLayer<T>::DenseLayer(
+        Layer<T>* prevLayer,
         std::string id,
         int unit,
         ActivationType actType,
         InitializerType weightInitType,
         InitializerType biasInitType
-    ): unit_{unit}, Layer(LayerType::DENSE, actType, weightInitType, biasInitType)
+    ): unit_{unit}, Layer<T>(LayerType::DENSE, actType, weightInitType, biasInitType)
     {
-        id_ = id;
+        this->id_ = id;
 
-        batchSize_ = prevLayer->pDst_->getNumOfData();
+        this->batchSize_ = prevLayer->pDst_->getNumOfData();
         int h = prevLayer->pDst_->getHeight();
         int w = prevLayer->pDst_->getWidth();
         int c = prevLayer->pDst_->getChannel();
         int input_size3D = prevLayer->pDst_->getSize3D();
 
-        pPrevLayer_ = prevLayer;
+        this->pPrevLayer_ = prevLayer;
 
-        pDst_ = new Tensor{batchSize_, 1, 1, unit};
-        pgDst_ = new Tensor{batchSize_, 1, 1, unit};
+        this->pDst_ = new Tensor<T>{this->batchSize_, 1, 1, unit};
+        this->pgDst_ = new Tensor<T>{this->batchSize_, 1, 1, unit};
 
-        pW_   = new Tensor{1, unit, input_size3D, 1};
-        pgW_  = new Tensor{1, unit, input_size3D, 1};
+        this->pW_   = new Tensor<T>{1, unit, input_size3D, 1};
+        this->pgW_  = new Tensor<T>{1, unit, input_size3D, 1};
 
-        pB_   = new Tensor{1, 1, 1, unit};
-        pgB_  = new Tensor{1, 1, 1, unit};
+        this->pB_   = new Tensor<T>{1, 1, 1, unit};
+        this->pgB_  = new Tensor<T>{1, 1, 1, unit};
 
         // Activator
-        applyActivator();
+        this->applyActivator();
     }
 
     // Constructor without ID
-    DenseLayer::DenseLayer(
-        Layer* prevLayer,
+    template<typename T>
+    DenseLayer<T>::DenseLayer(
+        Layer<T>* prevLayer,
         int unit,
         ActivationType actType,
         InitializerType weightInitType,
         InitializerType biasInitType
-    ): unit_{unit}, Layer(LayerType::DENSE, actType, weightInitType, biasInitType)
+    ): unit_{unit}, Layer<T>(LayerType::DENSE, actType, weightInitType, biasInitType)
     {
-        batchSize_ = prevLayer->pDst_->getNumOfData();
+        this->batchSize_ = prevLayer->pDst_->getNumOfData();
         int h = prevLayer->pDst_->getHeight();
         int w = prevLayer->pDst_->getWidth();
         int c = prevLayer->pDst_->getChannel();
         int input_size3D = prevLayer->pDst_->getSize3D();
 
-        pPrevLayer_ = prevLayer;
+        this->pPrevLayer_ = prevLayer;
 
-        pDst_  = new Tensor{batchSize_, 1, 1, unit_};
-        pgDst_ = new Tensor{batchSize_, 1, 1, unit_};
+        this->pDst_  = new Tensor<T>{this->batchSize_, 1, 1, unit_};
+        this->pgDst_ = new Tensor<T>{this->batchSize_, 1, 1, unit_};
 
-        pW_   = new Tensor{1, unit_, input_size3D, 1};
-        pgW_  = new Tensor{1, unit_, input_size3D, 1};
+        this->pW_   = new Tensor<T>{1, unit_, input_size3D, 1};
+        this->pgW_  = new Tensor<T>{1, unit_, input_size3D, 1};
 
-        pB_   = new Tensor{1, 1, 1, unit_};
-        pgB_  = new Tensor{1, 1, 1, unit_};
+        this->pB_   = new Tensor<T>{1, 1, 1, unit_};
+        this->pgB_  = new Tensor<T>{1, 1, 1, unit_};
 
         // Activator
-        applyActivator();
+        this->applyActivator();
     }
 
-    DenseLayer::DenseLayer(Layer* prevLayer, std::string id, LayerParams params):Layer(LayerType::DENSE) {
+    template<typename T>
+    DenseLayer<T>::DenseLayer(Layer<T>* prevLayer, std::string id, LayerParams params):Layer<T>(LayerType::DENSE) {
 
-        id_ = id;
+        this->id_ = id;
 
-        batchSize_ = prevLayer->pDst_->getNumOfData();
+        this->batchSize_ = prevLayer->pDst_->getNumOfData();
         int h = prevLayer->pDst_->getHeight();
         int w = prevLayer->pDst_->getWidth();
         int c = prevLayer->pDst_->getChannel();
         int input_size3D = prevLayer->pDst_->getSize3D();
 
-        pPrevLayer_ = prevLayer;
+        this->pPrevLayer_ = prevLayer;
 
         // Parameter setting
-        activationType_ = params.actType;
-        weightInitType_ = params.weight_init_type;
-        biasInitType_   = params.bias_init_type;
+        this->activationType_ = params.actType;
+        this->weightInitType_ = params.weight_init_type;
+        this->biasInitType_   = params.bias_init_type;
 
         unit_ = params.fc;
 
-        pDst_ = new Tensor{batchSize_, 1, 1, unit_};
-        pgDst_ = new Tensor{batchSize_, 1, 1, unit_};
+        this->pDst_ = new Tensor<T>{this->batchSize_, 1, 1, unit_};
+        this->pgDst_ = new Tensor<T>{this->batchSize_, 1, 1, unit_};
 
-        pW_   = new Tensor{1, unit_, input_size3D, 1};
-        pgW_  = new Tensor{1, unit_, input_size3D, 1};
+        this->pW_   = new Tensor<T>{1, unit_, input_size3D, 1};
+        this->pgW_  = new Tensor<T>{1, unit_, input_size3D, 1};
 
-        pB_   = new Tensor{1, 1, 1, unit_};
-        pgB_  = new Tensor{1, 1, 1, unit_};
+        this->pB_   = new Tensor<T>{1, 1, 1, unit_};
+        this->pgB_  = new Tensor<T>{1, 1, 1, unit_};
 
         // Activator
-        applyActivator();
+        this->applyActivator();
     }
 
     /* Destructor */
-    DenseLayer::~DenseLayer(){
+    template<typename T>
+    DenseLayer<T>::~DenseLayer(){
         fprintf(stderr, "--------------------- denseLayer Destructor\n");
     }
 
-    void DenseLayer::initialize(NetMode mode) {
+    template<typename T>
+    void DenseLayer<T>::initialize(NetMode mode) {
 
-        MKT_Assert(pDst_ != nullptr, "pDst_ is null");
-        MKT_Assert(pgDst_ != nullptr, "pgDst_ is null");
-        MKT_Assert(pW_ != nullptr, "pW_ is null");
-        MKT_Assert(pgW_ != nullptr, "pgW_ is null");
-        MKT_Assert(pB_ != nullptr, "pB_ is null");
-        MKT_Assert(pgB_ != nullptr, "pgB_ is null");
+        MKT_Assert(this->pDst_ != nullptr, "pDst_ is null");
+        MKT_Assert(this->pgDst_ != nullptr, "pgDst_ is null");
+        MKT_Assert(this->pW_ != nullptr, "pW_ is null");
+        MKT_Assert(this->pgW_ != nullptr, "pgW_ is null");
+        MKT_Assert(this->pB_ != nullptr, "pB_ is null");
+        MKT_Assert(this->pgB_ != nullptr, "pgB_ is null");
 
-        MKT_Assert(pActivator_ != nullptr, "pActivator_ is null");
+        MKT_Assert(this->pActivator_ != nullptr, "pActivator_ is null");
 
-        initOutputTensor();
-        initWeightTensor();
-        initBiasTensor();
+        this->initOutputTensor();
+        this->initWeightTensor();
+        this->initBiasTensor();
 
-        initGradTensor();
-        initGradWeightTensor();
-        initGradBiasTensor();
+        this->initGradTensor();
+        this->initGradWeightTensor();
+        this->initGradBiasTensor();
     }
 
-    void DenseLayer::Forward() {
+    template<typename T>
+    void DenseLayer<T>::Forward() {
 
         // 1. Rest data
-        pDst_->resetData();
-        pgDst_->resetData();
-        pgW_->resetData();
-        pgB_->resetData();
+        this->pDst_->resetData();
+        this->pgDst_->resetData();
+        this->pgW_->resetData();
+        this->pgB_->resetData();
 
-        Tensor* pSrc = pPrevLayer_->pDst_;
+        Tensor<T>* pSrc = this->pPrevLayer_->pDst_;
 
         // int batchSize = pSrc->getNumOfData();
 
-        float* pSrcData = pSrc->getCPUData();
+        T* pSrcData = pSrc->getCPUData();
         int srcSize3D = pSrc->getSize3D();
 
-        float* pDstData = pDst_->getCPUData();
-        int dstSize3D = pDst_->getSize3D();
+        T* pDstData = this->pDst_->getCPUData();
+        int dstSize3D = this->pDst_->getSize3D();
 
-        float* pWData = pW_->getCPUData();
+        T* pWData = this->pW_->getCPUData();
 
 
         gemm_cpu(CblasNoTrans, CblasTrans,      /* trans_A, trans_B  */
-            batchSize_, dstSize3D, srcSize3D,   /* M, N, K           */
+            this->batchSize_, dstSize3D, srcSize3D,   /* M, N, K           */
             1.0f,                               /* ALPHA             */
             pSrcData, srcSize3D,                /* A,       lda(K)   */
             pWData,   srcSize3D,                /* B,       ldb(K)   */
@@ -156,34 +162,35 @@ namespace mkt {
         // addBias();
 
         // 4. A = next layer input = activation(Z)
-        int fc_dst_c = pDst_->getChannel();
-        int fc_dst_h = pDst_->getHeight();
-        int fc_dst_w = pDst_->getWidth();
+        int fc_dst_c = this->pDst_->getChannel();
+        int fc_dst_h = this->pDst_->getHeight();
+        int fc_dst_w = this->pDst_->getWidth();
 
-        if (activationType_ != ActivationType::NONE)
+        if (this->activationType_ != ActivationType::NONE)
         {
-            pActivator_->Forward(*pDst_, *pDst_);
+            this->pActivator_->Forward(this->pDst_, this->pDst_);
         }
     }
 
-    void DenseLayer::Backward() {
+    template<typename T>
+    void DenseLayer<T>::Backward() {
 
-        float* pWData = pW_->getCPUData();
-        int dstSize3D = pDst_->getSize3D();
+        T* pWData = this->pW_->getCPUData();
+        int dstSize3D = this->pDst_->getSize3D();
 
-        float* pgDstData = pgDst_->getCPUData();
-        int gDst_size3D = pgDst_->getSize3D();
+        T* pgDstData = this->pgDst_->getCPUData();
+        int gDst_size3D = this->pgDst_->getSize3D();
 
         // 1. Back from Activator first
-        if (activationType_ != ActivationType::NONE)
+        if (this->activationType_ != ActivationType::NONE)
         {
-            pActivator_->Backward(*pDst_, *pgDst_, *pgDst_);
+            this->pActivator_->Backward(this->pDst_, this->pgDst_, this->pgDst_);
         }
 
         // 2. [Update gradient with respect to Bias]
         // dL/db = d^(l+1)
-        float* pgBData = pgB_->getCPUData();
-        for (int i = 0; i < batchSize_; ++i)
+        T* pgBData = this->pgB_->getCPUData();
+        for (int i = 0; i < this->batchSize_; ++i)
         {
             axpy(gDst_size3D, 1.0f, pgDstData + i * gDst_size3D, pgBData);
         }
@@ -199,16 +206,16 @@ namespace mkt {
          * C = pgWData   (N x K) = (Dst_Size3D x Src_Size3D)
          * C = A*B+C = (N xM) * (M x K) + (N x K) = (N x K) + (N x K)
          *************************************************************/
-        float* pgWData = pgW_->getCPUData();
+        T* pgWData = this->pgW_->getCPUData();
 
-        float* pSrcData = pPrevLayer_->pDst_->getCPUData();
-        int src_size3D = pPrevLayer_->pDst_->getSize3D();
+        T* pSrcData = this->pPrevLayer_->pDst_->getCPUData();
+        int src_size3D = this->pPrevLayer_->pDst_->getSize3D();
 
-        int dst_size3D = pDst_->getSize3D();
+        int dst_size3D = this->pDst_->getSize3D();
         // pgWData will be reset after update weight
         gemm_cpu(
             CblasTrans, CblasNoTrans,
-            dst_size3D, src_size3D, batchSize_,
+            dst_size3D, src_size3D, this->batchSize_,
             1.0f,
             pgDstData, dst_size3D,
             pSrcData, src_size3D,
@@ -238,15 +245,15 @@ namespace mkt {
          * B = pWdata    (N x K)
          * C = pSrc_gData = A * B = (M x N) (N x K) = (M x K)
          **********************************************************************************/
-        if (pPrevLayer_->pgDst_)
+        if (this->pPrevLayer_->pgDst_)
         {
-            float* pSrc_gData = pPrevLayer_->pgDst_->getCPUData();
-            int srcSize3D = pPrevLayer_->pgDst_->getSize3D();
+            T* pSrc_gData = this->pPrevLayer_->pgDst_->getCPUData();
+            int srcSize3D = this->pPrevLayer_->pgDst_->getSize3D();
 
             // pSrc_dif = pgDstData * pWdata + pSrc_dif
             gemm_cpu(
                 CblasNoTrans, CblasNoTrans,
-                batchSize_, srcSize3D, dstSize3D,
+                this->batchSize_, srcSize3D, dstSize3D,
                 1.0f,
                 pgDstData, gDst_size3D,
                 pWData, src_size3D,
@@ -255,7 +262,11 @@ namespace mkt {
             );
         }
     }
-}
+
+    // Explicitly instantiate the template, and its member definitions
+    template class DenseLayer<float>;
+
+} // namespce mkt
 
 
 /**

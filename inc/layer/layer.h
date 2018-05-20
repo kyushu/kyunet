@@ -47,7 +47,7 @@
 
 namespace mkt {
 
-
+    template<typename T>
     class Layer
     {
     protected:
@@ -61,17 +61,17 @@ namespace mkt {
         std::string id_;
         Layer *pPrevLayer_; // point to dst_tensor of previous layer
 
-        Tensor *pDst_;      // destination tensor
-        Tensor* pgDst_;      // derivate data
+        Tensor<T>* pDst_;      // destination tensor
+        Tensor<T>* pgDst_;      // derivate data
 
-        Tensor *pW_;        // weight tensor
-        Tensor *pgW_;       // derivate data of weight
+        Tensor<T> *pW_;        // weight tensor
+        Tensor<T> *pgW_;       // derivate data of weight
 
-        Tensor* pB_;        // bias tensor
-        Tensor* pgB_;       // derviate data of bias
+        Tensor<T>* pB_;        // bias tensor
+        Tensor<T>* pgB_;       // derviate data of bias
         bool bUseBias;
 
-        Activator* pActivator_;
+        Activator<T>* pActivator_;
 
         int batchSize_;
 

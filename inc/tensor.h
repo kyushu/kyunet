@@ -32,6 +32,7 @@
 #include "definitions.h"
 
 namespace mkt {
+    template<typename T>
     class Tensor
     {
     private:
@@ -43,7 +44,7 @@ namespace mkt {
         int size2D_;
         int size3D_;
         int wholeSize_;
-        float *pData_;   // data
+        T *pData_;   // data
     public:
         int wrIdx_;
 
@@ -77,7 +78,7 @@ namespace mkt {
 
         // Getter
         Shape getShape();
-        float* getCPUData();
+        T* getCPUData();
         int getNumOfData();
         int getChannel();
         int getWidth();

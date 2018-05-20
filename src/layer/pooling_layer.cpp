@@ -6,8 +6,9 @@
 
 namespace mkt {
 
-    PoolingLayer::PoolingLayer(
-        Layer* prevLayer,
+    template<typename T>
+    PoolingLayer<T>::PoolingLayer(
+        Layer<T>* prevLayer,
         std::string id,
         int fh,
         int fw,
@@ -21,51 +22,52 @@ namespace mkt {
         stride_h_{stride_h}, stride_w_{stride_w},
         pad_h_{pad_h}, pad_w_{pad_w},
         type_{type},
-        Layer(LayerType::POOLING)
+        Layer<T>(LayerType::POOLING)
     {
-        id_ = id;
+        this->id_ = id;
 
-        batchSize_ = prevLayer->pDst_->getNumOfData();
+        this->batchSize_ = prevLayer->pDst_->getNumOfData();
         int ih = prevLayer->pDst_->getHeight();
         int iw = prevLayer->pDst_->getWidth();
         int ic = prevLayer->pDst_->getChannel();
 
-        pPrevLayer_ = prevLayer;
+        this->pPrevLayer_ = prevLayer;
 
-        oc_ = ic;
+        this->oc_ = ic;
         // calculate pDst size: ow = (W-f +2p)/s +1
-        ow_ = static_cast<int>( ceil( static_cast<float>(iw - fw_ + 2*pad_w_) / stride_w_ ) ) + 1;
-        oh_ = static_cast<int>( ceil( static_cast<float>(ih - fh_ + 2*pad_h_) / stride_h_ ) ) + 1;
+        this->ow_ = static_cast<int>( ceil( static_cast<float>(iw - fw_ + 2*pad_w_) / stride_w_ ) ) + 1;
+        this->oh_ = static_cast<int>( ceil( static_cast<float>(ih - fh_ + 2*pad_h_) / stride_h_ ) ) + 1;
 
         if (pad_h_ || pad_w_)
         {
-            if ((ow_ - 1) * stride_w_ > iw + pad_w_) { --ow_; }
-            if ((oh_ - 1) * stride_h_ > ih + pad_h_) { --oh_; }
+            if (( this->ow_ - 1 ) * stride_w_ > iw + pad_w_) { --this->ow_; }
+            if (( this->oh_ - 1 ) * stride_h_ > ih + pad_h_) { --this->oh_; }
         }
 
-        MKT_Assert((ow_-1)*stride_w_ < iw + pad_w_, "polling size");
-        MKT_Assert((oh_-1)*stride_h_ < ih + pad_h_, "polling size");
+        MKT_Assert(( this->ow_-1)*stride_w_ < iw + pad_w_, "polling size");
+        MKT_Assert(( this->oh_-1)*stride_h_ < ih + pad_h_, "polling size");
 
-        pDst_  = new Tensor{batchSize_, oh_, ow_, oc_};
-        pgDst_ = new Tensor{batchSize_, oh_, ow_, oc_};
+        this->pDst_  = new Tensor<T>{ this->batchSize_, this->oh_, this->ow_, this->oc_};
+        this->pgDst_ = new Tensor<T>{ this->batchSize_, this->oh_, this->ow_, this->oc_};
 
         if (type_ == PoolingMethodType::MAX)
         {
             // For storing index of max value of src data in each pooling window
-            pMask = new Tensor{batchSize_, oh_, ow_, oc_};
+            pMask = new Tensor<T>{ this->batchSize_, this->oh_, this->ow_, this->oc_ };
         }
     }
 
-    PoolingLayer::PoolingLayer(Layer* prevLayer, std::string id, LayerParams params):Layer(LayerType::POOLING) {
+    template<typename T>
+    PoolingLayer<T>::PoolingLayer(Layer<T>* prevLayer, std::string id, LayerParams params):Layer<T>(LayerType::POOLING) {
 
-        id_ = id;
+        this->id_ = id;
 
-        batchSize_ = prevLayer->pDst_->getNumOfData();
+        this->batchSize_ = prevLayer->pDst_->getNumOfData();
         int ih = prevLayer->pDst_->getHeight();
         int iw = prevLayer->pDst_->getWidth();
         int ic = prevLayer->pDst_->getChannel();
 
-        pPrevLayer_ = prevLayer;
+        this->pPrevLayer_ = prevLayer;
 
         // Parameter setting
         type_ = params.pooling_type;
@@ -78,44 +80,46 @@ namespace mkt {
         pad_h_ = params.pad_h;
         pad_w_ = params.pad_w;
 
-        oc_ = ic;
+        this->oc_ = ic;
         // calculate pDst size: ow = (W-f +2p)/s +1
-        ow_ = static_cast<int>( ceil( static_cast<float>(iw - fw_ + 2*pad_w_) / stride_w_ ) ) + 1;
-        oh_ = static_cast<int>( ceil( static_cast<float>(ih - fh_ + 2*pad_h_) / stride_h_ ) ) + 1;
+        this->ow_ = static_cast<int>( ceil( static_cast<float>(iw - fw_ + 2*pad_w_) / stride_w_ ) ) + 1;
+        this->oh_ = static_cast<int>( ceil( static_cast<float>(ih - fh_ + 2*pad_h_) / stride_h_ ) ) + 1;
 
         if (pad_h_ || pad_w_)
         {
-            if ((ow_ - 1) * stride_w_ > iw + pad_w_) { --ow_; }
-            if ((oh_ - 1) * stride_h_ > ih + pad_h_) { --oh_; }
+            if (( this->ow_ - 1 ) * stride_w_ > iw + pad_w_) { --this->ow_; }
+            if (( this->oh_ - 1 ) * stride_h_ > ih + pad_h_) { --this->oh_; }
         }
 
-        MKT_Assert((ow_-1)*stride_w_ < iw + pad_w_, "polling size");
-        MKT_Assert((oh_-1)*stride_h_ < ih + pad_h_, "polling size");
+        MKT_Assert(( this->ow_-1 )*stride_w_ < iw + pad_w_, "polling size");
+        MKT_Assert(( this->oh_-1 )*stride_h_ < ih + pad_h_, "polling size");
 
-        pDst_  = new Tensor{batchSize_, oh_, ow_, oc_};
-        pgDst_ = new Tensor{batchSize_, oh_, ow_, oc_};
+        this->pDst_  = new Tensor<T>{ this->batchSize_, this->oh_, this->ow_, this->oc_ };
+        this->pgDst_ = new Tensor<T>{ this->batchSize_, this->oh_, this->ow_, this->oc_ };
 
         if (type_ == PoolingMethodType::MAX)
         {
             // For storing index of max value of src data in each pooling window
-            pMask = new Tensor{batchSize_, oh_, ow_, oc_};
+            pMask = new Tensor<T>{ this->batchSize_, this->oh_, this->ow_, this->oc_};
         }
     }
 
     // Destructor
-    PoolingLayer::~PoolingLayer() {
+    template<typename T>
+    PoolingLayer<T>::~PoolingLayer() {
 
     }
 
 
     // Initialization
-    void PoolingLayer::initialize(NetMode mode) {
+    template<typename T>
+    void PoolingLayer<T>::initialize(NetMode mode) {
 
-        MKT_Assert(pDst_ != nullptr, "pDst_ is null");
-        MKT_Assert(pgDst_ != nullptr, "pgDst_ is null");
+        MKT_Assert( this->pDst_ != nullptr, "pDst_ is null");
+        MKT_Assert( this->pgDst_ != nullptr, "pgDst_ is null");
 
-        initOutputTensor();
-        initGradTensor();
+        this->initOutputTensor();
+        this->initGradTensor();
 
         if (type_ == PoolingMethodType::MAX)
         {
@@ -125,30 +129,31 @@ namespace mkt {
     }
 
     // Computation Function
-    void PoolingLayer::Forward() {
+    template<typename T>
+    void PoolingLayer<T>::Forward() {
 
         // Reset data
-        pDst_->resetData();
-        pgDst_->resetData();
+        this->pDst_->resetData();
+        this->pgDst_->resetData();
 
-        Tensor* pSrc = pPrevLayer_->pDst_;
-        float* pSrcData = pSrc->getCPUData();
+        Tensor<T>* pSrc = this->pPrevLayer_->pDst_;
+        T* pSrcData = pSrc->getCPUData();
         int src_size2d = pSrc->getSize2D();
         int ih = pSrc->getHeight();
         int iw = pSrc->getWidth();
 
-        float* pDstData = pDst_->getCPUData();
-        int dst_size2D = pDst_->getSize2D();
+        T* pDstData = this->pDst_->getCPUData();
+        int dst_size2D = this->pDst_->getSize2D();
 
         switch (type_) {
             case PoolingMethodType::MAX:
             {
-                float* pMaskData = pMask->getCPUData();
+                T* pMaskData = pMask->getCPUData();
 
-                for (int b = 0; b < batchSize_; ++b) {
-                    for (int c = 0; c < oc_; ++c) {
-                        for (int ph = 0; ph < oh_; ++ph) {
-                            for (int pw = 0; pw < ow_; ++pw) {
+                for (int b = 0; b < this->batchSize_; ++b) {
+                    for (int c = 0; c < this->oc_; ++c) {
+                        for (int ph = 0; ph < this->oh_; ++ph) {
+                            for (int pw = 0; pw < this->ow_; ++pw) {
                                 int hstart = ph * stride_h_ - pad_h_;
                                 int wstart = pw * stride_w_ - pad_w_;
                                 int hend = std::min(hstart + fh_, ih);
@@ -156,7 +161,7 @@ namespace mkt {
                                 hstart = std::max(hstart, 0);
                                 wstart = std::max(wstart, 0);
 
-                                int pool_index = ph * ow_ + pw;
+                                int pool_index = ph * this->ow_ + pw;
                                 float fmax = -FLT_MAX;
 
                                 // pooling window
@@ -186,10 +191,10 @@ namespace mkt {
             }
                 break;
             case PoolingMethodType::AVG:
-                for (int b = 0; b < batchSize_; ++b) {
-                    for (int c = 0; c < oc_; ++c) {
-                        for (int ph = 0; ph < oh_; ++ph) {
-                            for (int pw = 0; pw < ow_; ++pw) {
+                for (int b = 0; b < this->batchSize_; ++b) {
+                    for (int c = 0; c < this->oc_; ++c) {
+                        for (int ph = 0; ph < this->oh_; ++ph) {
+                            for (int pw = 0; pw < this->ow_; ++pw) {
                                 int hstart = ph * stride_h_ - pad_h_;
                                 int wstart = pw * stride_w_ - pad_w_;
 
@@ -205,8 +210,8 @@ namespace mkt {
                                 hend = std::min(hend, ih);
                                 wend = std::min(wend, iw);
 
-                                int pool_index = ph * ow_ + pw;
-                                float favg = 0;
+                                int pool_index = ph * this->ow_ + pw;
+                                T favg = 0;
                                 for (int h = hstart; h < hend; ++h){
                                     for (int w = wstart; w < wend; ++w){
                                         int index = h * iw + w;
@@ -229,26 +234,27 @@ namespace mkt {
         }
     }
 
-    void PoolingLayer::Backward() {
+    template<typename T>
+    void PoolingLayer<T>::Backward() {
 
-        float* pgDstData = pgDst_->getCPUData();
-        int dst_size2D = pgDst_->getSize2D();
-        float* pgSrcData = pPrevLayer_->pgDst_->getCPUData();
-        int ih = pPrevLayer_->pgDst_->getHeight();
-        int iw = pPrevLayer_->pgDst_->getWidth();
-        int src_size2d = pPrevLayer_->pgDst_->getSize2D();
+        T* pgDstData = this->pgDst_->getCPUData();
+        int dst_size2D = this->pgDst_->getSize2D();
+        T* pgSrcData = this->pPrevLayer_->pgDst_->getCPUData();
+        int ih = this->pPrevLayer_->pgDst_->getHeight();
+        int iw = this->pPrevLayer_->pgDst_->getWidth();
+        int src_size2d = this->pPrevLayer_->pgDst_->getSize2D();
 
         switch(type_) {
             case PoolingMethodType::MAX:
             {
-                float* pMaskData = pMask->getCPUData();
+                T* pMaskData = pMask->getCPUData();
 
-                for (int b = 0; b < batchSize_; ++b) {
-                    for (int c = 0; c < oc_; ++c) {
+                for (int b = 0; b < this->batchSize_; ++b) {
+                    for (int c = 0; c < this->oc_; ++c) {
                         // Pooling window
-                        for (int ph = 0; ph < oh_; ++ph) {
-                            for (int pw = 0; pw < ow_; ++pw) {
-                                int pool_index = ph * ow_ + pw;
+                        for (int ph = 0; ph < this->oh_; ++ph) {
+                            for (int pw = 0; pw < this->ow_; ++pw) {
+                                int pool_index = ph * this->ow_ + pw;
                                 int src_index = pMaskData[pool_index];
                                 pgSrcData[src_index] += pgDstData[pool_index];
                             }
@@ -264,11 +270,11 @@ namespace mkt {
             }
                 break;
             case PoolingMethodType::AVG:
-                 for (int b = 0; b < batchSize_; ++b) {
-                    for (int c = 0; c < oc_; ++c) {
+                 for (int b = 0; b < this->batchSize_; ++b) {
+                    for (int c = 0; c < this->oc_; ++c) {
                         // Pooling window
-                        for (int ph = 0; ph < oh_; ++ph) {
-                            for (int pw = 0; pw < ow_; ++pw) {
+                        for (int ph = 0; ph < this->oh_; ++ph) {
+                            for (int pw = 0; pw < this->ow_; ++pw) {
                                 int hstart = ph * stride_h_ - pad_h_;
                                 int wstart = pw * stride_w_ - pad_w_;
                                 int hend = std::min(hstart + fh_, ih+pad_h_);
@@ -281,7 +287,7 @@ namespace mkt {
 
                                 for (int h = hstart; h < hend; ++h){
                                     for (int w = wstart; w < wend; ++w){
-                                        pgSrcData[h*iw + w] += pgDstData[ph*ow_ + pw] / pool_size;
+                                        pgSrcData[h*iw + w] += pgDstData[ph*this->ow_ + pw] / pool_size;
                                     }
                                 }
                             }
@@ -297,12 +303,16 @@ namespace mkt {
     }
 
     // Getter Function
-    int PoolingLayer::getFiltergetHeight() {
+    template<typename T>
+    int PoolingLayer<T>::getFiltergetHeight() {
         return fh_;
     }
-    int PoolingLayer::getFiltergetWidth() {
+    template<typename T>
+    int PoolingLayer<T>::getFiltergetWidth() {
         return fw_;
     }
 
+    // Explicitly instantiate the template, and its member definitions
+    template class PoolingLayer<float>;
 
-}
+} // namespace mkt

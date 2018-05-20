@@ -17,16 +17,16 @@ int main(int argc, char const *argv[])
 
 
     // Config KyuNet
-    KyuNet net;
-    InputLayer* pInputLayer = (InputLayer *)net.addInputLayer("input", batchSize, height, width, channel);
-    Layer *pPoolingLayer = net.addPoolingLayer( pInputLayer, "Pooling", 2, 2, 1, 1, 0, 0, PoolingMethodType::MAX);
+    KyuNet<float> net;
+    InputLayer<float>* pInputLayer = (InputLayer<float> *)net.addInputLayer("input", batchSize, height, width, channel);
+    Layer<float> *pPoolingLayer = net.addPoolingLayer( pInputLayer, "Pooling", 2, 2, 1, 1, 0, 0, PoolingMethodType::MAX);
 
     // initialize KyuNet (allocate memory space)
     net.Compile(NetMode::TRAINING);
 
     // Set pseudo data
     // std::srand (time(NULL));
-    Tensor* pInputTensor = pInputLayer->pDst_;
+    Tensor<float>* pInputTensor = pInputLayer->pDst_;
     float* pInDstData = pInputTensor->getCPUData();
     for (int b = 0; b < batchSize; ++b)
     {
@@ -49,7 +49,7 @@ int main(int argc, char const *argv[])
 
 
     // output
-    Tensor *pDst = pPoolingLayer->pDst_;
+    Tensor<float> *pDst = pPoolingLayer->pDst_;
     float* pDstData = pDst->getCPUData();
     int batchsize = pDst->getNumOfData();
     int wholeSize = pDst->getWholeSize();

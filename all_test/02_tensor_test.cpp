@@ -57,7 +57,7 @@ void test_load_image_file(std::string img_dir) {
     mkt::listdir(img_dir.c_str(), file_list);
 
     // Instantiate an Tensor
-    mkt::Tensor tensor(file_list.size(), 480, 600, 3);
+    mkt::Tensor<float> tensor(file_list.size(), 480, 600, 3);
     // mkt::Tensor tensor;
     // tensor.height_ = 480;
     // tensor.width_ = 600;

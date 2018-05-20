@@ -88,8 +88,8 @@ void test_flatten_image() {
 
 
     // Configure, initialize network
-    KyuNet net;
-    InputLayer* pInput = (InputLayer *)net.addInputLayer("input", batchSize, height, width, channel);
+    KyuNet<float> net;
+    InputLayer<float>* pInput = (InputLayer<float> *)net.addInputLayer("input", batchSize, height, width, channel);
     net.Compile(NetMode::TRAINING);
 
     // Get InputLayer
@@ -139,7 +139,7 @@ void test_add_batch_image() {
     int num_iter = file_list.size() / batchSize;
 
 
-    KyuNet net;
+    KyuNet<float> net;
     /*************************************************
      * Step 1. Configure KyuNetwork
      * We will demonstrate how to add batch image data
@@ -174,7 +174,7 @@ void test_add_batch_image() {
     /***********************************************
      * Verify
      **********************************************/
-    const InputLayer* pInput = net.getInputLayer();
+    const InputLayer<float>* pInput = net.getInputLayer();
     const float *pdata = pInput->pDst_->getCPUData();
     int size3D = pInput->pDst_->getSize3D();
     fprintf(stderr, "size3D: %d\n", size3D);

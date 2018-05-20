@@ -2,51 +2,59 @@
 
 namespace mkt {
 
-    ReluLayer::ReluLayer(
-        Layer* prevLayer,
+    template<typename T>
+    ReluLayer<T>::ReluLayer(
+        Layer<T>* prevLayer,
         std::string id,
-        float negative_slope
-    ): negative_slope_{negative_slope}, Layer(LayerType::RELU)
+        T negative_slope
+    ): negative_slope_{negative_slope}, Layer<T>(LayerType::RELU)
     {
 
-        id_ = id;
+        this->id_ = id;
 
-        batchSize_ = prevLayer->pDst_->getNumOfData();
+        this->batchSize_ = prevLayer->pDst_->getNumOfData();
 
-        pPrevLayer_ = prevLayer;
+        this->pPrevLayer_ = prevLayer;
 
         int ih = prevLayer->pDst_->getHeight();
         int iw = prevLayer->pDst_->getWidth();
         int ic = prevLayer->pDst_->getChannel();
 
-        oh_ = ih;
-        ow_ = iw;
-        oc_ = ic;
+        this->oh_ = ih;
+        this->ow_ = iw;
+        this->oc_ = ic;
 
-        pDst_  = new Tensor{batchSize_, oh_, ow_, oc_};
-        pgDst_ = new Tensor{batchSize_, oh_, ow_, oc_};
-
-    };
-
-    ReluLayer::~ReluLayer() {};
-
-    void ReluLayer::initialize(NetMode mode) {
-
-        MKT_Assert(pDst_ != nullptr, "pDst_ is null");
-        MKT_Assert(pgDst_ != nullptr, "pgDst_ is null");
-
-        initOutputTensor();
-        initGradTensor();
-    };
-
-
-    void ReluLayer::Forward() {
-        Tensor* pSrc = pPrevLayer_->pDst_;
-
-        relu_act_.Forward(*pSrc, *pDst_);
-    };
-
-    void ReluLayer::Backward() {
+        this->pDst_  = new Tensor<T>{ this->batchSize_, this->oh_, this->ow_, this->oc_ };
+        this->pgDst_ = new Tensor<T>{ this->batchSize_, this->oh_, this->ow_, this->oc_ };
 
     };
-}
+
+    template<typename T>
+    ReluLayer<T>::~ReluLayer() {};
+
+    template<typename T>
+    void ReluLayer<T>::initialize(NetMode mode) {
+
+        MKT_Assert( this->pDst_ != nullptr, "pDst_ is null" );
+        MKT_Assert( this->pgDst_ != nullptr, "pgDst_ is null" );
+
+        this->initOutputTensor();
+        this->initGradTensor();
+    };
+
+    template<typename T>
+    void ReluLayer<T>::Forward() {
+        Tensor<T>* pSrc = this->pPrevLayer_->pDst_;
+
+        relu_act_.Forward(pSrc, this->pDst_);
+    };
+
+    template<typename T>
+    void ReluLayer<T>::Backward() {
+        fprintf(stderr, "%s: %s: %d\n", __FILE__, __func__, __LINE__);
+    };
+
+    // Explicitly instantiate the template, and its member definitions
+    template class ReluLayer<float>;
+
+} // namespace mkt

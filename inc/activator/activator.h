@@ -8,12 +8,13 @@
 namespace mkt {
 
     // Abstract Class
+    template<typename T>
     class Activator
     {
     public:
         virtual ~Activator(){};
-        virtual void Forward(Tensor &src, Tensor &dst)=0;                           // forward pass
-        virtual void Backward(Tensor &src, Tensor &src_grad, Tensor &dst_grad)=0;   // back propagation
+        virtual void Forward(Tensor<T> *src, Tensor<T> *dst)=0;                           // forward pass
+        virtual void Backward(Tensor<T> *src, Tensor<T> *src_grad, Tensor<T> *dst_grad)=0;   // back propagation
     };
 
 

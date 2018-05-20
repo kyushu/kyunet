@@ -10,12 +10,12 @@
 using namespace mkt;
 
 void test_axpy() {
-    Tensor a{2, 8, 1, 1};
+    Tensor<float> a{2, 8, 1, 1};
     a.allocate();
     float* a_data = a.getCPUData();
 
 
-    Tensor b{1, 8, 1, 1};
+    Tensor<float> b{1, 8, 1, 1};
     b.allocate();
     float* b_data = b.getCPUData();
     for (int i = 0; i < b.getWholeSize(); ++i)

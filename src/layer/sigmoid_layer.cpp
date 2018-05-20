@@ -2,49 +2,57 @@
 
 namespace mkt {
 
-    SigmoidLayer::SigmoidLayer(
-        Layer* prevLayer,
+    template<typename T>
+    SigmoidLayer<T>::SigmoidLayer(
+        Layer<T>* prevLayer,
         std::string id
-    ): Layer(LayerType::SIGMOID)
+    ): Layer<T>(LayerType::SIGMOID)
     {
-        id_ = id;
+        this->id_ = id;
 
-        batchSize_ = prevLayer->pDst_->getNumOfData();
+        this->batchSize_ = prevLayer->pDst_->getNumOfData();
 
-        pPrevLayer_ = prevLayer;
+        this->pPrevLayer_ = prevLayer;
 
         int ih = prevLayer->pDst_->getHeight();
         int iw = prevLayer->pDst_->getWidth();
         int ic = prevLayer->pDst_->getChannel();
 
-        oh_ = ih;
-        ow_ = iw;
-        oc_ = ic;
+        this->oh_ = ih;
+        this->ow_ = iw;
+        this->oc_ = ic;
 
-        pDst_  = new Tensor{batchSize_, oh_, ow_, oc_};
-        pgDst_ = new Tensor{batchSize_, oh_, ow_, oc_};
-
-    };
-
-    SigmoidLayer::~SigmoidLayer() {};
-
-    void SigmoidLayer::initialize(NetMode mode) {
-        MKT_Assert(pDst_ != nullptr, "pDst_ is null");
-        MKT_Assert(pgDst_ != nullptr, "pgDst_ is null");
-
-        initOutputTensor();
-        initGradTensor();
-    };
-
-
-    void SigmoidLayer::Forward() {
-
-        Tensor* pSrc = pPrevLayer_->pDst_;
-
-        sigmoid_act_.Forward(*pSrc, *pDst_);
-    };
-
-    void SigmoidLayer::Backward() {
+        this->pDst_  = new Tensor<T>{ this->batchSize_, this->oh_, this->ow_, this->oc_};
+        this->pgDst_ = new Tensor<T>{ this->batchSize_, this->oh_, this->ow_, this->oc_};
 
     };
-}
+
+    template<typename T>
+    SigmoidLayer<T>::~SigmoidLayer() {};
+
+    template<typename T>
+    void SigmoidLayer<T>::initialize(NetMode mode) {
+        MKT_Assert( this->pDst_ != nullptr, "pDst_ is null" );
+        MKT_Assert( this->pgDst_ != nullptr, "pgDst_ is null" );
+
+        this->initOutputTensor();
+        this->initGradTensor();
+    };
+
+    template<typename T>
+    void SigmoidLayer<T>::Forward() {
+
+        Tensor<T>* pSrc = this->pPrevLayer_->pDst_;
+
+        sigmoid_act_.Forward(pSrc, this->pDst_);
+    };
+
+    template<typename T>
+    void SigmoidLayer<T>::Backward() {
+        fprintf(stderr, "%s: %s: %d\n", __FILE__, __func__, __LINE__);
+    };
+
+    // Explicitly instantiate the template, and its member definitions
+    template class SigmoidLayer<float>;
+
+} // namespace mkt

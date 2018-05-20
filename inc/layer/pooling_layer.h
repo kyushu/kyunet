@@ -5,7 +5,8 @@
 
 namespace mkt {
 
-    class PoolingLayer: public Layer
+    template<typename T>
+    class PoolingLayer: public Layer<T>
     {
     public:
         int fh_; // filter height
@@ -16,16 +17,16 @@ namespace mkt {
         int pad_w_;
         PoolingMethodType type_;
 
-        Tensor* pMask;
+        Tensor<T>* pMask;
 
 
-        PoolingLayer(Layer* prevLayer, std::string id,
+        PoolingLayer(Layer<T>* prevLayer, std::string id,
             int kernel_Height, int kernel_width,
             int stride_h, int stride_w,
             int pad_h, int pad_w,
             PoolingMethodType type
             );
-        PoolingLayer(Layer* prevLayer, std::string id, LayerParams params);
+        PoolingLayer(Layer<T>* prevLayer, std::string id, LayerParams params);
 
         ~PoolingLayer();
 

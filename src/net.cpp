@@ -32,12 +32,14 @@ namespace mkt {
     /****************
      *  constructor
      ****************/
-    KyuNet::KyuNet(): pSolver_{nullptr}, pInputLayer_{nullptr} {};
+    template<typename T>
+    KyuNet<T>::KyuNet(): pSolver_{nullptr}, pInputLayer_{nullptr} {};
 
     /**************
      *  Destructor
      **************/
-    KyuNet::~KyuNet() {
+    template<typename T>
+    KyuNet<T>::~KyuNet() {
 
         fprintf(stderr, "------------------- net destructor\n");
         fprintf(stderr, "layers.size(): %ld\n", layers_.size());
@@ -52,24 +54,27 @@ namespace mkt {
     /**
      * Add Solver
      */
-    void KyuNet::addSolver(Solver* pSolver) {
+    template<typename T>
+    void KyuNet<T>::addSolver(Solver<T>* pSolver) {
         pSolver_ = pSolver;
     }
 
     /**************************
      *  Add Layer Function
      **************************/
-    Layer* KyuNet::addInputLayer(std::string id, int batchSize, int h, int w, int c)
+    template<typename T>
+    Layer<T>* KyuNet<T>::addInputLayer(std::string id, int batchSize, int h, int w, int c)
     {
 
-        pInputLayer_ = new InputLayer{id, batchSize, h, w, c};
+        pInputLayer_ = new InputLayer<T>{id, batchSize, h, w, c};
         layers_.push_back(pInputLayer_);
 
         return pInputLayer_;
 
     }
 
-    Layer* KyuNet::addDenseLayer(Layer* prevLayer, std::string id, int unit, ActivationType activationType, InitializerType weightInitType, InitializerType biasInitType)
+    template<typename T>
+    Layer<T>* KyuNet<T>::addDenseLayer(Layer<T>* prevLayer, std::string id, int unit, ActivationType activationType, InitializerType weightInitType, InitializerType biasInitType)
     {
 
         if (layers_.size() == 0)
@@ -79,7 +84,7 @@ namespace mkt {
         }
 
         // Instantiate Dense Layer
-        DenseLayer* pDenseLayer = new DenseLayer{prevLayer, id, unit, activationType, weightInitType, biasInitType};
+        DenseLayer<T>* pDenseLayer = new DenseLayer<T>{prevLayer, id, unit, activationType, weightInitType, biasInitType};
 
         // Add layer
         layers_.push_back(pDenseLayer);
@@ -87,7 +92,8 @@ namespace mkt {
         return pDenseLayer;
     }
 
-    Layer* KyuNet::addDenseLayer(Layer* prevLayer, std::string id, LayerParams params)
+    template<typename T>
+    Layer<T>* KyuNet<T>::addDenseLayer(Layer<T>* prevLayer, std::string id, LayerParams params)
     {
         if (layers_.size() == 0)
         {
@@ -95,7 +101,7 @@ namespace mkt {
             return nullptr;
         }
         // Instantiate Dense Layer
-        DenseLayer* pDenseLayer = new DenseLayer{prevLayer, id, params};
+        DenseLayer<T>* pDenseLayer = new DenseLayer<T>{prevLayer, id, params};
 
         // Add layer
         layers_.push_back(pDenseLayer);
@@ -104,8 +110,9 @@ namespace mkt {
     }
 
     /* Convolution Layer */
-    Layer* KyuNet::addConvLayer(
-        Layer* prevLayer,
+    template<typename T>
+    Layer<T>* KyuNet<T>::addConvLayer(
+        Layer<T>* prevLayer,
         std::string id,
         int kernel_Height,
         int kernel_width,
@@ -127,35 +134,38 @@ namespace mkt {
         }
 
         // Instantiate Conv Layer
-        ConvLayer* pConvLayer = new ConvLayer{prevLayer, id, kernel_Height, kernel_width, kernel_channel, stride_h, stride_w, pad_h, pad_w, paddingType, activationType, weightInitType, biasInitType};
+        ConvLayer<T>* pConvLayer = new ConvLayer<T>{prevLayer, id, kernel_Height, kernel_width, kernel_channel, stride_h, stride_w, pad_h, pad_w, paddingType, activationType, weightInitType, biasInitType};
 
         // Add Layer
         layers_.push_back(pConvLayer);
 
         return pConvLayer;
     }
-    Layer* KyuNet::addConvLayer(Layer* prevLayer, std::string id, LayerParams params) {
+
+    template<typename T>
+    Layer<T>* KyuNet<T>::addConvLayer(Layer<T>* prevLayer, std::string id, LayerParams params) {
         if (layers_.size() == 0)
         {
             fprintf(stderr, "please add input layer first\n");
             return nullptr;
         }
 
-        ConvLayer* pConvLayer = new ConvLayer{prevLayer, id, params};
+        ConvLayer<T>* pConvLayer = new ConvLayer<T>{prevLayer, id, params};
 
         layers_.push_back(pConvLayer);
         return pConvLayer;
     }
 
     // Add Relu layer
-    Layer* KyuNet::addReluLayer(Layer* prevLayer, std::string id) {
+    template<typename T>
+    Layer<T>* KyuNet<T>::addReluLayer(Layer<T>* prevLayer, std::string id) {
         if (layers_.size() == 0) {
             fprintf(stderr, "please add input layer first\n");
             return nullptr;
         }
 
         // Instantiate Relu Layer
-        ReluLayer* pReluLayer = new ReluLayer(prevLayer, id);
+        ReluLayer<T>* pReluLayer = new ReluLayer<T>(prevLayer, id);
 
         // Add Layer
         layers_.push_back(pReluLayer);
@@ -164,14 +174,15 @@ namespace mkt {
     }
 
     // Add Sigmoid layer
-    Layer* KyuNet::addSigmoidLayer(Layer* prevLayer, std::string id) {
+    template<typename T>
+    Layer<T>* KyuNet<T>::addSigmoidLayer(Layer<T>* prevLayer, std::string id) {
         if (layers_.size() == 0) {
             fprintf(stderr, "please add input layer first\n");
             return nullptr;
         }
 
         // Instantiate Relu Layer
-        SigmoidLayer* psigmoidLayer = new SigmoidLayer(prevLayer, id);
+        SigmoidLayer<T>* psigmoidLayer = new SigmoidLayer<T>(prevLayer, id);
 
         // Add Layer
         layers_.push_back(psigmoidLayer);
@@ -179,7 +190,8 @@ namespace mkt {
         return psigmoidLayer;
     }
 
-    Layer* KyuNet::addPoolingLayer( Layer* prevLayer, std::string id, int kernel_Height, int kernel_width, int stride_h, int stride_w, int pad_h, int pad_w, PoolingMethodType type)
+    template<typename T>
+    Layer<T>* KyuNet<T>::addPoolingLayer( Layer<T>* prevLayer, std::string id, int kernel_Height, int kernel_width, int stride_h, int stride_w, int pad_h, int pad_w, PoolingMethodType type)
     {
 
         if (layers_.size() == 0) {
@@ -187,24 +199,26 @@ namespace mkt {
             return nullptr;
         }
 
-        PoolingLayer* poolingLayer= new PoolingLayer{prevLayer, id, kernel_Height, kernel_width, stride_h, stride_w, pad_h, pad_w, type};
+        PoolingLayer<T>* poolingLayer= new PoolingLayer<T>{prevLayer, id, kernel_Height, kernel_width, stride_h, stride_w, pad_h, pad_w, type};
 
         layers_.push_back(poolingLayer);
 
         return poolingLayer;
     }
 
-    Layer* KyuNet::addPoolingLayer( Layer* prevLayer, std::string id, LayerParams params) {
+    template<typename T>
+    Layer<T>* KyuNet<T>::addPoolingLayer( Layer<T>* prevLayer, std::string id, LayerParams params) {
         if (layers_.size() == 0) {
             fprintf(stderr, "please add input layer first\n");
             return nullptr;
         }
-        PoolingLayer* poolingLayer= new PoolingLayer{prevLayer, id, params};
+        PoolingLayer<T>* poolingLayer= new PoolingLayer<T>{prevLayer, id, params};
         layers_.push_back(poolingLayer);
         return poolingLayer;
     }
 
-    Layer* KyuNet::addSoftmaxLayer( Layer* prevLayer, std::string id)
+    template<typename T>
+    Layer<T>* KyuNet<T>::addSoftmaxLayer( Layer<T>* prevLayer, std::string id)
     {
 
         if (layers_.size() == 0) {
@@ -212,12 +226,13 @@ namespace mkt {
             return nullptr;
         }
 
-        SoftmaxLayer* softmaxLayer= new SoftmaxLayer{prevLayer, id};
+        SoftmaxLayer<T>* softmaxLayer= new SoftmaxLayer<T>{prevLayer, id};
         layers_.push_back(softmaxLayer);
         return softmaxLayer;
     }
 
-    Layer* KyuNet::addCrossEntropyLossWithSoftmaxLayer( Layer* prevLayer, std::string id)
+    template<typename T>
+    Layer<T>* KyuNet<T>::addCrossEntropyLossWithSoftmaxLayer( Layer<T>* prevLayer, std::string id)
     {
 
         if (layers_.size() == 0) {
@@ -225,7 +240,7 @@ namespace mkt {
             return nullptr;
         }
 
-        CrossEntropyLossWithSoftmaxLayer* pCELossWithSoftmaxLayer= new CrossEntropyLossWithSoftmaxLayer{prevLayer, id};
+        CrossEntropyLossWithSoftmaxLayer<T>* pCELossWithSoftmaxLayer= new CrossEntropyLossWithSoftmaxLayer<T>{prevLayer, id};
         layers_.push_back(pCELossWithSoftmaxLayer);
         return pCELossWithSoftmaxLayer;
     }
@@ -233,7 +248,8 @@ namespace mkt {
     /**************************
      *  Compile Function
      **************************/
-    void KyuNet::Compile(NetMode mode) {
+    template<typename T>
+    void KyuNet<T>::Compile(NetMode mode) {
 
         if (layers_.size() == 0) {
             return;
@@ -242,7 +258,7 @@ namespace mkt {
         // Initialize Layer
         for (int i = 0; i < layers_.size(); ++i)
         {
-            Layer* layer = layers_.at(i);
+            Layer<T>* layer = layers_.at(i);
             if (i == 0 && layer->getType() == LayerType::INPUT)
             {
                 layer->initialize(mode);
@@ -265,14 +281,15 @@ namespace mkt {
     /**************************
      *  Forward
      **************************/
-    void KyuNet::Forward() {
+    template<typename T>
+    void KyuNet<T>::Forward() {
         if (layers_.size() == 0) {
             return;
         } else {
             for (int i = 0; i < layers_.size(); ++i)
             {
                 // fprintf(stderr, "forward: %d\n", i);
-                Layer* pLayer = layers_.at(i);
+                Layer<T>* pLayer = layers_.at(i);
                 if (i == 0) {
                     MKT_Assert(pLayer->getType() == LayerType::INPUT, "The first layer is not InputLayer");
                 } else {
@@ -285,14 +302,15 @@ namespace mkt {
     /**************************
      *  Backward
      **************************/
-    void KyuNet::Backward() {
+    template<typename T>
+    void KyuNet<T>::Backward() {
         if (layers_.size() == 0) {
             return;
         } else {
             // for (int i = layers_.size()-1; i > 0; --i)
             for(size_t i = layers_.size(); i-- > 0; )
             {
-                Layer* pLayer = layers_.at(i);
+                Layer<T>* pLayer = layers_.at(i);
                 if (i == 0) {
                     MKT_Assert(pLayer->getType() == LayerType::INPUT, "The first layer is not InputLayer");
                 } else {
@@ -307,7 +325,8 @@ namespace mkt {
     /**************************
      *  Update
      **************************/
-    void KyuNet::Train() {
+    template<typename T>
+    void KyuNet<T>::Train() {
         Forward();
         Backward();
 
@@ -325,7 +344,8 @@ namespace mkt {
     }
 
     // Add data Function
-    OP_STATUS KyuNet::add_data_from_file_list(std::vector<std::string> fileList) {
+    template<typename T>
+    OP_STATUS KyuNet<T>::add_data_from_file_list(std::vector<std::string> fileList) {
 
 
         int numImage = fileList.size();
@@ -383,9 +403,10 @@ namespace mkt {
         return OP_STATUS::SUCCESS;
     }
 
-    void KyuNet::addBatchLabels(std::string layer, std::vector<int> labels) {
+    template<typename T>
+    void KyuNet<T>::addBatchLabels(std::string layer, std::vector<int> labels) {
 
-        CrossEntropyLossWithSoftmaxLayer *pCrossEntropyLayer = (CrossEntropyLossWithSoftmaxLayer *)layers_.back();
+        CrossEntropyLossWithSoftmaxLayer<T> *pCrossEntropyLayer = (CrossEntropyLossWithSoftmaxLayer<T> *)layers_.back();
 
         pCrossEntropyLayer->LoadLabel(labels);
     }
@@ -393,13 +414,16 @@ namespace mkt {
     /**
      * Getter function
      */
-    int KyuNet::getNumOfLayer() { return layers_.size(); }
+    template<typename T>
+    int KyuNet<T>::getNumOfLayer() { return layers_.size(); }
 
-    const InputLayer* KyuNet::getInputLayer() {
+    template<typename T>
+    const InputLayer<T>* KyuNet<T>::getInputLayer() {
         return pInputLayer_;
     }
 
-    const std::vector<Layer*> KyuNet::getLayers() {
+    template<typename T>
+    const std::vector<Layer<T>*> KyuNet<T>::getLayers() {
 
         return layers_;
     }
@@ -407,12 +431,13 @@ namespace mkt {
     /**
      * Helper function
      */
-    void KyuNet::deFlattenInputImage(unsigned char *pImg, int index, float max_pixel_value) {
+    template<typename T>
+    void KyuNet<T>::deFlattenInputImage(unsigned char *pImg, int index, int max_pixel_value) {
 
         int batchSize = pInputLayer_->pDst_->getNumOfData();
         if (index < batchSize)
         {
-            float* pInData = pInputLayer_->pDst_->getCPUData();
+            T* pInData = pInputLayer_->pDst_->getCPUData();
             int size2D = pInputLayer_->pDst_->getSize2D();
             int size3D = pInputLayer_->pDst_->getSize3D();
             int channel = pInputLayer_->pDst_->getChannel();
@@ -423,7 +448,7 @@ namespace mkt {
                 int idx = int(i/channel);
                 for (int c = 0; c < channel; ++c)
                 {
-                    int pixel = int((pInData[image_offset + idx + size2D*c]/2.0f - 0.5) * max_pixel_value);
+                    int pixel = int((pInData[image_offset + idx + size2D*c]/2.0f - 0.5) * static_cast<T>(max_pixel_value) );
                     pImg[i+c] = (unsigned)pixel;
                 }
             }
@@ -432,6 +457,7 @@ namespace mkt {
         }
     }
 
-    // template class KyuNet<float>;
+    template class KyuNet<float>;
     // template class KyuNet<double>;
-}
+
+} // namespace mkt

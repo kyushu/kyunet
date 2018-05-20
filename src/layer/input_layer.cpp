@@ -6,23 +6,25 @@ namespace mkt {
     static int MAX_PIXEL_VALUE = 255;
 
     // Constructor
-    InputLayer::InputLayer(std::string id, int bSize, int h, int w, int c): Layer(LayerType::INPUT) {
-        id_ = id;
+    template<typename T>
+    InputLayer<T>::InputLayer(std::string id, int bSize, int h, int w, int c): Layer<T>(LayerType::INPUT) {
+        this->id_ = id;
         // this->dh_ = h;
         // this->dw_ = w;
         // this->dc_ = c;
-        pDst_ = new Tensor{bSize, h, w, c};
+        this->pDst_ = new Tensor<T>{ bSize, h, w, c };
 
     };
 
     // Destructor
-    InputLayer::~InputLayer() {
+    template<typename T>
+    InputLayer<T>::~InputLayer() {
         fprintf(stderr, "--------------------- InputLayer Destructor\n");
     };
 
-
-    void InputLayer::initialize(NetMode mode) {
-        initOutputTensor();
+    template<typename T>
+    void InputLayer<T>::initialize(NetMode mode) {
+        this->initOutputTensor();
     }
 
     /*
@@ -48,25 +50,27 @@ namespace mkt {
       B B B B B B B B B
 
     */
-    void InputLayer::addFlattenImageToTensor(unsigned char *pImg, int index, bool bNormalize) {
+    template<typename T>
+    void InputLayer<T>::addFlattenImageToTensor(unsigned char *pImg, int index, bool bNormalize) {
 
-        if (pDst_)
+        if (this->pDst_)
         {
-            int depth  = pDst_->getChannel();
-            int height = pDst_->getHeight();
-            int width  = pDst_->getWidth();
+            int depth  = this->pDst_->getChannel();
+            int height = this->pDst_->getHeight();
+            int width  = this->pDst_->getWidth();
             int sz = width*height;
 
-            int size2D = pDst_->getSize2D();
-            int size3D = pDst_->getSize3D();
-            float* ptr = pDst_->getCPUData() + index * size3D;
+            int size2D = this->pDst_->getSize2D();
+            int size3D = this->pDst_->getSize3D();
+            T* ptr = this->pDst_->getCPUData() + index * size3D;
             // fprintf(stdout, "size2D: %d\n", size2D);
             for (int i = 0; i < size3D; i+=depth)
             {
                 int idx = int(i/depth);
                 for (int m = 0; m < depth; ++m)
                 {
-                    ptr[idx + size2D*m] = bNormalize ? (float(pImg[i+m]) / MAX_PIXEL_VALUE - 0.5f) * 2.0f : float(pImg[i+m]);
+                    ptr[idx + size2D*m] = bNormalize ? (static_cast<T>( pImg[i+m] ) / MAX_PIXEL_VALUE - 0.5f) * 2.0f :
+                                                        static_cast<T>(pImg[i+m]);
                 }
             }
 
@@ -77,7 +81,8 @@ namespace mkt {
     }
 
     // For Debug
-    void InputLayer::DeFlattenImage(const float* pData, int height, int width, int channel, unsigned char *pImg) {
+    template<typename T>
+    void InputLayer<T>::DeFlattenImage(const T* pData, int height, int width, int channel, unsigned char *pImg) {
 
         int size2D = height*width;
         int size3D = size2D * channel;
@@ -85,7 +90,6 @@ namespace mkt {
         for (int i = 0; i < size3D; i+=channel)
         {
             int idx = int(i/channel);
-            // float maxValue = 255;
             for (int m = 0; m < channel; ++m)
             {
                 // int pixel = int(pData[idx + size2D*m] * MAX_PIXEL_VALUE);
@@ -98,4 +102,7 @@ namespace mkt {
 
     }
 
-}
+    // Explicitly instantiate the template, and its member definitions
+    template class InputLayer<float>;
+
+} // namespace mkt

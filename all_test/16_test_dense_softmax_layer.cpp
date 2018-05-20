@@ -33,19 +33,19 @@ int main(int argc, char const *argv[])
     /*************
      * Config KyuNet
      *************/
-    KyuNet net;
+    KyuNet<float> net;
     // Input Layer
-    InputLayer* pInputLayer = (InputLayer *)net.addInputLayer("input", batchSize, height, width, channel);
+    InputLayer<float>* pInputLayer = (InputLayer<float> *)net.addInputLayer("input", batchSize, height, width, channel);
 
     // Dense Layer
     InitializerType weightInitType = InitializerType::ONE;
     InitializerType biasInitType = InitializerType::ZERO;
     int fc_unit = 16;
     fprintf(stderr, "fc_unit(num of class) = %d\n", fc_unit);
-    DenseLayer* pDenseLayer = (DenseLayer *)net.addDenseLayer(pInputLayer, "fc1", fc_unit, ActivationType::RELU, weightInitType, biasInitType);
+    DenseLayer<float>* pDenseLayer = (DenseLayer<float> *)net.addDenseLayer(pInputLayer, "fc1", fc_unit, ActivationType::RELU, weightInitType, biasInitType);
 
     // Softmax Layer
-    Layer* pSoftmaxLayer = net.addSoftmaxLayer( pDenseLayer, "softmax1");
+    Layer<float>* pSoftmaxLayer = net.addSoftmaxLayer( pDenseLayer, "softmax1");
 
 
     /*****************************************

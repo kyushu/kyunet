@@ -32,12 +32,12 @@ int main(int argc, char const *argv[])
     /*************
      * Config KyuNet
      *************/
-    KyuNet net;
+    KyuNet<float> net;
     // Input Layer
-    InputLayer* pInputLayer = (InputLayer *)net.addInputLayer("input", batchSize, height, width, channel);
+    InputLayer<float>* pInputLayer = (InputLayer<float> *)net.addInputLayer("input", batchSize, height, width, channel);
 
     // Softmax Layer
-    Layer* pSoftmaxLayer = net.addSoftmaxLayer( pInputLayer, "softmax1");
+    Layer<float>* pSoftmaxLayer = net.addSoftmaxLayer( pInputLayer, "softmax1");
 
 
     /*****************************************

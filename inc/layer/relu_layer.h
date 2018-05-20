@@ -6,13 +6,14 @@
 
 namespace mkt {
 
-    class ReluLayer: public Layer
+    template<typename T>
+    class ReluLayer: public Layer<T>
     {
     private:
-        Relu_Act relu_act_;
-        float negative_slope_;
+        Relu_Act<T> relu_act_;
+        T negative_slope_;
     public:
-        ReluLayer(Layer* prevLayer, std::string id, float negative_slope = 0.0f);
+        ReluLayer(Layer<T>* prevLayer, std::string id, T negative_slope = 0.0f);
         ~ReluLayer();
 
         void initialize(NetMode mode);

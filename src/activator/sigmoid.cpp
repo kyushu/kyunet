@@ -8,16 +8,19 @@ namespace mkt {
 
 
     // Constructor
-    Sigmoid_Act::Sigmoid_Act() {};
+    template<typename T>
+    Sigmoid_Act<T>::Sigmoid_Act() {};
 
     // Destructor
-    Sigmoid_Act::~Sigmoid_Act(){};
+    template<typename T>
+    Sigmoid_Act<T>::~Sigmoid_Act(){};
 
-    void Sigmoid_Act::Forward(Tensor &src, Tensor &dst) {
+    template<typename T>
+    void Sigmoid_Act<T>::Forward(Tensor<T> *src, Tensor<T> *dst) {
 
         // Check size
-        int srcWholeSize = src.getWholeSize();
-        int dstWholeSize = src.getWholeSize();
+        int srcWholeSize = src->getWholeSize();
+        int dstWholeSize = src->getWholeSize();
         CHECK_EQ(srcWholeSize, dstWholeSize, __func__);
         // if (!Check_EQ(srcWholeSize, dstWholeSize))
         // {
@@ -26,8 +29,8 @@ namespace mkt {
         // }
 
         // Get data memory
-        float* pSrcData = src.getCPUData();
-        float* pDstData = dst.getCPUData();
+        T* pSrcData = src->getCPUData();
+        T* pDstData = dst->getCPUData();
 
         for (int i = 0; i < dstWholeSize; ++i)
         {
@@ -35,9 +38,14 @@ namespace mkt {
         }
     };
 
-    void Sigmoid_Act::Backward(Tensor &src, Tensor &src_grad, Tensor &dst_grad) {
+    template<typename T>
+    void Sigmoid_Act<T>::Backward(Tensor<T> *src, Tensor<T> *src_grad, Tensor<T> *dst_grad) {
+        fprintf(stderr, "%s, %s, %d not yet implement\n", __FILE__, __func__, __LINE__);
     };
 
-}
+    // Explicitly instantiate the template, and its member definitions
+    template class Sigmoid_Act<float>;
+
+} // namespace mkt
 
 

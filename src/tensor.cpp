@@ -28,7 +28,8 @@
 namespace mkt {
 
     // Constructor
-    Tensor::Tensor():
+    template<typename T>
+    Tensor<T>::Tensor():
         num_{0},
         channel_{0},
         height_{0},
@@ -41,7 +42,8 @@ namespace mkt {
     {};
 
     // Constructor
-    Tensor::Tensor(int num, int height, int width, int ch):
+    template<typename T>
+    Tensor<T>::Tensor(int num, int height, int width, int ch):
         num_{num},
         height_{height},
         width_{width},
@@ -56,7 +58,8 @@ namespace mkt {
         // fprintf(stderr, "tensor construct channel_: %d\n", channel_);
     };
 
-    Tensor::Tensor(Shape shape) {
+    template<typename T>
+    Tensor<T>::Tensor(Shape shape) {
         num_ = shape[0];
         height_ = shape[1];
         width_ = shape[2];
@@ -68,7 +71,8 @@ namespace mkt {
     }
 
     // Destructor
-    Tensor::~Tensor(){
+    template<typename T>
+    Tensor<T>::~Tensor(){
         delete[] pData_;
     };
 
@@ -77,7 +81,8 @@ namespace mkt {
     /*************
      * Initialize
      *************/
-    void Tensor::allocate() {
+    template<typename T>
+    void Tensor<T>::allocate() {
 
         // fprintf(stderr, "init_type: %d\n", init_type);
         // size2D_ = height_ * width_;
@@ -90,11 +95,12 @@ namespace mkt {
             return;
         }
 
-        pData_ = new float[wholeSize_];
+        pData_ = new T[wholeSize_];
 
     }
 
-    void Tensor::Reshape(int num, int height, int width, int ch) {
+    template<typename T>
+    void Tensor<T>::Reshape(int num, int height, int width, int ch) {
         num_ = num;
         height_ = height;
         width_ = width;
@@ -115,7 +121,8 @@ namespace mkt {
     /*********************
      * add data from file
      *********************/
-    OP_STATUS Tensor::addData(char const *filename) {
+    template<typename T>
+    OP_STATUS Tensor<T>::addData(char const *filename) {
 
         // Safety Check
         if (wrIdx_ >= num_)
@@ -125,7 +132,7 @@ namespace mkt {
         }
 
         // Get current write address
-        float* ptr = pData_ + wrIdx_ * size3D_;
+        T* ptr = pData_ + wrIdx_ * size3D_;
 
         // Load image from file
         int w, h, c;
@@ -140,7 +147,7 @@ namespace mkt {
         fprintf(stderr, "w: %d, h: %d, c: %d\n", w, h, c);
         for (int i = 0; i < size3D_; ++i)
         {
-            *(ptr+i) = (float)*(pImg+i);
+            *(ptr+i) = static_cast<T>( *(pImg+i) );
         }
 
         ++wrIdx_;
@@ -149,7 +156,8 @@ namespace mkt {
     }
 
     // add data from array
-    OP_STATUS Tensor::addData(const float *pImg) {
+    template<typename T>
+    OP_STATUS Tensor<T>::addData(const float *pImg) {
 
         assert(pImg);
 
@@ -161,11 +169,11 @@ namespace mkt {
         }
 
         // Get current write address
-        float* ptr = pData_ + wrIdx_ * size3D_;
+        T* ptr = pData_ + wrIdx_ * size3D_;
 
         for (int i = 0; i < size3D_; ++i)
         {
-            *(ptr+i) = *(pImg+i);
+            *(ptr+i) = static_cast<T>( *(pImg+i) );
         }
 
         ++wrIdx_;
@@ -174,7 +182,8 @@ namespace mkt {
     }
 
     // add data from vector
-    OP_STATUS Tensor::addData(std::vector<float> vImg) {
+    template<typename T>
+    OP_STATUS Tensor<T>::addData(std::vector<float> vImg) {
 
         // Safety Check
         if (wrIdx_ >= num_)
@@ -189,11 +198,11 @@ namespace mkt {
         }
 
         // Get current write address
-        float* ptr = pData_ + wrIdx_ * size3D_;
+        T* ptr = pData_ + wrIdx_ * size3D_;
 
         for (int i = 0; i < size3D_; ++i)
         {
-            *(ptr+i) = vImg.at(i);
+            *(ptr+i) = static_cast<T>( vImg.at(i) );
         }
 
         ++wrIdx_;
@@ -201,27 +210,41 @@ namespace mkt {
         return OP_STATUS::SUCCESS;
     }
 
-
-    void Tensor::resetData() {
+    template<typename T>
+    void Tensor<T>::resetData() {
         // std::memset(pData_, 0, wholeSize_ * sizeof(float));
-        std::fill_n(pData_, wholeSize_, 0.0f);
+        std::fill_n(pData_, wholeSize_, 0);
     }
 
     /********************************
     ** Getter
     ********************************/
-    float* Tensor::getCPUData()   { return pData_; }
-    int    Tensor::getNumOfData() { return num_; }
-    int    Tensor::getWidth()     { return width_; }
-    int    Tensor::getHeight()    { return height_; }
-    int    Tensor::getChannel()   { return channel_; }
-    int    Tensor::getSize2D()    { return size2D_; }
-    int    Tensor::getSize3D()    { return size3D_; }
-    int    Tensor::getWholeSize() { return wholeSize_; }
+    template<typename T>
+    T* Tensor<T>::getCPUData()   { return pData_; }
+    template<typename T>
+    int    Tensor<T>::getNumOfData() { return num_; }
+    template<typename T>
+    int    Tensor<T>::getWidth()     { return width_; }
+    template<typename T>
+    int    Tensor<T>::getHeight()    { return height_; }
+    template<typename T>
+    int    Tensor<T>::getChannel()   { return channel_; }
+    template<typename T>
+    int    Tensor<T>::getSize2D()    { return size2D_; }
+    template<typename T>
+    int    Tensor<T>::getSize3D()    { return size3D_; }
+    template<typename T>
+    int    Tensor<T>::getWholeSize() { return wholeSize_; }
 
-    Shape Tensor::getShape() {
+    template<typename T>
+    Shape Tensor<T>::getShape() {
         Shape shape{num_, height_, width_, channel_};
         return shape;
     }
-}
+
+
+    // Explicitly instantiate the template, and its member definitions
+    template class Tensor<float>;
+
+} // namespace mkt
 

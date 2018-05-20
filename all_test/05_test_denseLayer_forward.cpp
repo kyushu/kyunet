@@ -49,12 +49,12 @@ int main(int argc, char const *argv[])
                           9,3, 1,5, 8,7};
 
     // Configure, initialize network
-    KyuNet net;
-    InputLayer* pInputLayer = (InputLayer *)net.addInputLayer("input", batchSize, height, width, channel);
+    KyuNet<float> net;
+    InputLayer<float>* pInputLayer = (InputLayer<float> *)net.addInputLayer("input", batchSize, height, width, channel);
 
     InitializerType weightInitType = InitializerType::ONE;
     InitializerType biasInitType = InitializerType::ZERO;
-    Layer* pDenseLayer = net.addDenseLayer(pInputLayer, "Layer1", 4, ActivationType::RELU, weightInitType, biasInitType);
+    Layer<float>* pDenseLayer = net.addDenseLayer(pInputLayer, "Layer1", 4, ActivationType::RELU, weightInitType, biasInitType);
     net.Compile(NetMode::TRAINING);
 
 

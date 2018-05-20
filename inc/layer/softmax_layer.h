@@ -5,13 +5,15 @@
 #include "operators/mat_operators.h"
 
 namespace mkt {
-    class SoftmaxLayer: public Layer
+
+    template<typename T>
+    class SoftmaxLayer: public Layer<T>
     {
     public:
-        Tensor* pScale_;
+        Tensor<T>* pScale_;
 
         SoftmaxLayer();
-        SoftmaxLayer(Layer* prevLayer, std::string id);
+        SoftmaxLayer(Layer<T>* prevLayer, std::string id);
         ~SoftmaxLayer();
 
         void initialize(NetMode mode);

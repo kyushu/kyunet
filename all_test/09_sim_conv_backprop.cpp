@@ -14,7 +14,7 @@ int main(int argc, char const *argv[])
     int ic = 1;
 
     // set src differential tensor
-    mkt::Tensor src_grad(batch_size, ih, iw, ic);
+    mkt::Tensor<float> src_grad(batch_size, ih, iw, ic);
     src_grad.allocate();
     float* pSrcGradData = src_grad.getCPUData();
 
@@ -22,12 +22,12 @@ int main(int argc, char const *argv[])
     int fh = 2;
     int fw = 2;
     int oc = 1;
-    mkt::Tensor weight(ic, 2, 2, oc);
+    mkt::Tensor<float> weight(ic, 2, 2, oc);
     weight.allocate();
     float* pWData = weight.getCPUData();
 
     // Set dst differential tensor
-    mkt::Tensor dst_grad(batch_size, 2, 2, oc);
+    mkt::Tensor<float> dst_grad(batch_size, 2, 2, oc);
     dst_grad.allocate();
     float* pDstGradData = dst_grad.getCPUData();
 
@@ -39,7 +39,7 @@ int main(int argc, char const *argv[])
     mkt::mktLog(1, "k: %d\n", k);
 
     // Set temporary tensor for storing Col2Im matrix
-    mkt::Tensor temp(1, n, k, 1);
+    mkt::Tensor<float> temp(1, n, k, 1);
     temp.allocate();
     float* ptmpData = temp.getCPUData();
 

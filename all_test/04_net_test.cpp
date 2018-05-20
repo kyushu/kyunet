@@ -8,8 +8,8 @@
 #include "folder_file_utils.hpp"
 
 #include "tensor.h"
-#include "layer.h"
-#include "inputLayer.h"
+#include "layer/layer.h"
+#include "layer/input_layer.h"
 #include "net.h"
 
 using namespace mkt;
@@ -24,6 +24,9 @@ using namespace mkt;
 */
 #include "stb_image.h"
 #include "stb_image_resize.h"
+
+
+typedef KyuNet<float> KyuNetf;
 
 unsigned char* resize_image(std::string file, int out_w, int out_h) {
 
@@ -88,12 +91,12 @@ void test_flatten_image() {
 
 
     // Configure, initialize network
-    KyuNet net;
+    KyuNet<float> net;
     net.addInputLayer("input", batchSize, height, width, channel);
-    net.Compile();
+    net.Compile(NetMode::TRAINING);
 
     // Get InputLayer
-    InputLayer* pInput = net.InputLayer();
+    const InputLayer<float>* pInput = net.getInputLayer();
     const float *pdata = pInput->pDst_->getCPUData();
     int size3D = pInput->pDst_->getSize3D();
     fprintf(stderr, "size3D: %d\n", size3D);
@@ -136,7 +139,7 @@ void test_add_batch_image() {
     int num_iter = file_list.size() / batchSize;
 
 
-    KyuNet net;
+    KyuNet<float> net;
     /***********************************************
      *  Step 1. Configure KyuNetwork
      *  Add layer by parameters
@@ -168,7 +171,7 @@ void test_add_batch_image() {
     /***********************************************
      * Verify
      **********************************************/
-    InputLayer* pInput = net.InputLayer();
+    InputLayer<float>* pInput = net.InputLayer();
     const float *pdata = pInput->pDst_->getCPUData();
     int size3D = pInput->pDst_->getSize3D();
     fprintf(stderr, "size3D: %d\n", size3D);

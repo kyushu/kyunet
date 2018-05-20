@@ -14,10 +14,10 @@ int main(int argc, char const *argv[])
     int input_ch = 1;
 
     /* Configure KyuNet */
-    KyuNet net;
+    KyuNet<float> net;
 
     // Input layer
-    InputLayer* pInLayer = (InputLayer *)net.addInputLayer("input", batchSize, input_height, input_width, input_ch);
+    InputLayer<float>* pInLayer = (InputLayer<float> *)net.addInputLayer("input", batchSize, input_height, input_width, input_ch);
 
     // Convolution Layer 1
     LayerParams parConv1;
@@ -32,7 +32,7 @@ int main(int argc, char const *argv[])
     parConv1.actType = ActivationType::NONE;
     parConv1.weight_init_type = InitializerType::ONE;
     parConv1.bias_init_type = InitializerType::ZERO;
-    ConvLayer* pConvLayer1 = (ConvLayer* )net.addConvLayer(pInLayer, "conv1", parConv1);
+    ConvLayer<float>* pConvLayer1 = (ConvLayer<float>* )net.addConvLayer(pInLayer, "conv1", parConv1);
 
     // Convolution Layer 2
     LayerParams parConv2;
@@ -47,7 +47,7 @@ int main(int argc, char const *argv[])
     parConv2.actType = ActivationType::NONE;
     parConv2.weight_init_type = InitializerType::TEST;
     parConv2.bias_init_type = InitializerType::ZERO;
-    ConvLayer* pConvLayer2 = (ConvLayer* )net.addConvLayer(pConvLayer1, "conv2", parConv2);
+    ConvLayer<float>* pConvLayer2 = (ConvLayer<float>* )net.addConvLayer(pConvLayer1, "conv2", parConv2);
 
     // Pooling Layer
     LayerParams pool_params;
@@ -58,7 +58,7 @@ int main(int argc, char const *argv[])
     pool_params.pad_h = 0;
     pool_params.pad_w = 0;
     pool_params.pooling_type = PoolingMethodType::AVG;
-    PoolingLayer* pPoolingLayer = (PoolingLayer*)net.addPoolingLayer( pConvLayer2, "Pooling", pool_params);
+    PoolingLayer<float>* pPoolingLayer = (PoolingLayer<float>*)net.addPoolingLayer( pConvLayer2, "Pooling", pool_params);
 
     /* Initialize KyuNet(Allocate memory) */
     net.Compile(NetMode::TRAINING);

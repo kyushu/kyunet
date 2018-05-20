@@ -28,7 +28,7 @@ macro(add_example_with_stb name)
     target_link_libraries(${name} libkyunet )
 endmacro()
 
-macro(add_example_with_image_process name)
+macro(add_example_with_stb_cv name)
     add_executable(${name} ${name}.cpp ${stb_SRC})
     target_link_libraries(${name} ${OpenCV_LIBS} libkyunet )
 endmacro()
@@ -38,84 +38,67 @@ find_package(OpenCV REQUIRED)
         INCLUDE_DIRECTORIES(${OpenCV_INCLUDE_DIRS})
 
         # 01 load_imabe_test
-        add_executable(load_image_test 01_load_image_test.cpp ${stb_SRC})
-        target_link_libraries(load_image_test ${OpenCV_LIBS})
+        add_example_with_stb_cv(01_load_image_test)
 
         # 02 tensor_test
-        add_executable(tensor_test 02_tensor_test.cpp)
-        target_link_libraries(tensor_test ${OpenCV_LIBS} libkyunet)
+        add_example_with_stb_cv(02_tensor_test)
 
         # 03 test_add_data_flatten
-        add_executable(test_add_data_flatten 03_test_add_data_flatten.cpp)
-        target_link_libraries(test_add_data_flatten ${OpenCV_LIBS} libkyunet)
+        add_example_with_stb_cv(03_test_add_data_flatten)
+
+        # # 04 net test
+        # add_example(04_net_test)
 
         # 05 test_denseLayer
-        add_executable(test_denseLayer_forward 05_test_denseLayer_forward.cpp)
-        target_link_libraries(test_denseLayer_forward ${OpenCV_LIBS} libkyunet)
+        add_example_with_stb_cv(05_test_denseLayer_forward)
 
         # 06 test_operation
-        add_executable(test_operation 06_test_operation.cpp)
-        target_link_libraries(test_operation ${OpenCV_LIBS} libkyunet)
+        add_example_with_stb_cv(06_test_operation)
 
         # 07 im2col_test
-        add_executable(im2col_test 07_im2col_test.cpp)
-        target_link_libraries(im2col_test libkyunet)
+        add_example(07_im2col_test)
 
         # 08 test_convlayer
-        add_executable(test_convlayer_forward 08_test_convlayer_forward.cpp)
-        target_link_libraries(test_convlayer_forward ${OpenCV_LIBS} libkyunet)
+        add_example_with_stb_cv(08_test_convlayer_forward)
 
         # 09 sim_conv_backprop
-        add_executable(sim_conv_backprop 09_sim_conv_backprop.cpp)
-        target_link_libraries(sim_conv_backprop libkyunet)
+        add_example(09_sim_conv_backprop)
 
         # 10 test_distribute
-        add_executable(test_distribute 10_test_distribute.cpp)
-        target_link_libraries(test_distribute)
+        add_example(10_test_distribute)
 
         # 11 test_filler
-        add_executable(test_filler 11_test_filler.cpp)
-        target_link_libraries(test_filler libkyunet)
+        add_example(11_test_filler)
 
         # 12 test_relu_layer_forward
-        add_executable(test_relu_layer_forward 12_test_relu_layer_forward.cpp)
-        target_link_libraries(test_relu_layer_forward libkyunet)
+        add_example(12_test_relu_layer_forward)
 
         # 13 test_sigmoid_layer_forward
-        add_executable(test_sigmoid_layer_forward 13_test_sigmoid_layer_forward.cpp)
-        target_link_libraries(test_sigmoid_layer_forward libkyunet)
+        add_example(13_test_sigmoid_layer_forward)
 
         # 14 test_pooling_method
-        add_executable(test_pooling_forward 14_test_pooling_forward.cpp)
-        target_link_libraries(test_pooling_forward libkyunet)
+        add_example(14_test_pooling_forward)
 
         # 15 test_softmax_layer
-        add_executable(test_softmax_layer 15_test_softmax_layer.cpp)
-        target_link_libraries(test_softmax_layer libkyunet)
+        add_example(15_test_softmax_layer)
 
         # 16 test_dense_softmax_layer
-        add_executable(test_dense_softmax_layer 16_test_dense_softmax_layer.cpp)
-        target_link_libraries(test_dense_softmax_layer libkyunet)
+        add_example(16_test_dense_softmax_layer)
 
         # 17 test_cross_entropy_with_softmax_layer
-        add_executable(test_cross_entropy_with_softmax_layer 17_test_cross_entropy_with_softmax_layer.cpp)
-        target_link_libraries(test_cross_entropy_with_softmax_layer libkyunet)
+        add_example(17_test_cross_entropy_with_softmax_layer)
 
         # 18 test_cross_entropy_with_softmax_layer
-        add_executable(test_pooling_backward 18_test_pooling_backward.cpp)
-        target_link_libraries(test_pooling_backward libkyunet)
+        add_example_with_stb_cv(18_test_pooling_backward)
 
         # 19_test_convLayer_backward
-        add_executable(test_convLayer_backward 19_test_convLayer_backward.cpp)
-        target_link_libraries(test_convLayer_backward libkyunet)
+        add_example(19_test_convLayer_backward)
 
         # 20_test_conv_pooling_dense_crossLoss
-        add_executable(test_conv_pooling_dense_crossLoss 20_test_conv_pooling_dense_crossLoss.cpp)
-        target_link_libraries(test_conv_pooling_dense_crossLoss libkyunet)
-
+        add_example(20_test_conv_pooling_dense_crossLoss)
 
         # 21_test_mnist_load_batch
-        add_example_with_image_process(21_test_mnist_load_batch)
+        add_example_with_stb_cv(21_test_mnist_load_batch)
 
     else()
         message("OpenCV not found")

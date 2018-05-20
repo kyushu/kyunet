@@ -29,11 +29,11 @@ int main(int argc, char const *argv[])
      /*************
      * Config KyuNet
      *************/
-    KyuNet net;
+    KyuNet<float> net;
 
-    InputLayer* pInputLayer = (InputLayer *)net.addInputLayer("input", batchSize, height, width, channel);
+    InputLayer<float>* pInputLayer = (InputLayer<float> *)net.addInputLayer("input", batchSize, height, width, channel);
 
-    CrossEntropyLossWithSoftmaxLayer* pCrossEntropyLayer = (CrossEntropyLossWithSoftmaxLayer *)net.addCrossEntropyLossWithSoftmaxLayer(pInputLayer, "cross_entropy_loss");
+    CrossEntropyLossWithSoftmaxLayer<float>* pCrossEntropyLayer = (CrossEntropyLossWithSoftmaxLayer<float> *)net.addCrossEntropyLossWithSoftmaxLayer(pInputLayer, "cross_entropy_loss");
 
 
     net.Compile(NetMode::TRAINING);
@@ -57,7 +57,7 @@ int main(int argc, char const *argv[])
     /*
      * Display Probability
      */
-    Layer* pSoftmaxLayer = &(pCrossEntropyLayer->softmaxLayer_);
+    Layer<float>* pSoftmaxLayer = &(pCrossEntropyLayer->softmaxLayer_);
     fprintf(stderr, "Dst data (probability) of Softmax Layer\n");
     int s_dst_c = pSoftmaxLayer->pDst_->getChannel();
     int s_dst_h = pSoftmaxLayer->pDst_->getHeight();

@@ -9,11 +9,11 @@
 #include "softmax_layer.h"
 
 namespace mkt {
-
-    class CrossEntropyLossWithSoftmaxLayer: public Layer
+    template<typename T>
+    class CrossEntropyLossWithSoftmaxLayer: public Layer<T>
     {
     public:
-        CrossEntropyLossWithSoftmaxLayer(Layer* prevLayer, std::string id);
+        CrossEntropyLossWithSoftmaxLayer(Layer<T>* prevLayer, std::string id);
         ~CrossEntropyLossWithSoftmaxLayer();
 
         void initialize(NetMode mode);
@@ -24,8 +24,8 @@ namespace mkt {
         void Forward();
         void Backward();
 
-        SoftmaxLayer softmaxLayer_;
-        Tensor* pLabel_;
+        SoftmaxLayer<T> softmaxLayer_;
+        Tensor<T>* pLabel_;
     };
 }
 

@@ -4,12 +4,14 @@
 #include "test_utils.hpp"
 
 namespace mkt {
-    CrossEntropyLossWithSoftmaxLayer::CrossEntropyLossWithSoftmaxLayer(
-        Layer* prevLayer,
-        std::string id): Layer(LayerType::CROSS_LOSS_SOFTMAX)
+
+    template<typename T>
+    CrossEntropyLossWithSoftmaxLayer<T>::CrossEntropyLossWithSoftmaxLayer(
+        Layer<T>* prevLayer,
+        std::string id): Layer<T>(LayerType::CROSS_LOSS_SOFTMAX)
     {
-        batchSize_ = prevLayer->pDst_->getNumOfData();
-        pPrevLayer_ = prevLayer;
+        this->batchSize_ = prevLayer->pDst_->getNumOfData();
+        this->pPrevLayer_ = prevLayer;
 
         int ih = prevLayer->pDst_->getHeight();
         int iw = prevLayer->pDst_->getWidth();
@@ -19,9 +21,9 @@ namespace mkt {
          * Now i just fix the input height and width is 1
          * that means the previous layer must be DenseLayer
          **************************************************/
-        oh_ = 1;
-        ow_ = 1;
-        oc_ = 1;
+        this->oh_ = 1;
+        this->ow_ = 1;
+        this->oc_ = 1;
 
 
         /*
@@ -30,9 +32,9 @@ namespace mkt {
          * calculate probability.then calculate loss
          */
         softmaxLayer_.pPrevLayer_ = prevLayer;
-        softmaxLayer_.Reshape(batchSize_, ih, iw, ic);
+        softmaxLayer_.Reshape(this->batchSize_, ih, iw, ic);
 
-        pDst_ = new Tensor{1, 1, 1, 1}; // only for loss
+        this->pDst_ = new Tensor<T>{1, 1, 1, 1}; // only for loss
 
         /*
          * [pgDst_]
@@ -45,24 +47,26 @@ namespace mkt {
          * For now, the label data of Cross Entroyp Loss
          * is Scale Not One-Hot encoding vector
          */
-        pLabel_ = new Tensor{batchSize_, 1, 1, 1};
+        pLabel_ = new Tensor<T>{this->batchSize_, 1, 1, 1};
 
     }
 
     // Destructor
-    CrossEntropyLossWithSoftmaxLayer::~CrossEntropyLossWithSoftmaxLayer() {
+    template<typename T>
+    CrossEntropyLossWithSoftmaxLayer<T>::~CrossEntropyLossWithSoftmaxLayer() {
 
         delete pLabel_;
 
     }
 
     // Initialization
-    void CrossEntropyLossWithSoftmaxLayer::initialize(NetMode mode) {
+    template<typename T>
+    void CrossEntropyLossWithSoftmaxLayer<T>::initialize(NetMode mode) {
 
-        MKT_Assert(pDst_ != nullptr, "pDst_ is null");
+        MKT_Assert(this->pDst_ != nullptr, "pDst_ is null");
         MKT_Assert(pLabel_ != nullptr, "pLabel_ is null");
 
-        initOutputTensor();
+        this->initOutputTensor();
 
         pLabel_->allocate();
     }
@@ -73,33 +77,35 @@ namespace mkt {
      * There are 10 classes and batch size = 64, so there are 64 labels
      *  the range of each label is 0 ~ 9
      *********************************************************************/
-    void CrossEntropyLossWithSoftmaxLayer::LoadLabel(int num, const int* pLabel) {
+    template<typename T>
+    void CrossEntropyLossWithSoftmaxLayer<T>::LoadLabel(int num, const int* pLabel) {
 
         CHECK_EQ(pLabel_->getWholeSize(), num, __FILE__);
 
         int numClass = softmaxLayer_.pDst_->getChannel();
 
-        float* pLabelData = pLabel_->getCPUData();
+        T* pLabelData = pLabel_->getCPUData();
 
         for (int i = 0; i < num; ++i)
         {
             CHECK_LT(pLabel[i], numClass, __FILE__, __LINE__);
-            pLabelData[i] = static_cast<float>( pLabel[i] );
+            pLabelData[i] = static_cast<T>( pLabel[i] );
         }
     }
 
-    void CrossEntropyLossWithSoftmaxLayer::LoadLabel(const std::vector<int>& labels) {
+    template<typename T>
+    void CrossEntropyLossWithSoftmaxLayer<T>::LoadLabel(const std::vector<int>& labels) {
 
         CHECK_EQ(pLabel_->getWholeSize(), static_cast<int>(labels.size()), __FILE__);
 
         int numClass = softmaxLayer_.pDst_->getChannel();
 
-        float* pLabelData = pLabel_->getCPUData();
+        T* pLabelData = pLabel_->getCPUData();
 
         for (size_t i = 0; i < labels.size(); ++i)
         {
             CHECK_LT(labels[i], numClass, __FILE__, __LINE__);
-            pLabelData[i] = static_cast<float>( labels[i] );
+            pLabelData[i] = static_cast<T>( labels[i] );
         }
     }
 
@@ -111,12 +117,13 @@ namespace mkt {
      * Loss = - ln(y_k) where k is the index of y_i_hat = 1
      *
      *****************************************************/
-    void CrossEntropyLossWithSoftmaxLayer::Forward() {
+    template<typename T>
+    void CrossEntropyLossWithSoftmaxLayer<T>::Forward() {
 
         // Reset Data
         // pDst_->resetData();
 
-        Tensor* pSrc = pPrevLayer_->pDst_;
+        Tensor<T>* pSrc = this->pPrevLayer_->pDst_;
 
         softmaxLayer_.Forward();
 
@@ -124,11 +131,11 @@ namespace mkt {
         int size2D = softmaxLayer_.pDst_->getSize2D();
         int numClass = softmaxLayer_.pDst_->getChannel();
 
-        const float* pTruth_label = pLabel_->getCPUData();
-        const float* prob_data = softmaxLayer_.pDst_->getCPUData();
-        float loss = 0;
+        const T* pTruth_label = pLabel_->getCPUData();
+        const T* prob_data = softmaxLayer_.pDst_->getCPUData();
+        T loss = 0;
 
-        for (int b = 0; b < batchSize_; ++b)
+        for (int b = 0; b < this->batchSize_; ++b)
         {
             for (int i = 0; i < size2D; ++i)
             {
@@ -142,8 +149,9 @@ namespace mkt {
                 // fprintf(stderr, "[cross entropy loss forwartd]: prob_data[%d] = %f\n", i + label_value*size2D + b*dim, prob_data[i + label_value*size2D + b*dim]);
             }
         }
-        // fprintf(stderr, "loss - %f\n", loss);
-        pDst_->getCPUData()[0] = loss / batchSize_ * size2D;
+
+        // pDst_ is used to store average loss of batch
+        this->pDst_->getCPUData()[0] = loss / this->batchSize_ * size2D;
         // fprintf(stderr, "%s:%d loss: %f\n", __FILE__, __LINE__, pDst_->getCPUData()[0]);
     }
 
@@ -153,22 +161,23 @@ namespace mkt {
      *            = exp(x_j) / sum(exp(x_i))    , if j != k
      * k is the index of label which equals to 1
      ****************************************************/
-    void CrossEntropyLossWithSoftmaxLayer::Backward() {
+    template<typename T>
+    void CrossEntropyLossWithSoftmaxLayer<T>::Backward() {
 
         int wholeSize = softmaxLayer_.pDst_->getWholeSize();
         int dim = softmaxLayer_.pDst_->getSize3D();
         int size2D = softmaxLayer_.pDst_->getSize2D();
-        float* prob = softmaxLayer_.pDst_->getCPUData();
+        T* prob = softmaxLayer_.pDst_->getCPUData();
 
-        float* pSrc_dif = pPrevLayer_->pgDst_->getCPUData();
+        T* pSrc_dif = this->pPrevLayer_->pgDst_->getCPUData();
 
         if (pSrc_dif)
         {
             // pSrc_dif = prob = exp(xj) / sum(exp(xi))
             mem_copy_cpu(wholeSize, prob, pSrc_dif);
 
-            const float* pTruth_label = pLabel_->getCPUData();
-            for (int b = 0; b < batchSize_; ++b)
+            const T* pTruth_label = pLabel_->getCPUData();
+            for (int b = 0; b < this->batchSize_; ++b)
             {
                 for (int i = 0; i < size2D; ++i)
                 {
@@ -179,5 +188,9 @@ namespace mkt {
             }
         }
     }
-}
+
+    // Explicitly instantiate the template, and its member definitions
+    template class CrossEntropyLossWithSoftmaxLayer<float>;
+
+} // namespace mkt
 

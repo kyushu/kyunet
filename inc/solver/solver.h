@@ -12,12 +12,14 @@
 
 namespace mkt {
 
+    template<typename T>
     class KyuNet;
 
+    template<typename T>
     class Solver
     {
     public:
-        Solver(KyuNet* Net) {
+        Solver(KyuNet<T>* Net) {
             pNet_ = Net;
         };
         ~Solver(){
@@ -34,10 +36,10 @@ namespace mkt {
         void Regularize();
 
     protected:
-        KyuNet* pNet_;
+        KyuNet<T>* pNet_;
         RegularizationType regularizationType_;
-        float momentum_;
-        float lambda_; // L1 or L2 regularization parameter
+        T momentum_;
+        T lambda_; // L1 or L2 regularization parameter
 
 
     };

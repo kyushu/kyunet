@@ -45,15 +45,16 @@ void check_image_info(std::string full_path) {
     fprintf(stderr, "w: %d, h: %d, c: %d\n", w, h, c);
 }
 
-KyuNet* configure_kyunet(int batchSize, int input_height, int input_width, int input_ch) {
+template<typename T>
+KyuNet<T>* configure_kyunet(int batchSize, int input_height, int input_width, int input_ch) {
 
 
 
     /* Configure Net */
-    KyuNet* net = new KyuNet{};
+    KyuNet<T>* net = new KyuNet<T>{};
 
     // Input layer
-    InputLayer* pInLayer = (InputLayer *)net->addInputLayer("input", batchSize, input_height, input_width, input_ch);
+    InputLayer<T>* pInLayer = (InputLayer<T> *)net->addInputLayer("input", batchSize, input_height, input_width, input_ch);
 
     fprintf(stderr, "input Layer: batch: %d, h: %d, w: %d, c: %d (%d)\n",
         pInLayer->pDst_->getNumOfData(),
@@ -75,7 +76,7 @@ KyuNet* configure_kyunet(int batchSize, int input_height, int input_width, int i
     conv1_par.actType = ActivationType::RELU;
     conv1_par.weight_init_type = InitializerType::HE_INIT_NORM;
     conv1_par.bias_init_type = InitializerType::ZERO;
-    ConvLayer* pConvLayer1 = (ConvLayer* )net->addConvLayer(pInLayer, "conv1", conv1_par);
+    ConvLayer<T>* pConvLayer1 = (ConvLayer<T>* )net->addConvLayer(pInLayer, "conv1", conv1_par);
 
     // Pooling Layer
     LayerParams pool_params;
@@ -86,7 +87,7 @@ KyuNet* configure_kyunet(int batchSize, int input_height, int input_width, int i
     pool_params.pad_h = 0;
     pool_params.pad_w = 0;
     pool_params.pooling_type = PoolingMethodType::MAX;
-    PoolingLayer* pPoolingLayer = (PoolingLayer*)net->addPoolingLayer( pConvLayer1, "Pooling1", pool_params);
+    PoolingLayer<T>* pPoolingLayer = (PoolingLayer<T>*)net->addPoolingLayer( pConvLayer1, "Pooling1", pool_params);
 
     // Dense Layer
     LayerParams dense_params;
@@ -94,15 +95,15 @@ KyuNet* configure_kyunet(int batchSize, int input_height, int input_width, int i
     dense_params.actType = ActivationType::RELU;
     dense_params.weight_init_type = InitializerType::HE_INIT_NORM;
     dense_params.bias_init_type = InitializerType::ZERO;
-    DenseLayer* pDenseLayer = (DenseLayer* )net->addDenseLayer(pPoolingLayer, "dense1", dense_params);
+    DenseLayer<T>* pDenseLayer = (DenseLayer<T>* )net->addDenseLayer(pPoolingLayer, "dense1", dense_params);
 
     // CrossEntropyWutgSoftmaxLayer
-    CrossEntropyLossWithSoftmaxLayer* pCrossEntropyLayer = (CrossEntropyLossWithSoftmaxLayer *)net->addCrossEntropyLossWithSoftmaxLayer(pDenseLayer, "cross_entropy_loss");
+    CrossEntropyLossWithSoftmaxLayer<T>* pCrossEntropyLayer = (CrossEntropyLossWithSoftmaxLayer<T> *)net->addCrossEntropyLossWithSoftmaxLayer(pDenseLayer, "cross_entropy_loss");
 
     /* Initialize Net (Allocate menory) */
     net->Compile(NetMode::TRAINING);
 
-    SGDSolver* pSgdSolver = new SGDSolver{net};
+    SGDSolver<T>* pSgdSolver = new SGDSolver<T>{net};
     pSgdSolver->initialize();
     net->addSolver(pSgdSolver);
 
@@ -154,10 +155,10 @@ int main(int argc, char const *argv[])
 
     //////////////////////////////////////////////
     /* Configure Net */
-    KyuNet* net = new KyuNet{};
+    KyuNet<float>* net = new KyuNet<float>{};
 
     // Input layer
-    InputLayer* pInLayer = (InputLayer *)net->addInputLayer("input", batchSize, input_height, input_width, input_ch);
+    InputLayer<float>* pInLayer = (InputLayer<float> *)net->addInputLayer("input", batchSize, input_height, input_width, input_ch);
 
     fprintf(stderr, "input Layer: batch: %d, h: %d, w: %d, c: %d (%d)\n",
         pInLayer->pDst_->getNumOfData(),
@@ -179,7 +180,7 @@ int main(int argc, char const *argv[])
     conv1_par.actType = ActivationType::RELU;
     conv1_par.weight_init_type = InitializerType::HE_INIT_NORM;
     conv1_par.bias_init_type = InitializerType::ZERO;
-    ConvLayer* pConvLayer1 = (ConvLayer* )net->addConvLayer(pInLayer, "conv1", conv1_par);
+    ConvLayer<float>* pConvLayer1 = (ConvLayer<float>* )net->addConvLayer(pInLayer, "conv1", conv1_par);
 
     // Convolution Layer 2
     LayerParams conv2_par;
@@ -194,7 +195,7 @@ int main(int argc, char const *argv[])
     conv2_par.actType = ActivationType::RELU;
     conv2_par.weight_init_type = InitializerType::HE_INIT_NORM;
     conv2_par.bias_init_type = InitializerType::ZERO;
-    ConvLayer* pConvLayer2 = (ConvLayer* )net->addConvLayer(pConvLayer1, "conv2", conv2_par);
+    ConvLayer<float>* pConvLayer2 = (ConvLayer<float>* )net->addConvLayer(pConvLayer1, "conv2", conv2_par);
 
     // Pooling Layer
     LayerParams pool_params;
@@ -205,7 +206,7 @@ int main(int argc, char const *argv[])
     pool_params.pad_h = 0;
     pool_params.pad_w = 0;
     pool_params.pooling_type = PoolingMethodType::MAX;
-    PoolingLayer* pPoolingLayer = (PoolingLayer*)net->addPoolingLayer( pConvLayer2, "Pooling1", pool_params);
+    PoolingLayer<float>* pPoolingLayer = (PoolingLayer<float>*)net->addPoolingLayer( pConvLayer2, "Pooling1", pool_params);
 
     // Dense Layer
     LayerParams dense_params;
@@ -213,12 +214,12 @@ int main(int argc, char const *argv[])
     dense_params.actType = ActivationType::RELU;
     dense_params.weight_init_type = InitializerType::HE_INIT_NORM;
     dense_params.bias_init_type = InitializerType::ZERO;
-    DenseLayer* pDenseLayer = (DenseLayer* )net->addDenseLayer(pPoolingLayer, "dense1", dense_params);
+    DenseLayer<float>* pDenseLayer = (DenseLayer<float>* )net->addDenseLayer(pPoolingLayer, "dense1", dense_params);
 
     // CrossEntropyWutgSoftmaxLayer
-    CrossEntropyLossWithSoftmaxLayer* pCrossEntropyLayer = (CrossEntropyLossWithSoftmaxLayer *)net->addCrossEntropyLossWithSoftmaxLayer(pDenseLayer, "cross_entropy_loss");
+    CrossEntropyLossWithSoftmaxLayer<float>* pCrossEntropyLayer = (CrossEntropyLossWithSoftmaxLayer<float> *)net->addCrossEntropyLossWithSoftmaxLayer(pDenseLayer, "cross_entropy_loss");
 
-    SGDSolver* pSgdSolver = new SGDSolver{net};
+    SGDSolver<float>* pSgdSolver = new SGDSolver<float>{net};
     net->addSolver(pSgdSolver);
 
     /* Initialize Net (Allocate menory) */

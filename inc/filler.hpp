@@ -7,6 +7,7 @@
 
 namespace mkt {
 
+    template<typename T>
     class Xavier
     {
     Distribution distri_;
@@ -14,7 +15,7 @@ namespace mkt {
         Xavier(Distribution distri):distri_{distri}{};
         ~Xavier(){};
 
-        void operator() (Tensor &x) {
+        void operator() (Tensor<T> &x) {
 
             int in = x.getNumOfData() * x.getSize2D();
             int out = x.getSize2D() * x.getChannel();
@@ -44,6 +45,7 @@ namespace mkt {
     };
 
     // He initialization aka MSRA
+    template<typename T>
     class HeInit
     {
         Distribution distri_;
@@ -51,7 +53,7 @@ namespace mkt {
         HeInit(Distribution distri):distri_{distri}{};
         ~HeInit(){};
 
-        void operator() (Tensor &x) {
+        void operator() (Tensor<T> &x) {
             int in = x.getNumOfData() * x.getSize2D();
             // int out = x.getSize2D() * x.getChannel();
             float* xData = x.getCPUData();

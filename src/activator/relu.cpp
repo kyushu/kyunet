@@ -3,16 +3,19 @@
 namespace mkt {
 
     // Constructor
-    Relu_Act::Relu_Act():negative_slope_{0} {};
+    template<typename T>
+    Relu_Act<T>::Relu_Act():negative_slope_{0} {};
 
     // Destructor
-    Relu_Act::~Relu_Act() {};
+    template<typename T>
+    Relu_Act<T>::~Relu_Act() {};
 
-    void Relu_Act::Forward(Tensor &src, Tensor &dst) {
+    template<typename T>
+    void Relu_Act<T>::Forward(Tensor<T> *src, Tensor<T> *dst) {
 
         // Check size
-        int srcWholeSize = src.getWholeSize();
-        int dstWholeSize = src.getWholeSize();
+        int srcWholeSize = src->getWholeSize();
+        int dstWholeSize = src->getWholeSize();
         CHECK_EQ(srcWholeSize, dstWholeSize, __func__);
         // if (!Check_EQ(srcWholeSize, dstWholeSize))
         // {
@@ -21,8 +24,8 @@ namespace mkt {
         // }
 
         // Get data memory
-        float* pSrcData = src.getCPUData();
-        float* pDstData = dst.getCPUData();
+        T* pSrcData = src->getCPUData();
+        T* pDstData = dst->getCPUData();
 
         //
         for (int i = 0; i < dstWholeSize; ++i)
@@ -33,13 +36,14 @@ namespace mkt {
 
     };
 
-    void Relu_Act::Backward(Tensor &src, Tensor &src_grad, Tensor &dst_grad) {
+    template<typename T>
+    void Relu_Act<T>::Backward(Tensor<T> *src, Tensor<T> *src_grad, Tensor<T> *dst_grad) {
 
-        float* pSrcData = src.getCPUData();
-        float* pSrcGradData = src_grad.getCPUData();
-        float* pDstGradData = dst_grad.getCPUData();
+        T* pSrcData = src->getCPUData();
+        T* pSrcGradData = src_grad->getCPUData();
+        T* pDstGradData = dst_grad->getCPUData();
 
-        int wholeSize = src.getWholeSize();
+        int wholeSize = src->getWholeSize();
         for (int i = 0; i < wholeSize; ++i)
         {
             pSrcGradData[i] = pDstGradData[i] *
@@ -47,4 +51,7 @@ namespace mkt {
         }
     };
 
-}
+    // Explicitly instantiate the template, and its member definitions
+    template class Relu_Act<float>;
+
+} // namespace mkt

@@ -6,20 +6,21 @@
 namespace mkt {
 
     // Constructor
-    SGDSolver::SGDSolver(KyuNet* net): Solver(net) {
+    template<typename T>
+    SGDSolver<T>::SGDSolver(KyuNet<T>* net): Solver<T>(net) {
 
         // Initialize Momentum value matrix
-        std::vector<Layer*> layers = net->getLayers();
+        std::vector<Layer<T>*> layers = net->getLayers();
         for (int i = 0; i < layers.size(); ++i)
         {
             if (layers[i]->pW_)
             {
                 Shape shape = layers.at(i)->getWeight_Shape();
                 // momentums_.emplace_back(new Tensor{shape});
-                Tensor* pTensor = new Tensor{shape};
+                Tensor<T>* pTensor = new Tensor<T>{shape};
                 momentums_.push_back(pTensor);
             } else {
-                Tensor* pTensor = new Tensor{1,1,1,1};
+                Tensor<T>* pTensor = new Tensor<T>{1,1,1,1};
                 // momentums_.emplace_back(new Tensor{1,1,1,1});
                 momentums_.push_back(pTensor);
             }
@@ -27,9 +28,11 @@ namespace mkt {
     }
 
     // Destructor
-    SGDSolver::~SGDSolver(){}
+    template<typename T>
+    SGDSolver<T>::~SGDSolver(){}
 
-    void SGDSolver::initialize() {
+    template<typename T>
+    void SGDSolver<T>::initialize() {
 
         // allocate Tensor in momentums
         for (int i = 0; i < momentums_.size(); ++i)
@@ -38,8 +41,8 @@ namespace mkt {
         }
     }
 
-
-    void SGDSolver::Update() {
+    template<typename T>
+    void SGDSolver<T>::Update() {
         /**
          * Origin SGD:
          * Wt+1 = Wt - alpha * gWt.
@@ -59,18 +62,18 @@ namespace mkt {
 
 
         // Start from the back of layers
-        std::vector<Layer*> layers = pNet_->getLayers();
+        std::vector<Layer<T>*> layers = this->pNet_->getLayers();
         for(size_t i = layers.size(); i-- > 0; ) {
 
-            Layer* pLayer = layers.at(i);
+            Layer<T>* pLayer = layers.at(i);
             if (pLayer->pW_)
             {
                 size_t size = pLayer->pgW_->getWholeSize();
-                float* pWData = pLayer->pW_->getCPUData();
-                float* pgWData = pLayer->pgW_->getCPUData();
+                T* pWData = pLayer->pW_->getCPUData();
+                T* pgWData = pLayer->pgW_->getCPUData();
 
                 // gWt_m = momentums[i]
-                float* pMomentumData = momentums_.at(i)->getCPUData();
+                T* pMomentumData = momentums_.at(i)->getCPUData();
 
 
 
@@ -92,4 +95,8 @@ namespace mkt {
             }
         }
     }
-}
+
+    // Explicitly instantiate the template, and its member definitions
+    template class SGDSolver<float>;
+
+} // namespace mkt

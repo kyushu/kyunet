@@ -7,10 +7,8 @@
 
 namespace mkt {
 
-
-
-
-    class Sigmoid_Act: public Activator
+    template<typename T>
+    class Sigmoid_Act: public Activator<T>
     {
     private:
         float negative_slope_;
@@ -18,8 +16,8 @@ namespace mkt {
         Sigmoid_Act();
         ~Sigmoid_Act();
 
-        void Forward(Tensor &src, Tensor &dst);
-        void Backward(Tensor &src, Tensor &src_grad, Tensor &dst_grad);
+        void Forward(Tensor<T> *src, Tensor<T> *dst);
+        void Backward(Tensor<T> *src, Tensor<T> *src_grad, Tensor<T> *dst_grad);
 
     };
 }
