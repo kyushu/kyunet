@@ -66,12 +66,12 @@ namespace mkt {
         // Initialize Function
         // void initialize(int batchSize, int h, int w, int c);
         void allocate();
-        void Reshape(int num, int height, int width, int ch);
+        void Reshape(int num, int height, int width, int ch, bool reAllocate=true);
 
         // Add Data Function
         OP_STATUS addData(char const *filename);
-        OP_STATUS addData(const float *pImg);
-        OP_STATUS addData(std::vector<float> vImg);
+        OP_STATUS addData(const T *pImg);
+        OP_STATUS addData(std::vector<T> vImg);
 
         //
         void resetData();

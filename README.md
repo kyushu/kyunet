@@ -1,9 +1,23 @@
 # kyunet
+
+### Purpose
+
 Implement a neural network framework from scratch for understanding and research.
 
-[all_test]: function test
-[example]: example of neural network implementation
-[inc]: header file
-[src]: cpp file
+### Current status
+
+Implemented operation:
+
+* Input Layer
+* Dense Layer (fully connected layer)
+* Conv Layer
+* Pooling Layer
+* Softmax layer
+* Cross entropy loss with softmax layer
+* ReLu
+* Sigmoid
+* Xavier initialization
+* He(MSRA) initialization
+* SGD solver(optimizer)
 
 

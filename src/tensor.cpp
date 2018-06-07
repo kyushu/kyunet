@@ -1,24 +1,3 @@
-/*
-* Copyright (c) 2017 Morpheus Tsai.
-*
-* Permission is hereby granted, free of charge, to any person obtaining a copy
-* of this software and associated documentation files (the "Software"), to deal
-* in the Software without restriction, including without limitation the rights
-* to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-* copies of the Software, and to permit persons to whom the Software is
-* furnished to do so, subject to the following conditions:
-*
-* The above copyright notice and this permission notice shall be included in
-* all copies or substantial portions of the Software.
-*
-* THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-* IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-* FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-* AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-* LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-* OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-* SOFTWARE.
-*/
 
 #include "tensor.h"
 #include "inc_thirdparty.h"
@@ -27,7 +6,9 @@
 
 namespace mkt {
 
-    // Constructor
+    /**
+     * Constructor without parameters
+     */
     template<typename T>
     Tensor<T>::Tensor():
         num_{0},
@@ -41,7 +22,9 @@ namespace mkt {
         pData_{nullptr}
     {};
 
-    // Constructor
+    /**
+     * Constructor with 4 Dimension parameters
+     */
     template<typename T>
     Tensor<T>::Tensor(int num, int height, int width, int ch):
         num_{num},
@@ -58,6 +41,9 @@ namespace mkt {
         // fprintf(stderr, "tensor construct channel_: %d\n", channel_);
     };
 
+    /**
+     * Constructor with Shape
+     */
     template<typename T>
     Tensor<T>::Tensor(Shape shape) {
         num_ = shape[0];
@@ -65,7 +51,7 @@ namespace mkt {
         width_ = shape[2];
         channel_ = shape[3];
 
-         size2D_ = height_ * width_;
+        size2D_ = height_ * width_;
         size3D_ = size2D_ * channel_;
         wholeSize_ = num_ * size3D_;
     }
@@ -99,8 +85,25 @@ namespace mkt {
 
     }
 
+    /**
+     * There are two ways to reshape tensor
+     * 1. If new shape is smaller then current, we don't re-allocate
+     *      the memory space but just update the domension parameters.
+     *      In this way we may save the time cost of allocate, release
+     *      memory space but waste some memory space.
+     * 2. Release current memory space and allocate new memory space with
+     *      new dimension parameters.
+     *      In this way we keep the memory size as required but spend more
+     *      time for re-alocate memory space.
+     *
+     * The DEFAULT of reAllocate = TRUE
+     */
     template<typename T>
-    void Tensor<T>::Reshape(int num, int height, int width, int ch) {
+    void Tensor<T>::Reshape(int num, int height, int width, int ch, bool reAllocate) {
+
+        int ori_whileSize = wholeSize_;
+
+        // Update dimension parameters
         num_ = num;
         height_ = height;
         width_ = width;
@@ -110,17 +113,32 @@ namespace mkt {
         size3D_ = size2D_ * channel_;
         wholeSize_ = num_ * size3D_;
 
-        if (pData_)
+        //
+        if (reAllocate)
         {
-            delete[] pData_;
+            if (pData_)
+            {
+                delete[] pData_;
+            }
+            allocate();
         }
-
-        allocate();
+        else {
+            if (pData_)
+            {
+                if (ori_whileSize < wholeSize_)
+                {
+                    delete[] pData_;
+                    allocate();
+                }
+            } else {
+                allocate();
+            }
+        }
     }
 
-    /*********************
+    /**
      * add data from file
-     *********************/
+     */
     template<typename T>
     OP_STATUS Tensor<T>::addData(char const *filename) {
 
@@ -155,9 +173,11 @@ namespace mkt {
         return OP_STATUS::SUCCESS;
     }
 
-    // add data from array
+    /**
+     * add data from array
+     */
     template<typename T>
-    OP_STATUS Tensor<T>::addData(const float *pImg) {
+    OP_STATUS Tensor<T>::addData(const T *pImg) {
 
         assert(pImg);
 
@@ -181,9 +201,11 @@ namespace mkt {
         return OP_STATUS::SUCCESS;
     }
 
-    // add data from vector
+    /**
+     * add data from std::vector
+     */
     template<typename T>
-    OP_STATUS Tensor<T>::addData(std::vector<float> vImg) {
+    OP_STATUS Tensor<T>::addData(std::vector<T> vImg) {
 
         // Safety Check
         if (wrIdx_ >= num_)
@@ -210,6 +232,7 @@ namespace mkt {
         return OP_STATUS::SUCCESS;
     }
 
+    // Reset data in tensor to zero
     template<typename T>
     void Tensor<T>::resetData() {
         // std::memset(pData_, 0, wholeSize_ * sizeof(float));
