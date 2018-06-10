@@ -1,5 +1,5 @@
-#ifndef SGD_SOLVER_H
-#define SGD_SOLVER_H
+#ifndef MKT_SGD_SOLVER_H
+#define MKT_SGD_SOLVER_H
 
 #include "solver/solver.h"
 #include "tensor.h"

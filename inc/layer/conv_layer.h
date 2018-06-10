@@ -10,21 +10,6 @@ namespace mkt {
     class ConvLayer:public Layer<T>
     {
     public:
-        int fh_; // filter height
-        int fw_; // filter width
-        int fc_; // filter channel = number of Filter(kernel)
-        int stride_h_;
-        int stride_w_;
-        int pad_h_;
-        int pad_w_;
-        PaddingType padding_type_;
-
-        // kernel(filter) tensor Dimension
-        int dilation_h_;
-        int dilation_w_;
-
-        Tensor<T>* pTmpCol_;
-
 
         ConvLayer(
             Layer<T>* prevLayer,
@@ -46,9 +31,8 @@ namespace mkt {
 
         ~ConvLayer();
 
+        // Must Implement virtual finctions form Layer class
         void initialize(NetMode mode);
-
-        // Computation Function
         void Forward();
         void Backward();
 
@@ -57,9 +41,26 @@ namespace mkt {
         int getFiltergetHeight();
         int getFiltergetWidth();
         int getFiltergetChannel();
-    };
+        Tensor<T>* getTmpCol();
 
-}
+    private:
+        int fh_; // filter height
+        int fw_; // filter width
+        int fc_; // filter channel = number of Filter(kernel)
+        int stride_h_;
+        int stride_w_;
+        int pad_h_;
+        int pad_w_;
+        PaddingType padding_type_;
+
+        // kernel(filter) tensor Dimension
+        int dilation_h_;
+        int dilation_w_;
+
+        Tensor<T>* pTmpCol_;
+    };
+} // namespace mkt
+
 
 
 #endif

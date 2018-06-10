@@ -1,5 +1,5 @@
-#ifndef PARAMETER_HPP
-#define PARAMETER_HPP
+#ifndef MKT_PARAMETER_HPP
+#define MKT_PARAMETER_HPP
 
 #include "definitions.h"
 

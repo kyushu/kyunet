@@ -52,7 +52,8 @@ namespace mkt {
         RELU,
         SIGMOID,
         SOFTMAX,
-        CROSS_LOSS_SOFTMAX
+        CROSS_LOSS_SOFTMAX,
+        BATCHNORM
     };
 
     // Weight Initializer type

@@ -4,8 +4,8 @@
  */
 
 
-#ifndef SOLVER_H
-#define SOLVER_H
+#ifndef MKT_SOLVER_H
+#define MKT_SOLVER_H
 
 #include "net.h"
 #include "definitions.h"

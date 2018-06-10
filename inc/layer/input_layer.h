@@ -15,13 +15,13 @@ namespace mkt {
 
         ~InputLayer();
 
-        // Method
+        // Must Implement virtual finctions form Layer class
         void initialize(NetMode mode);
-        void addFlattenImageToTensor(unsigned char *pImg, int index, bool bNormalize);
-        void DeFlattenImage(const T* pData, int height, int width, int channel, unsigned char *pImg);
-
         void Forward(){};
         void Backward(){};
+
+        void addFlattenImageToTensor(unsigned char *pImg, int index, bool bNormalize);
+        void DeFlattenImage(const T* pData, int height, int width, int channel, unsigned char *pImg);
 
     };
 }

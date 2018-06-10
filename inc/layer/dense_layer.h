@@ -10,7 +10,6 @@ namespace mkt {
     {
 
     public:
-        int unit_;
 
         // Constructor with ID
         DenseLayer(
@@ -34,9 +33,8 @@ namespace mkt {
 
         ~DenseLayer();
 
+        // Must Implement virtual finctions form Layer class
         void initialize(NetMode mode);
-
-        // Computation Function
         void Forward();
         void Backward();
     };

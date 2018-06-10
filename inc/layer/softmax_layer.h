@@ -16,12 +16,12 @@ namespace mkt {
         SoftmaxLayer(Layer<T>* prevLayer, std::string id);
         ~SoftmaxLayer();
 
+        // Must Implement virtual finctions form Layer class
         void initialize(NetMode mode);
-        void Reshape(int num, int height, int width, int ch);
-
-        // Computation Function
         void Forward();
         void Backward();
+
+        void Reshape(int num, int height, int width, int ch);
     };
 }
 

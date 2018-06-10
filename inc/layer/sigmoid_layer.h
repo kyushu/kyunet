@@ -1,5 +1,5 @@
-#ifndef _SIGMOID_LAYER_H_
-#define _SIGMOID_LAYER_H_
+#ifndef MKT_SIGMOID_LAYER_H
+#define MKT_SIGMOID_LAYER_H
 
 #include "layer/layer.h"
 #include "activator/sigmoid_act.h"
@@ -15,8 +15,8 @@ namespace mkt {
         SigmoidLayer(Layer<T>* prevLayer, std::string id);
         ~SigmoidLayer();
 
+        // Must Implement virtual finctions form Layer class
         void initialize(NetMode mode);
-        // Computation Function
         void Forward();
         void Backward();
     };
