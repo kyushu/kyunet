@@ -2,7 +2,7 @@
 /**
  * Implement Batch normalization which is proposed in the paper
  * "Batch Normalization: Accelerating Deep Network Training by
- *  Reducing Internal Covariate Shift"
+ *  Reducing Internal Covariate Shift". S. Ioffe and C. Szegedy (2015)
  *
  * The purpose of Batch normalization is trying to reduce "Internal
  *  Covariant Shift" Which is "the change in the distribution of network
@@ -16,6 +16,8 @@
  * For Convolution layer, the dimension of Gamma and Beta is MXC,
  * M is batch size and C is number of kernel(filter).
  */
+
+
 
 #ifndef MKT_BATCHNORM_H
 #define MKT_BATCHNORM_H
@@ -37,8 +39,8 @@ public:
     void Backward();
 
 private:
-    T mu;             // mean
-    T variance;       // variance = sigmae square
+    Tensor<T>* pMu_;             // mean
+    Tensor<T>* pVariance_;       // variance = sigmae square
 
     // Here i use pW_ to be "gamma" and pB_ to be "beta"
     // pW_  = gamma = learned scale parameter
