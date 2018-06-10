@@ -85,10 +85,10 @@ int main(int argc, char const *argv[])
     print_matrix(1, fc1, fh1, fw1, pConv_WData1);
 
     fprintf(stderr, "############ [Conv1-TmpCol] ############\n");
-    float* pConv_TmpColData1 = pConvLayer1->pTmpCol_->getCPUData();
-    int tmpcol_c1 = pConvLayer1->pTmpCol_->getChannel();
-    int tmpcol_h1 = pConvLayer1->pTmpCol_->getHeight();
-    int tmpcol_w1 = pConvLayer1->pTmpCol_->getWidth();
+    float* pConv_TmpColData1 = pConvLayer1->getTmpCol()->getCPUData();
+    int tmpcol_c1 = pConvLayer1->getTmpCol()->getChannel();
+    int tmpcol_h1 = pConvLayer1->getTmpCol()->getHeight();
+    int tmpcol_w1 = pConvLayer1->getTmpCol()->getWidth();
     print_matrix(1, tmpcol_c1, tmpcol_h1, tmpcol_w1, pConv_TmpColData1);
 
     fprintf(stderr, "############ [Conv1-Output] ############\n");
@@ -108,10 +108,10 @@ int main(int argc, char const *argv[])
     print_matrix(1, fc2, fh2, fw2, pConv_WData2);
 
     fprintf(stderr, "############ [Conv2-TmpCol] ############\n");
-    float* pConv_TmpColData2 = pConvLayer2->pTmpCol_->getCPUData();
-    int tmpcol_c2 = pConvLayer2->pTmpCol_->getChannel();
-    int tmpcol_h2 = pConvLayer2->pTmpCol_->getHeight();
-    int tmpcol_w2 = pConvLayer2->pTmpCol_->getWidth();
+    float* pConv_TmpColData2 = pConvLayer2->getTmpCol()->getCPUData();
+    int tmpcol_c2 = pConvLayer2->getTmpCol()->getChannel();
+    int tmpcol_h2 = pConvLayer2->getTmpCol()->getHeight();
+    int tmpcol_w2 = pConvLayer2->getTmpCol()->getWidth();
     print_matrix(1, tmpcol_c2, tmpcol_h2, tmpcol_w2, pConv_TmpColData2);
 
     fprintf(stderr, "############ [Conv2-Output] ############\n");
@@ -144,10 +144,10 @@ int main(int argc, char const *argv[])
     net.Backward();
 
     fprintf(stderr, "############ [Conv2-Col2Im] ############\n");
-    float* pConv_col2im2 = pConvLayer2->pTmpCol_->getCPUData();
-    int c2_col2im_c = pConvLayer2->pTmpCol_->getChannel();
-    int c2_col2im_h = pConvLayer2->pTmpCol_->getHeight();
-    int c2_col2im_w = pConvLayer2->pTmpCol_->getWidth();
+    float* pConv_col2im2 = pConvLayer2->getTmpCol()->getCPUData();
+    int c2_col2im_c = pConvLayer2->getTmpCol()->getChannel();
+    int c2_col2im_h = pConvLayer2->getTmpCol()->getHeight();
+    int c2_col2im_w = pConvLayer2->getTmpCol()->getWidth();
 
     print_matrix(1, c2_col2im_c, c2_col2im_h, c2_col2im_w, pConv_col2im2);
 

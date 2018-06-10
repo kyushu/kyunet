@@ -257,7 +257,7 @@ int main(int argc, char const *argv[])
             if (b > 0 && b%10 == 0)
             {
                 float loss = pCrossEntropyLayer->pDst_->getCPUData()[0];
-                fprintf(stderr, "%d: %f\n", i, loss);
+                fprintf(stderr, "%d: loss = %f\n", i, loss);
             }
         }
     }

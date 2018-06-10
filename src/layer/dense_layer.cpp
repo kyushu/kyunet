@@ -12,7 +12,7 @@ namespace mkt {
         ActivationType actType,
         InitializerType weightInitType,
         InitializerType biasInitType
-    ): unit_{unit}, Layer<T>(LayerType::DENSE, actType, weightInitType, biasInitType)
+    ): Layer<T>(LayerType::DENSE, actType, weightInitType, biasInitType)
     {
         this->id_ = id;
 
@@ -24,14 +24,18 @@ namespace mkt {
 
         this->pPrevLayer_ = prevLayer;
 
-        this->pDst_ = new Tensor<T>{this->batchSize_, 1, 1, unit};
-        this->pgDst_ = new Tensor<T>{this->batchSize_, 1, 1, unit};
+        this->oh_ = 1;
+        this->ow_ = 1;
+        this->oc_ = unit;
 
-        this->pW_   = new Tensor<T>{1, unit, input_size3D, 1};
-        this->pgW_  = new Tensor<T>{1, unit, input_size3D, 1};
+        this->pDst_ = new Tensor<T>{this->batchSize_, 1, 1, this->oc_};
+        this->pgDst_ = new Tensor<T>{this->batchSize_, 1, 1, this->oc_};
 
-        this->pB_   = new Tensor<T>{1, 1, 1, unit};
-        this->pgB_  = new Tensor<T>{1, 1, 1, unit};
+        this->pW_   = new Tensor<T>{1, this->oc_, input_size3D, 1};
+        this->pgW_  = new Tensor<T>{1, this->oc_, input_size3D, 1};
+
+        this->pB_   = new Tensor<T>{1, 1, 1, this->oc_};
+        this->pgB_  = new Tensor<T>{1, 1, 1, this->oc_};
 
         // Activator
         this->applyActivator();
@@ -45,24 +49,28 @@ namespace mkt {
         ActivationType actType,
         InitializerType weightInitType,
         InitializerType biasInitType
-    ): unit_{unit}, Layer<T>(LayerType::DENSE, actType, weightInitType, biasInitType)
+    ): Layer<T>(LayerType::DENSE, actType, weightInitType, biasInitType)
     {
         this->batchSize_ = prevLayer->pDst_->getNumOfData();
-        int h = prevLayer->pDst_->getHeight();
-        int w = prevLayer->pDst_->getWidth();
-        int c = prevLayer->pDst_->getChannel();
+        // int h = prevLayer->pDst_->getHeight();
+        // int w = prevLayer->pDst_->getWidth();
+        // int c = prevLayer->pDst_->getChannel();
         int input_size3D = prevLayer->pDst_->getSize3D();
 
         this->pPrevLayer_ = prevLayer;
 
-        this->pDst_  = new Tensor<T>{this->batchSize_, 1, 1, unit_};
-        this->pgDst_ = new Tensor<T>{this->batchSize_, 1, 1, unit_};
+        this->oh_ = 1;
+        this->ow_ = 1;
+        this->oc_ = unit;
 
-        this->pW_   = new Tensor<T>{1, unit_, input_size3D, 1};
-        this->pgW_  = new Tensor<T>{1, unit_, input_size3D, 1};
+        this->pDst_  = new Tensor<T>{this->batchSize_, 1, 1, this->oc_};
+        this->pgDst_ = new Tensor<T>{this->batchSize_, 1, 1, this->oc_};
 
-        this->pB_   = new Tensor<T>{1, 1, 1, unit_};
-        this->pgB_  = new Tensor<T>{1, 1, 1, unit_};
+        this->pW_   = new Tensor<T>{1, this->oc_, input_size3D, 1};
+        this->pgW_  = new Tensor<T>{1, this->oc_, input_size3D, 1};
+
+        this->pB_   = new Tensor<T>{1, 1, 1, this->oc_};
+        this->pgB_  = new Tensor<T>{1, 1, 1, this->oc_};
 
         // Activator
         this->applyActivator();
@@ -74,9 +82,9 @@ namespace mkt {
         this->id_ = id;
 
         this->batchSize_ = prevLayer->pDst_->getNumOfData();
-        int h = prevLayer->pDst_->getHeight();
-        int w = prevLayer->pDst_->getWidth();
-        int c = prevLayer->pDst_->getChannel();
+        // int h = prevLayer->pDst_->getHeight();
+        // int w = prevLayer->pDst_->getWidth();
+        // int c = prevLayer->pDst_->getChannel();
         int input_size3D = prevLayer->pDst_->getSize3D();
 
         this->pPrevLayer_ = prevLayer;
@@ -86,16 +94,19 @@ namespace mkt {
         this->weightInitType_ = params.weight_init_type;
         this->biasInitType_   = params.bias_init_type;
 
-        unit_ = params.fc;
 
-        this->pDst_ = new Tensor<T>{this->batchSize_, 1, 1, unit_};
-        this->pgDst_ = new Tensor<T>{this->batchSize_, 1, 1, unit_};
+        this->oh_ = 1;
+        this->ow_ = 1;
+        this->oc_ = params.fc;
 
-        this->pW_   = new Tensor<T>{1, unit_, input_size3D, 1};
-        this->pgW_  = new Tensor<T>{1, unit_, input_size3D, 1};
+        this->pDst_ = new Tensor<T>{this->batchSize_, 1, 1, this->oc_};
+        this->pgDst_ = new Tensor<T>{this->batchSize_, 1, 1, this->oc_};
 
-        this->pB_   = new Tensor<T>{1, 1, 1, unit_};
-        this->pgB_  = new Tensor<T>{1, 1, 1, unit_};
+        this->pW_   = new Tensor<T>{1, this->oc_, input_size3D, 1};
+        this->pgW_  = new Tensor<T>{1, this->oc_, input_size3D, 1};
+
+        this->pB_   = new Tensor<T>{1, 1, 1, this->oc_};
+        this->pgB_  = new Tensor<T>{1, 1, 1, this->oc_};
 
         // Activator
         this->applyActivator();
@@ -110,12 +121,12 @@ namespace mkt {
     template<typename T>
     void DenseLayer<T>::initialize(NetMode mode) {
 
-        MKT_Assert(this->pDst_ != nullptr, "pDst_ is null");
+        MKT_Assert(this->pDst_  != nullptr, "pDst_ is null");
         MKT_Assert(this->pgDst_ != nullptr, "pgDst_ is null");
-        MKT_Assert(this->pW_ != nullptr, "pW_ is null");
-        MKT_Assert(this->pgW_ != nullptr, "pgW_ is null");
-        MKT_Assert(this->pB_ != nullptr, "pB_ is null");
-        MKT_Assert(this->pgB_ != nullptr, "pgB_ is null");
+        MKT_Assert(this->pW_    != nullptr, "pW_ is null");
+        MKT_Assert(this->pgW_   != nullptr, "pgW_ is null");
+        MKT_Assert(this->pB_    != nullptr, "pB_ is null");
+        MKT_Assert(this->pgB_   != nullptr, "pgB_ is null");
 
         MKT_Assert(this->pActivator_ != nullptr, "pActivator_ is null");
 
@@ -150,13 +161,13 @@ namespace mkt {
         T* pWData = this->pW_->getCPUData();
 
 
-        gemm_cpu(CblasNoTrans, CblasTrans,      /* trans_A, trans_B  */
+        gemm_cpu(CblasNoTrans, CblasTrans,            /* trans_A, trans_B  */
             this->batchSize_, dstSize3D, srcSize3D,   /* M, N, K           */
-            1.0f,                               /* ALPHA             */
-            pSrcData, srcSize3D,                /* A,       lda(K)   */
-            pWData,   srcSize3D,                /* B,       ldb(K)   */
-            1.0f,                               /* BETA             */
-            pDstData, dstSize3D);               /* C,       ldc(N)   */
+            1.0f,                                     /* ALPHA             */
+            pSrcData, srcSize3D,                      /* A,       lda(K)   */
+            pWData,   srcSize3D,                      /* B,       ldb(K)   */
+            1.0f,                                     /* BETA             */
+            pDstData, dstSize3D);                     /* C,       ldc(N)   */
 
         // 3. Z + bias
         // addBias();
@@ -277,14 +288,14 @@ namespace mkt {
  *
  * 2. Z =             A(x)      x                B(Weight)
  *                                                (N=16)
- *                                             (oh*ow*oc = 2*2*4 = 16)
+ *                                             (1*unit*input_size*1 = 1*16*9+1)
  *                 (K = 9)
  *             (ih*iw*ic = 3*3*3 = 9)
  *                                           |w_00_00, ...,  w_0_08|
  *                                           |w_01_00, ...,  w_1_08|
  *      (M)     | x0, ...,  x8|              |w_02_00, ...,  w_2_08|     |z0 , ..., z15|
- * (batch_size) | x9, ..., x16| x trapnspos( |w_03_00, ...,  w_3_08| ) = |z16, ..., z31|
- *              |x17, ..., x24|              |w_04_00, ...,  w_4_08|     |z32, ..., z47|
+ * (batch_size) | x9, ..., x17| x trapnspos( |w_03_00, ...,  w_3_08| ) = |z16, ..., z31|
+ *              |x18, ..., x26|              |w_04_00, ...,  w_4_08|     |z32, ..., z47|
  *                                           |                     |
  *                                           |                     |
  *                                           |                     |
@@ -303,6 +314,20 @@ namespace mkt {
  * w_n1_n2
  * n1: index of destination
  * n2: index of source
+ *
+ * For instance
+ * # batch size = 32
+ * # Previous layer is convolutionla layer and output feature map is
+ *  feature mape = 16 x 5 x 5 = channel * height * width
+ *  so the total number of data is 32 * 16* 5 * 5
+ * # The number node of dense layer is 128
+ *
+ *       (16*5*5 = 400)      (128)                (128)
+ *       | s0 ~ s399 |   | f0 ~ f127 |        | d0 ~ d127 |
+ *       |     .     |   |     .     |        |     .     |
+ *   (32)|     .     | x |     .     |(400) = |     .     |(32)
+ *       |     .     |   |     .     |        |     .     |
+ *       | s0 ~ s399 |   | f0 ~ f127 |        | d0 ~ d127 |
  *
  *
  *

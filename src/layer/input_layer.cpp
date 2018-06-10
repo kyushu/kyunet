@@ -28,8 +28,9 @@ namespace mkt {
     }
 
     /*
-      the "FlattenImageToTensor" will normalize each pixel of image from (0, 255)  to (-1, 1)
-      and the pixel order will be reordered
+      the "FlattenImageToTensor" will normalize the intensity value of each pixel from (0, 255)  to (-1, 1)
+      and separate RGB channel.
+
       assume image is 3x4x3 = w x h x c
       the original order of pixel of image is
 
@@ -40,7 +41,7 @@ namespace mkt {
       R G B R G B R G B
       R G B R G B R G B
 
-      and convert it into
+      and convert it into c x w x h
 
       0 1 2 3 4 5 6 7 8
       -----------------
@@ -75,9 +76,10 @@ namespace mkt {
             }
 
             // pDst_->wrIdx_++;
-        } else {
-            // assert(this->pDst);
         }
+        //  else {
+        //     // assert(this->pDst);
+        // }
     }
 
     // For Debug
@@ -106,3 +108,25 @@ namespace mkt {
     template class InputLayer<float>;
 
 } // namespace mkt
+
+/**
+ * The format of image data after FlattenImage process is
+ * For instance
+ * batch size     = 4
+ * RGB image size = 3x2x3 = row x col x depth(channel)
+ *
+ * Tensor = batch_size x depth x row x col
+
+ * [p_0_0_00, p_0_0_01, p_0_0_10, p_0_0_11, p_0_0_20, p_0_0_21, p_1_1_00 ~ p_1_1_21, p_0_2_00 ~ p_0_2_21]
+ * [p_1_0_00, p_1_0_01, p_1_0_10, p_1_0_11, p_1_0_20, p_1_0_21, p_1_1_00 ~ p_1_1_21, p_1_2_00 ~ p_1_2_21]
+ *
+ *
+ * |                 Ch 0 of image 0                          |  Ch 1 of image 0   |  Ch 2 of image 0   |
+ * |                 Ch 0 of image 1                          |  Ch 1 of image 1   |  Ch 2 of image 1   |
+ *
+ * p_b_d_hw
+ * b = batch size
+ * d = depth
+ * h = height = row
+ * w = width  = col
+ */

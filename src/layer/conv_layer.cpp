@@ -143,15 +143,13 @@ namespace mkt {
     template<typename T>
     void ConvLayer<T>::initialize(NetMode mode) {
 
-        MKT_Assert(this->pDst_ != nullptr, "pDst_ is null");
+        MKT_Assert(this->pDst_  != nullptr, "pDst_ is null");
         MKT_Assert(this->pgDst_ != nullptr, "pgDst_ is null");
-        MKT_Assert(this->pW_ != nullptr, "pW_ is null");
-        MKT_Assert(this->pgW_ != nullptr, "pgW_ is null");
-        MKT_Assert(this->pB_ != nullptr, "pB_ is null");
-        MKT_Assert(this->pgB_ != nullptr, "pgB_ is null");
-
-        MKT_Assert(this->pActivator_ != nullptr, "pActivator_ is null");
-
+        MKT_Assert(this->pW_    != nullptr, "pW_ is null");
+        MKT_Assert(this->pgW_   != nullptr, "pgW_ is null");
+        MKT_Assert(this->pB_    != nullptr, "pB_ is null");
+        MKT_Assert(this->pgB_   != nullptr, "pgB_ is null");
+        // MKT_Assert(this->pActivator_ != nullptr, "pActivator_ is null");
         MKT_Assert(pTmpCol_ != nullptr, "pTmpCol_ is null");
 
         this->initOutputTensor();
@@ -226,7 +224,7 @@ namespace mkt {
                 CblasNoTrans, CblasNoTrans,         /* trans_A, trans_B */
                 fc, dst_size2D, filter_size2D*ic,   /* M,       N, K    */
                 1.0f,                               /* ALPHA            */
-                pWData, this->pW_->getSize2D()*ic,        /* A,       lda(K)  */
+                pWData, this->pW_->getSize2D()*ic,  /* A,       lda(K)  */
                 pTmpColData,   oh*ow,               /* B,       ldb(N)  */
                 1.0f,                               /* BETA             */
                 pDstData + i*dst_size3D, oh*ow      /* C,       ldc(N)  */
@@ -400,6 +398,9 @@ namespace mkt {
     template<typename T>
     int ConvLayer<T>::getFiltergetChannel() { return fc_; }
 
+    template<typename T>
+    Tensor<T>* ConvLayer<T>::getTmpCol()       { return pTmpCol_; }
+
 
     // Explicitly instantiate the template, and its member definitions
     template class ConvLayer<float>;
@@ -412,40 +413,45 @@ namespace mkt {
  *
  * ### Step 1. Im2col ###
  * For example:
- *     src     =ih(3) * iw(3) * ic(3)
+ *     src     = ic(3) * ih(3) * iw(3)
  *     filter  = ic(3) * fh(2) * fw(2) * fc(2)
  *     padding = 0
  *     stride  = 1
  *     dst     = oh(2) * ow(2)
  *
-              ch1         ch2         ch3
+ * ------------------------------------------------------------------------
+ *              ch1          ch2          ch3
  * src =   | 00 01 02 | | 09 10 11 | | 18 19 20 |
  *         | 03 04 05 | | 12 13 14 | | 21 22 23 |
  *         | 06 07 08 | | 15 16 17 | | 24 25 26 |
  *
+ * ------------------------------------------------------------------------
  * According to the dimension of src and filter
  * The filter(weight_matrix) is
- * Filter_0    |w_000, w_001| |w_100, w_101| |w_200, w_201|
- *             |w_002, w_003| |w_102, w_103| |w_202, w_203|
+ * Filter_0 = |w_0_000, w_0_001| |w_0_100, w_0_101| |w_0_200, w_0_201|
+ *            |w_0_010, w_0_011| |w_0_110, w_0_111| |w_0_210, w_0_211|
  *
- * Filter_1    |w_010, w_001| |w_110, w001| |w_210, w_001|
- *             |w_012, w_003| |w_112, w003| |w_212, w_003|
+ * Filter_1 = |w_1_000, w_1_001| |w_1_100, w_1_101| |w_1_200, w_1_201|
+ *            |w_1_010, w_1_011| |w_1_110, w_1_111| |w_1_210, w_1_211|
+ *  w_c_ihw:
+ *  c = index of filter
+ *  i = index of scr channel
+ *  h = index of filter height (row)
+ *  w = index of filter width  (col)
+ * ------------------------------------------------------------------------
  *
- * w_ifc,
- * i=index of scr channel
- * f=index of filter
- * c=index of weight of filter
+ * The first region of convolution operation is
+ * |0 1| convert to column vector = |0|
+ * |3 4|                            |1|
+ *                                  |3|
+ *                                  |4|
  *
+ * ------------------------------------------------------------------------
+ * For the computation reason, we need to convert each
+ * receptive field(2d patch) of filter into col vector.
  *
- * The first region of src which is applied to filter is
- * |0 1| convert to column vector= |0|
- * |3 4|                        |1|
- *                              |3|
- *                              |4|
- *
- * For the computation reason, we convert each receptive field(2d patch)
- * of filter into col vector
  * Conver src from image to column vector
+ *                      oh * ow = 2*2 = 4
  * im2col(src) =   | s00 s01 s03 s04 |
  *                 | s01 s02 s04 s05 |  src Channel 0
  *                 | s03 s04 s06 s07 |
@@ -468,10 +474,11 @@ namespace mkt {
  * im2col matrix = (ic*fh*fw) by (oh*ow)
  *
  *
+ * ------------------------------------------------------------------------
  * ### Step 2. GEMM: kernel X im2col ###
  * All parameters follow above
  *     src     = ih(3) x iw(3) x ic(3)
- *     filter  = ( ic(3) * fh(2) * fw(2) ) x fc(2)
+ *     filter  = fc(2) x ( ic(3) * fh(2) * fw(2) )
  *     padding = 0
  *     stride  = 1
  *     dst     = oh(2) X ow(2)
@@ -481,40 +488,52 @@ namespace mkt {
  *
  *     According to the dimension of src and filter
  *     The filter is
- *     Filter_0    |w_000, w_001| |w_100, w101| |w_200, w_201|
- *                 |w_002, w_003| |w_102, w103| |w_202, w_203|
+ *                     Ch 0 of src        Ch 1 of src       Ch 2 of src
  *
- *     Filter_1    |w_010, w_001| |w_110, w001| |w_210, w_001|
- *                 |w_012, w_003| |w_112, w003| |w_212, w_003|
+ *     Filter_0    |w_0_000, w_0_001| |w_0_100, w_0_101| |w_0_200, w_0_201|
+ *                 |w_0_010, w_0_011| |w_0_110, w_0_111| |w_0_210, w_0_211|
  *
- *     w_ifc,
- *     i=index of scr channel
- *     f=index of filter
- *     c=index of weight of filter
+ *     Filter_1    |w_1_000, w_1_001| |w_1_100, w_1_101| |w_1_200, w_1_201|
+ *                 |w_1_010, w_1_011| |w_1_110, w_1_111| |w_1_210, w_1_211|
  *
- *     The filter matrix is converted to row vectors.
- *     | w_000, ..., w_003, w_104, ..., w_107, w_208, ..., w_2011 | = filter 0 (F0)
- *     | w_010, ..., w_013, w_114, ..., w_117, w_218, ..., w_2011 | = filter 1 (F1)
+ *     w_c_ihw,
+ *     c = index of filter
+ *     i = index of scr channel
+ *     h = index of filter height (row)
+ *     w = index of filter width  (col)
+ *
+ *
+ * 1-1.
+ *  The filter matrix is converted to row vectors.
+ *       (   Ch 0 of src   )  (   Ch 1 of src   )  (   Ch 2 of src   )
+ *     | w_0_000 ... w_0_011, w_0_100 ... w_0_111, w_0_200 ... w_0_211 | = filter 0 (F0)
+ *     | w_1_000 ... w_1_011, w_1_100 ... w_1_111, w_1_200 ... w_1_211 | = filter 1 (F1)
+ *
+ *  The sequential index of memory address is
+ *       (       Ch 0 of src      )  (       Ch 1 of src      )  (       Ch 2 of src      )
+ *     | w_000, w_001, w_002, w_003, w_004, w_005, w_006, w_007, w_008, w_009, w_010, w_011 |
+ *     | w_012, w_013, w_014, w_015, w_016, w_017, w_018, w_019, w_020, w_021, w_022, w_023 |
  *
  *     filter matrix(Weight_matrix) = oc X (fh*fw*ic)
  *
  *
  * 2. Dst matrix = Weight_matrix X im2col(src) =
  *                          (oh * ow)
- *                     |  s0  s1  s3  s4 |
- *                     |  s1  s2  s4  s5 |
- *                     |  s3  s4  s6  s7 |
- *                     |  s4  s5  s7  s8 |
- *       (fh*fw*ic)    |  s9 s10 s12 s13 |
- *       |   F0   |    | s10 s11 s13 s14 |
- * (oc)  |   F1   |  X | s12 s13 s15 s16 | = oc X (oh*ow)
+ *                     | s00 s01 s03 s04 |
+ *                     | s01 s02 s04 s05 |
+ *                     | s03 s04 s06 s07 |
+ *                     | s04 s05 s07 s08 |
+ *       (fh*fw*ic)    | s09 s10 s12 s13 |
+ *       |   F0   |    | s10 s11 s13 s14 |   | d0, d1, d2, d3 |
+ * (oc)  |   F1   |  X | s12 s13 s15 s16 | = | d4, d5, d6, d7 | = oc X (oh*ow)
  *                     | s13 s14 s16 s17 |
  *                     | s18 s19 s21 s22 |
  *                     | s19 s20 s22 s23 |
  *                     | s21 s22 s24 s25 |
  *                     | s22 s23 s25 s26 |
  *
- *     Dst matrix = oc X (oh*ow)
+ *                    ( output ch 0 )( outputch 1 )
+ *     Dst matrix = | d0, d1, d2, d3 d4, d5, d6, d7 | = oc X (oh*ow)
 */
 
 

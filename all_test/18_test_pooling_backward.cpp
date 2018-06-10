@@ -89,10 +89,10 @@ int main(int argc, char const *argv[])
     print_matrix(1, fc, fh, fw, pConv_WData);
 
     fprintf(stderr, "############ [Conv-TmpCol] ############\n");
-    float* pConv_TmpColData = pConvLayer->pTmpCol_->getCPUData();
-    int tmpcol_c = pConvLayer->pTmpCol_->getChannel();
-    int tmpcol_h = pConvLayer->pTmpCol_->getHeight();
-    int tmpcol_w = pConvLayer->pTmpCol_->getWidth();
+    float* pConv_TmpColData = pConvLayer->getTmpCol()->getCPUData();
+    int tmpcol_c = pConvLayer->getTmpCol()->getChannel();
+    int tmpcol_h = pConvLayer->getTmpCol()->getHeight();
+    int tmpcol_w = pConvLayer->getTmpCol()->getWidth();
     print_matrix(1, tmpcol_c, tmpcol_h, tmpcol_w, pConv_TmpColData);
 
     fprintf(stderr, "############ [Conv-Output] ############\n");

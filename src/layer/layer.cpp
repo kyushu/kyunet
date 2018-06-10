@@ -92,7 +92,7 @@ namespace mkt {
             }
             case InitializerType::ONE:
             {
-                std::fill_n(pWData, weight_wholeSize, 1);
+                std::fill_n(pWData, weight_wholeSize, 1.0f);
                 break;
             }
             case InitializerType::TEST:

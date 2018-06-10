@@ -51,7 +51,7 @@ namespace mkt {
 
     template<typename T>
     void ReluLayer<T>::Backward() {
-        fprintf(stderr, "%s: %s: %d\n", __FILE__, __func__, __LINE__);
+        relu_act_.Backward(this->pDst_, this->pgDst_, this->pgDst_);
     };
 
     // Explicitly instantiate the template, and its member definitions
