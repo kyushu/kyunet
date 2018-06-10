@@ -19,8 +19,9 @@ namespace mkt {
     class Solver
     {
     public:
-        Solver(KyuNet<T>* Net) {
+        Solver(KyuNet<T>* Net, T learning_rate) {
             pNet_ = Net;
+            learning_rate_ = learning_rate;
         };
         ~Solver(){
             pNet_ = nullptr;
@@ -38,6 +39,7 @@ namespace mkt {
     protected:
         KyuNet<T>* pNet_;
         RegularizationType regularizationType_;
+        T learning_rate_;
         T momentum_;
         T lambda_; // L1 or L2 regularization parameter
 

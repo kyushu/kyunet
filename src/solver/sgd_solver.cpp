@@ -7,7 +7,7 @@ namespace mkt {
 
     // Constructor
     template<typename T>
-    SGDSolver<T>::SGDSolver(KyuNet<T>* net): Solver<T>(net) {
+    SGDSolver<T>::SGDSolver(KyuNet<T>* net, T learning_rate): Solver<T>(net, learning_rate) {
 
         // Initialize Momentum value matrix
         std::vector<Layer<T>*> layers = net->getLayers();
@@ -81,7 +81,8 @@ namespace mkt {
                 // cur_update_value = fraction_momentum * pre_Momentum[i] + laerning_rate * pgW_[i]
                 axpby(
                     size,           // The size
-                    0.0001/64.0f,           // a = learning rate
+                    // 0.0001/64.0f,           // a = learning rate
+                    this->learning_rate_/64.0f,           // a = learning rate
                     pgWData,        // x
                     0.9,            // b = fraction of momentum
                     pMomentumData   // y

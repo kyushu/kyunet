@@ -219,7 +219,8 @@ int main(int argc, char const *argv[])
     // CrossEntropyWutgSoftmaxLayer
     CrossEntropyLossWithSoftmaxLayer<float>* pCrossEntropyLayer = (CrossEntropyLossWithSoftmaxLayer<float> *)net->addCrossEntropyLossWithSoftmaxLayer(pDenseLayer, "cross_entropy_loss");
 
-    SGDSolver<float>* pSgdSolver = new SGDSolver<float>{net};
+    float learning_rate = 0.0003;
+    SGDSolver<float>* pSgdSolver = new SGDSolver<float>{net, learning_rate};
     net->addSolver(pSgdSolver);
 
     /* Initialize Net (Allocate menory) */
