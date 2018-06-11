@@ -367,23 +367,70 @@ namespace mkt {
     void ConvLayer<T>::calcOutputSize(int ic, int ih, int iw) {
         switch(padding_type_) {
             case PaddingType::VALID:
-                this->ow_ = static_cast<int>( static_cast<float>(iw - fw_ + 2*pad_w_) / stride_w_) + 1;
-                this->oh_ = static_cast<int>( static_cast<float>(ih - fh_ + 2*pad_h_) / stride_h_) + 1;
+                /**
+                 * The definition of VALID is
+                 * stride_w = stride_h = 1
+                 * pad_w = 0
+                 * pad_h = 0
+                 */
+                stride_w_ = 1;
+                stride_h_ = 1;
+                pad_w_ = 0;
+                pad_h_ = 0;
+                this->ow_ = static_cast<int>( static_cast<float>(iw -fw_ + 1) );
+                this->oh_ = static_cast<int>( static_cast<float>(ih -fh_ + 1) );
                 break;
+
             case PaddingType::SAME:
 
-                pad_w_ = static_cast<int>( ((iw-1)*stride_w_ + fw_ - iw) * 0.5 );
-                this->ow_    = static_cast<int>( static_cast<float>(iw - fw_ + (2*pad_w_)) / stride_w_ )  + 1;
-                MKT_Assert(iw == this->ow_, "iw != ow");
+                /**
+                 * The definition of SAME(Half) is
+                 * stride_w = stride_h = 1
+                 * fw = 2n+1
+                 * fh = 2n+1
+                 * pad_w = floor(fw/2)
+                 * paf_h = floor(fh/2)
+                 */
+                MKT_Assert(fw_%2 == 1, "fw != 2n+1");
+                MKT_Assert(fh_%2 == 1, "fh != 2n+1");
 
-                pad_h_ = static_cast<int>( ((ih-1)*stride_h_ + fh_ - ih) * 0.5 );
-                this->oh_    = static_cast<int>( static_cast<float>(ih - fh_ + (2*pad_h_)) / stride_h_ ) + 1;
-                MKT_Assert(ih == this->oh_, "ih != oh");
+                this->ow_ = iw;
+                this->oh_ = ih;
+                stride_w_ = 1;
+                stride_h_ = 1;
+                pad_w_ = std::floor( static_cast<float>(fw_)/2 );
+                pad_h_ = std::floor( static_cast<float>(fh_)/2 );
+
+                MKT_Assert(this->ow_ = iw, "iw != ow");
+                MKT_Assert(this->oh_ = ih, "ih != oh");
+
 
                 break;
+
+            case PaddingType::FULL:
+                /**
+                 * The definition of FULL is
+                 * stride_w = stride_h = 1
+                 * pad_w = fw - 1
+                 * paf_h = fh - 1
+                 */
+                stride_w_ = 1;
+                stride_h_ = 1;
+                pad_w_ = fw_ - 1;
+                pad_h_ = fh_ - 1;
+
+                this->ow_ = iw + (fw_ - 1);
+                this->oh_ = ih + (fh_ - 1);
+
+                break;
+
+            case PaddingType::NORMAL:
+                this->ow_ = static_cast<int>( static_cast<float>(iw - fw_ + 2*pad_w_) / stride_w_ ) + 1;
+                this->oh_ = static_cast<int>( static_cast<float>(ih - fh_ + 2*pad_h_) / stride_h_ ) + 1;
+                break;
             default:
-                this->ow_ = static_cast<int>( static_cast<float>(iw - fw_) / stride_w_)  + 1;
-                this->oh_ = static_cast<int>( static_cast<float>(ih - fh_) / stride_h_)  + 1;
+                this->ow_ = static_cast<int>( static_cast<float>(iw - fw_ + 2*pad_w_) / stride_w_ ) + 1;
+                this->oh_ = static_cast<int>( static_cast<float>(ih - fh_ + 2*pad_h_) / stride_h_ ) + 1;
                 break;
         }
     }
