@@ -38,6 +38,7 @@ namespace mkt {
 
     protected:
         KyuNet<T>* pNet_;
+        int batchSize_;
         RegularizationType regularizationType_;
         T learning_rate_;
         T momentum_;

@@ -45,7 +45,7 @@ namespace mkt {
 
 */
 
-    int gemm_cpu(
+    int gemm_cpu (
         CBLAS_TRANSPOSE trans_a, CBLAS_TRANSPOSE trans_b,
         int M, int N, int K,
         float ALPHA,
@@ -130,7 +130,7 @@ namespace mkt {
      * x: vector
      * y: vector
      */
-    int gemv_cpu(
+    int gemv_cpu (
         CBLAS_TRANSPOSE trans_a,
         int m, int n,
         float alpha, float *a, float *x,
@@ -164,6 +164,7 @@ namespace mkt {
         return 0;
     }
 
+
     /******************
      * y = aX + Y
      ******************/
@@ -174,11 +175,23 @@ namespace mkt {
         }
     }
 
+    /******************
+     * y = aX + bY
+     ******************/
     void axpby(int n, float a, float *x, float b, float *y)
     {
-        for (int i = 0; i < n; ++i) {
-            y[i] = a * x[i] + b * y[i];
+        if (b == 0)
+        {
+            for (int i = 0; i < n; ++i) {
+                y[i] = a * x[i];
+            }
         }
+        else {
+            for (int i = 0; i < n; ++i) {
+                y[i] = a * x[i] + b * y[i];
+            }
+        }
+
 
     }
 

@@ -3,7 +3,7 @@
 
 #include "tensor.h"
 #include "help_func/helper.hpp"
-#include "mkt_log.hpp"
+#include "mkt_log.h"
 
 namespace mkt {
 

@@ -34,7 +34,13 @@
 
 namespace mkt {
 
-    namespace UTILS {
+    class UTILS
+    {
+    public:
+        UTILS();
+        ~UTILS();
+
+
         static  bool caseInsensitiveCompare(const std::string a, const std::string b)
         {
             unsigned int sz = a.size();
@@ -100,11 +106,12 @@ namespace mkt {
             return tokens;
         }
 
-        bool has_only_digits(const std::string s){
+        static bool has_only_digits(const std::string s){
           return s.find_first_not_of( "0123456789" ) == std::string::npos;
         }
 
-    } // namespace UTILS
+    };
+
 } // namespace mkt
 
 

@@ -111,7 +111,10 @@ namespace mkt {
     enum class PaddingType:int
     {
         VALID=0, /*No padding*/
-        SAME     /*padding the input such that the output has the same length as the original input*/
+        SAME,     /*padding the input such that the output has the same length as the original input*/
+        FULL,
+        NORMAL,
+        LOAD_PARAMETER
         // causal
     };
 
@@ -127,7 +130,8 @@ namespace mkt {
         L2
     };
 
-    typedef std::vector<int> Shape;
+
+
 
 
 } // namespace mkt

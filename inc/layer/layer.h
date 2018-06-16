@@ -43,7 +43,7 @@
 #include "activator/activator.h"
 #include "activator/relu_act.h"
 #include "activator/sigmoid_act.h"
-#include "LayerParams.hpp"
+#include "params.h"
 
 namespace mkt {
 

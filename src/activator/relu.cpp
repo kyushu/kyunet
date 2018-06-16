@@ -16,7 +16,7 @@ namespace mkt {
         // Check size
         int srcWholeSize = src->getWholeSize();
         int dstWholeSize = src->getWholeSize();
-        CHECK_EQ(srcWholeSize, dstWholeSize, __func__);
+        CHECK_EQ(srcWholeSize, dstWholeSize, __func__, __LINE__);
         // if (!Check_EQ(srcWholeSize, dstWholeSize))
         // {
         //     MKT_ERR_LOG("Relu:Forward, size of src(%d) and dst(%d) is not equal\n", srcWholeSize, dstWholeSize);

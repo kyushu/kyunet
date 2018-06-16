@@ -1,6 +1,6 @@
 #include "layer/conv_layer.h"
 
-#include "test_utils.hpp"
+#include "conv_arithmetic.h"
 
 namespace mkt {
 
@@ -12,11 +12,12 @@ namespace mkt {
         int fh,
         int fw,
         int fc,
-        int stride_h,
-        int stride_w,
-        int pad_h,
-        int pad_w,
-        PaddingType paddingType,
+        ConvParam convParam,
+        // int stride_h,
+        // int stride_w,
+        // int pad_h,
+        // int pad_w,
+        // PaddingType paddingType,
         ActivationType actType,
         InitializerType weightInitType,
         InitializerType biasInitType
@@ -25,20 +26,22 @@ namespace mkt {
         fh_{fh},
         fw_{fw},
         fc_{fc},
-        stride_h_{stride_h},
-        stride_w_{stride_w},
-        pad_h_{pad_h},
-        pad_w_{pad_w},
-        padding_type_{paddingType},
-        dilation_h_{1},
-        dilation_w_{1},
+        convParam_{convParam},
+        // stride_h_{stride_h},
+        // stride_w_{stride_w},
+        // pad_h_{pad_h},
+        // pad_w_{pad_w},
+        // padding_type_{paddingType},
+        // dilation_h_{1},
+        // dilation_w_{1},
         Layer<T>(LayerType::CONVOLUTION, actType, weightInitType, biasInitType)
     {
+
         MKT_Assert(fc_ > 0, "fc_ = 0");
         MKT_Assert(fh_ > 0, "fh_ = 0");
         MKT_Assert(fw_ > 0, "fw_ = 0");
-        MKT_Assert(stride_h_ > 0, "stride_h_ = 0");
-        MKT_Assert(stride_w_ > 0, "stride_w_ = 0");
+        MKT_Assert(convParam_.stride_h_ > 0, "stride_h_ = 0");
+        MKT_Assert(convParam_.stride_w_ > 0, "stride_w_ = 0");
 
 
         this->id_ = id;
@@ -53,7 +56,8 @@ namespace mkt {
         this->oc_ = fc_;
 
         // Calculate oh, ow by input and filter dimension
-        calcOutputSize(ic, ih, iw);
+        // calcOutputSize(ic, ih, iw);
+        conv::calcOutputSize(iw, ih, fw_, fh_, convParam_, this->ow_, this->oh_);
 
         this->pDst_ = new Tensor<T>{this->batchSize_, this->oh_, this->ow_, this->oc_};
         this->pgDst_ = new Tensor<T>{this->batchSize_, this->oh_, this->ow_, this->oc_};
@@ -93,27 +97,28 @@ namespace mkt {
         fh_ = params.fh;
         fw_ = params.fw;
 
-        stride_h_ = params.stride_h;
-        stride_w_ = params.stride_w;
+        convParam_.stride_h_ = params.stride_h;
+        convParam_.stride_w_ = params.stride_w;
 
-        padding_type_ = params.padding_type;
-        pad_h_ = params.pad_h;
-        pad_w_ = params.pad_w;
+        convParam_.paddingType_ = params.padding_type;
+        convParam_.pad_h_ = params.pad_h;
+        convParam_.pad_w_ = params.pad_w;
 
         // Temporary set dilation to 1
-        dilation_h_ = params.dilation_h;
-        dilation_w_ = params.dilation_w;
+        convParam_.dilation_h_ = params.dilation_h;
+        convParam_.dilation_w_ = params.dilation_w;
 
         this->oc_ = fc_;
 
         MKT_Assert(fc_ > 0, "fc_ = 0");
         MKT_Assert(fh_ > 0, "fh_ = 0");
         MKT_Assert(fw_ > 0, "fw_ = 0");
-        MKT_Assert(stride_h_ > 0, "stride_h_ = 0");
-        MKT_Assert(stride_w_ > 0, "stride_w_ = 0");
+        MKT_Assert(convParam_.stride_h_ > 0, "stride_h_ = 0");
+        MKT_Assert(convParam_.stride_w_ > 0, "stride_w_ = 0");
 
         // Calculate oh, ow by input and filter dimension
-        calcOutputSize(ic, ih, iw);
+        // calcOutputSize(ic, ih, iw);
+        conv::calcOutputSize(iw, ih, fw_, fh_, convParam_, this->ow_, this->oh_);
 
         this->pDst_ = new Tensor<T>{this->batchSize_, this->oh_, this->ow_, this->oc_};
         this->pgDst_ = new Tensor<T>{this->batchSize_, this->oh_, this->ow_, this->oc_};
@@ -213,9 +218,9 @@ namespace mkt {
             mkt::im2col_cpu(pSrcData + i*src_size3D,
                 ic, ih, iw,
                 fh, fw,
-                pad_h_, pad_w_,
-                stride_h_, stride_w_,
-                dilation_h_, dilation_w_,
+                convParam_.pad_h_, convParam_.pad_w_,
+                convParam_.stride_h_, convParam_.stride_w_,
+                convParam_.dilation_h_, convParam_.dilation_w_,
                 pTmpColData
             );
 
@@ -322,9 +327,9 @@ namespace mkt {
             mkt::im2col_cpu(pSrcData + b*src_size3D,
                 ic, ih, iw,
                 fh, fw,
-                pad_h_, pad_w_,
-                stride_h_, stride_w_,
-                dilation_h_, dilation_w_,
+                convParam_.pad_h_, convParam_.pad_w_,
+                convParam_.stride_h_, convParam_.stride_w_,
+                convParam_.dilation_h_, convParam_.dilation_w_,
                 pTmpColData
             );
             mkt::gemm_cpu(
@@ -354,84 +359,12 @@ namespace mkt {
                     pTmpColData,
                     ic, ih, iw,
                     fh_, fw_,
-                    pad_h_, pad_w_,
-                    stride_h_, stride_w_,
-                    dilation_h_, dilation_w_,
+                    convParam_.pad_h_, convParam_.pad_w_,
+                    convParam_.stride_h_, convParam_.stride_w_,
+                    convParam_.dilation_h_, convParam_.dilation_w_,
                     pgSrcData + b*gsrc_size3D
                 );
             }
-        }
-    }
-
-    template<typename T>
-    void ConvLayer<T>::calcOutputSize(int ic, int ih, int iw) {
-        switch(padding_type_) {
-            case PaddingType::VALID:
-                /**
-                 * The definition of VALID is
-                 * stride_w = stride_h = 1
-                 * pad_w = 0
-                 * pad_h = 0
-                 */
-                stride_w_ = 1;
-                stride_h_ = 1;
-                pad_w_ = 0;
-                pad_h_ = 0;
-                this->ow_ = static_cast<int>( static_cast<float>(iw -fw_ + 1) );
-                this->oh_ = static_cast<int>( static_cast<float>(ih -fh_ + 1) );
-                break;
-
-            case PaddingType::SAME:
-
-                /**
-                 * The definition of SAME(Half) is
-                 * stride_w = stride_h = 1
-                 * fw = 2n+1
-                 * fh = 2n+1
-                 * pad_w = floor(fw/2)
-                 * paf_h = floor(fh/2)
-                 */
-                MKT_Assert(fw_%2 == 1, "fw != 2n+1");
-                MKT_Assert(fh_%2 == 1, "fh != 2n+1");
-
-                this->ow_ = iw;
-                this->oh_ = ih;
-                stride_w_ = 1;
-                stride_h_ = 1;
-                pad_w_ = std::floor( static_cast<float>(fw_)/2 );
-                pad_h_ = std::floor( static_cast<float>(fh_)/2 );
-
-                MKT_Assert(this->ow_ = iw, "iw != ow");
-                MKT_Assert(this->oh_ = ih, "ih != oh");
-
-
-                break;
-
-            case PaddingType::FULL:
-                /**
-                 * The definition of FULL is
-                 * stride_w = stride_h = 1
-                 * pad_w = fw - 1
-                 * paf_h = fh - 1
-                 */
-                stride_w_ = 1;
-                stride_h_ = 1;
-                pad_w_ = fw_ - 1;
-                pad_h_ = fh_ - 1;
-
-                this->ow_ = iw + (fw_ - 1);
-                this->oh_ = ih + (fh_ - 1);
-
-                break;
-
-            case PaddingType::NORMAL:
-                this->ow_ = static_cast<int>( static_cast<float>(iw - fw_ + 2*pad_w_) / stride_w_ ) + 1;
-                this->oh_ = static_cast<int>( static_cast<float>(ih - fh_ + 2*pad_h_) / stride_h_ ) + 1;
-                break;
-            default:
-                this->ow_ = static_cast<int>( static_cast<float>(iw - fw_ + 2*pad_w_) / stride_w_ ) + 1;
-                this->oh_ = static_cast<int>( static_cast<float>(ih - fh_ + 2*pad_h_) / stride_h_ ) + 1;
-                break;
         }
     }
 

@@ -1,5 +1,4 @@
 #include "layer/dense_layer.h"
-#include "test_utils.hpp"
 
 namespace mkt {
 

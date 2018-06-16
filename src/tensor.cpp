@@ -47,9 +47,10 @@ namespace mkt {
     template<typename T>
     Tensor<T>::Tensor(Shape shape) {
         num_ = shape[0];
-        height_ = shape[1];
-        width_ = shape[2];
-        channel_ = shape[3];
+        channel_ = shape[1];
+        height_ = shape[2];
+        width_ = shape[3];
+
 
         size2D_ = height_ * width_;
         size3D_ = size2D_ * channel_;
@@ -261,7 +262,7 @@ namespace mkt {
 
     template<typename T>
     Shape Tensor<T>::getShape() {
-        Shape shape{num_, height_, width_, channel_};
+        Shape shape{num_, channel_, height_, width_};
         return shape;
     }
 

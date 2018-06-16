@@ -1,5 +1,5 @@
-#ifndef MKT_FILLER_H
-#define MKT_FILLER_H
+#ifndef MKT_FILLER_HPP
+#define MKT_FILLER_HPP
 
 #include <random>
 
@@ -80,7 +80,7 @@ namespace mkt {
             }
         }
     };
-}
+} // namespace mkt
 
 
 

@@ -11,7 +11,7 @@ namespace mkt {
     class SGDSolver: public Solver<T>
     {
     public:
-        SGDSolver(KyuNet<T>* net, T learning_rate);
+        SGDSolver(KyuNet<T>* net, int batchSize, T learning_rate);
         ~SGDSolver();
 
         // Initialize Function

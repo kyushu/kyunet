@@ -117,11 +117,7 @@ namespace mkt {
         int kernel_Height,
         int kernel_width,
         int kernel_channel,
-        int stride_h,
-        int stride_w,
-        int pad_h,
-        int pad_w,
-        PaddingType paddingType,
+        ConvParam convParam,
         ActivationType activationType,
         InitializerType weightInitType, InitializerType biasInitType
         )
@@ -134,7 +130,9 @@ namespace mkt {
         }
 
         // Instantiate Conv Layer
-        ConvLayer<T>* pConvLayer = new ConvLayer<T>{prevLayer, id, kernel_Height, kernel_width, kernel_channel, stride_h, stride_w, pad_h, pad_w, paddingType, activationType, weightInitType, biasInitType};
+        // ConvLayer<T>* pConvLayer = new ConvLayer<T>{prevLayer, id, kernel_Height, kernel_width, kernel_channel, stride_h, stride_w, pad_h, pad_w, paddingType, activationType, weightInitType, biasInitType};
+        ConvLayer<T>* pConvLayer = new ConvLayer<T>{prevLayer, id, kernel_Height, kernel_width, kernel_channel, convParam, activationType, weightInitType, biasInitType};
+
 
         // Add Layer
         layers_.push_back(pConvLayer);
@@ -245,6 +243,15 @@ namespace mkt {
         return pCELossWithSoftmaxLayer;
     }
 
+    template<typename T>
+    Layer<T>* KyuNet<T>::addBatchNormLayer(Layer<T>* prevLayer, std::string id)
+    {
+
+        BatchNormLayer<T>* pBatchNormLayer = new BatchNormLayer<T>{prevLayer, id, InitializerType::ONE, InitializerType::ZERO};
+        layers_.push_back(pBatchNormLayer);
+        return pBatchNormLayer;
+    }
+
     /**************************
      *  Compile Function
      **************************/
@@ -327,7 +334,11 @@ namespace mkt {
      **************************/
     template<typename T>
     void KyuNet<T>::Train() {
+
+        // every Tensor for temporary data of layer will be
+        // reset in Forward function of each layer
         Forward();
+
         Backward();
 
         pSolver_->Update();

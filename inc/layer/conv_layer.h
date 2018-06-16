@@ -5,6 +5,7 @@
 #include "layer.h"
 
 
+
 namespace mkt {
     template<typename T>
     class ConvLayer:public Layer<T>
@@ -17,11 +18,12 @@ namespace mkt {
             int fh,
             int fw,
             int fc,
-            int stride_h,
-            int stride_w,
-            int pad_h,
-            int pad_w,
-            PaddingType paddingType,
+            // int stride_h,
+            // int stride_w,
+            // int pad_h,
+            // int pad_w,
+            // PaddingType paddingType,
+            ConvParam convParam,
             ActivationType actType,
             InitializerType weightInitType,
             InitializerType biasInitType
@@ -36,7 +38,6 @@ namespace mkt {
         void Forward();
         void Backward();
 
-        void calcOutputSize(int ic, int ih, int iw);
         // Getter Function
         int getFiltergetHeight();
         int getFiltergetWidth();
@@ -47,16 +48,15 @@ namespace mkt {
         int fh_; // filter height
         int fw_; // filter width
         int fc_; // filter channel = number of Filter(kernel)
-        int stride_h_;
-        int stride_w_;
-        int pad_h_;
-        int pad_w_;
-        PaddingType padding_type_;
 
-        // kernel(filter) tensor Dimension
-        int dilation_h_;
-        int dilation_w_;
-
+        // int stride_h_;
+        // int stride_w_;
+        // int pad_h_;
+        // int pad_w_;
+        // PaddingType padding_type_;
+        // int dilation_h_;
+        // int dilation_w_;
+        ConvParam convParam_;
         Tensor<T>* pTmpCol_;
     };
 } // namespace mkt

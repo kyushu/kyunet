@@ -1,8 +1,6 @@
 #include "layer/pooling_layer.h"
 #include <cfloat>
 
-#include "test_utils.hpp"
-
 
 namespace mkt {
 

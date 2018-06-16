@@ -38,6 +38,8 @@
 #include "layer/pooling_layer.h"
 #include "layer/softmax_layer.h"
 #include "layer/cross_entropy_loss_with_softmax_layer.h"
+#include "layer/batchNorm_layer.h"
+
 
 
 namespace mkt {
@@ -71,7 +73,9 @@ namespace mkt {
 
         Layer<T>* addDenseLayer(Layer<T>* prevLayer, std::string id, LayerParams params);
 
-        Layer<T>* addConvLayer(Layer<T>* prevLayer, std::string id, int kernel_Height, int kernel_width, int kernel_channel, int stride_h, int stride_w, int pad_h, int pad_w, PaddingType paddingType, ActivationType activationType, InitializerType weightInitType, InitializerType biasInitType);
+        // Layer<T>* addConvLayer(Layer<T>* prevLayer, std::string id, int kernel_Height, int kernel_width, int kernel_channel, int stride_h, int stride_w, int pad_h, int pad_w, PaddingType paddingType, ActivationType activationType, InitializerType weightInitType, InitializerType biasInitType);
+
+        Layer<T>* addConvLayer(Layer<T>* prevLayer, std::string id, int kernel_Height, int kernel_width, int kernel_channel, ConvParam convParam, ActivationType activationType, InitializerType weightInitType, InitializerType biasInitType);
 
         Layer<T>* addConvLayer(Layer<T>* prevLayer, std::string id, LayerParams params);
 
@@ -87,6 +91,7 @@ namespace mkt {
 
         Layer<T>* addCrossEntropyLossWithSoftmaxLayer( Layer<T>* prevLayer, std::string id);
 
+        Layer<T>* addBatchNormLayer(Layer<T>* prevLayer, std::string id);
         /**
          * Compile Function: allocate memory
          */

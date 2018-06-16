@@ -1,13 +1,14 @@
 
 #include "solver/sgd_solver.h"
 
-#include "test_utils.hpp"
 
 namespace mkt {
 
     // Constructor
     template<typename T>
-    SGDSolver<T>::SGDSolver(KyuNet<T>* net, T learning_rate): Solver<T>(net, learning_rate) {
+    SGDSolver<T>::SGDSolver(KyuNet<T>* net, int batchSize, T learning_rate): Solver<T>(net, learning_rate) {
+
+        this->batchSize_ = batchSize;
 
         // Initialize Momentum value matrix
         std::vector<Layer<T>*> layers = net->getLayers();
@@ -16,13 +17,13 @@ namespace mkt {
             if (layers[i]->pW_)
             {
                 Shape shape = layers.at(i)->getWeight_Shape();
-                // momentums_.emplace_back(new Tensor{shape});
-                Tensor<T>* pTensor = new Tensor<T>{shape};
-                momentums_.push_back(pTensor);
+                momentums_.emplace_back(new Tensor<T>{shape});
+                // Tensor<T>* pTensor = new Tensor<T>{shape};
+                // momentums_.push_back(pTensor);
             } else {
-                Tensor<T>* pTensor = new Tensor<T>{1,1,1,1};
-                // momentums_.emplace_back(new Tensor{1,1,1,1});
-                momentums_.push_back(pTensor);
+                momentums_.emplace_back(new Tensor<T>{1,1,1,1});
+                // Tensor<T>* pTensor = new Tensor<T>{1,1,1,1};
+                // momentums_.push_back(pTensor);
             }
         }
     }
@@ -53,16 +54,17 @@ namespace mkt {
          * we add previous momentum of gWt to current gWt, so gWt will be
          * gWt_m = (m * gWt-1_m) + (alpha * gWt)
          *          |     |           |      |
-         *          |     |           |      |---gradient of loss with respect to weight
-         *          |     |           |----------learning rate
-         *          |     |----------------------Momentum of previous update value
-         *          |----------------------------fraction of momentum
+         *          |     |           |      |___ gradient of loss with respect to weight
+         *          |     |           |__________ learning rate
+         *          |     |______________________ Momentum of previous update value
+         *          |____________________________ fraction of momentum
          * Wt+1 = Wt - gWt_m
          */
 
 
         // Start from the back of layers
         std::vector<Layer<T>*> layers = this->pNet_->getLayers();
+        T learning_rate = this->learning_rate_ / this->batchSize_;
         for(size_t i = layers.size(); i-- > 0; ) {
 
             Layer<T>* pLayer = layers.at(i);
@@ -80,12 +82,12 @@ namespace mkt {
                 // y = ax+by
                 // cur_update_value = fraction_momentum * pre_Momentum[i] + laerning_rate * pgW_[i]
                 axpby(
-                    size,           // The size
-                    // 0.0001/64.0f,           // a = learning rate
-                    this->learning_rate_/64.0f,           // a = learning rate
-                    pgWData,        // x
-                    0.9,            // b = fraction of momentum
-                    pMomentumData   // y
+                    size,            // The size
+                    // 0.0001/64.0f, // a = learning rate
+                    learning_rate,   // a = learning rate
+                    pgWData,         // x
+                    0.9,             // b = fraction of momentum
+                    pMomentumData    // y
                 );
 
                 axpy(size, -1, pMomentumData, pWData);

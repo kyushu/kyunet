@@ -1,7 +1,7 @@
 #include "layer/cross_entropy_loss_with_softmax_layer.h"
 #include <cfloat>
 
-#include "test_utils.hpp"
+#include "mkt_log.h"
 
 namespace mkt {
 
@@ -80,7 +80,7 @@ namespace mkt {
     template<typename T>
     void CrossEntropyLossWithSoftmaxLayer<T>::LoadLabel(int num, const int* pLabel) {
 
-        CHECK_EQ(pLabel_->getWholeSize(), num, __FILE__);
+        CHECK_EQ(pLabel_->getWholeSize(), num, __FILE__, __LINE__);
 
         int numClass = softmaxLayer_.pDst_->getChannel();
 
@@ -96,7 +96,7 @@ namespace mkt {
     template<typename T>
     void CrossEntropyLossWithSoftmaxLayer<T>::LoadLabel(const std::vector<int>& labels) {
 
-        CHECK_EQ(pLabel_->getWholeSize(), static_cast<int>(labels.size()), __FILE__);
+        CHECK_EQ(pLabel_->getWholeSize(), static_cast<int>(labels.size()), __FILE__, __LINE__);
 
         int numClass = softmaxLayer_.pDst_->getChannel();
 
@@ -141,8 +141,8 @@ namespace mkt {
             {
                 const int label_value = static_cast<int>( pTruth_label[i + b*size2D]);
                 // fprintf(stderr, "label_value[%d]: %d\n", (i + b*size2D), label_value);
-                CHECK_GE(label_value, 0, __func__);
-                CHECK_LT(label_value, numClass, __func__);
+                CHECK_GE(label_value, 0, __func__, __LINE__);
+                CHECK_LT(label_value, numClass, __func__, __LINE__);
                 // fprintf(stderr, "i: %d, label_value: %d, size2D: %d, b: %d, dim: %d\n", i, label_value, size2D, b, dim);
                 // fprintf(stderr, "prob_data[%d]: %f\n", i + label_value*size2D + b*dim, prob_data[i + label_value*size2D + b*dim]);
                 loss -= log( std::max(prob_data[i + label_value*size2D + b*dim], FLT_MIN) );

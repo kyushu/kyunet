@@ -30,6 +30,7 @@
 #include <cstring>
 
 #include "definitions.h"
+#include "params.h"
 
 namespace mkt {
     template<typename T>
