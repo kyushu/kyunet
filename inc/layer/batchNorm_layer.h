@@ -26,12 +26,15 @@
 
 namespace mkt {
 
+const double DEFAULT_BATCH_NORM_EPS = 0.0001;
+
 template<typename T>
-class BatchNorm: public Layer<T>
+class BatchNormLayer: public Layer<T>
 {
 public:
-    BatchNorm(Layer<T>* prevLayer, std::string id);
-    ~BatchNorm();
+    BatchNormLayer(Layer<T>* prevLayer, std::string id, InitializerType weightInitType,
+        InitializerType biasInitType, T eps=DEFAULT_BATCH_NORM_EPS);
+    ~BatchNormLayer();
 
     // Must Implement virtual finctions form Layer class
     void initialize(NetMode mode);
@@ -39,8 +42,16 @@ public:
     void Backward();
 
 private:
-    Tensor<T>* pMu_;             // mean
-    Tensor<T>* pVariance_;       // variance = sigmae square
+    T eps_;
+    int running_stats_window_size_;
+    int num_updates_;
+    Tensor<T>* pRunning_means_;     // for inference
+    Tensor<T>* pRunning_variances_; // for inference
+
+    Tensor<T>* pMean_;              // current batch data mean
+    Tensor<T>* pInvstds_;           // current batch data variance = sigmae square
+    Tensor<T>* pdvar_;
+    Tensor<T>* pdmean_;
 
     // Here i use pW_ to be "gamma" and pB_ to be "beta"
     // pW_  = gamma = learned scale parameter
