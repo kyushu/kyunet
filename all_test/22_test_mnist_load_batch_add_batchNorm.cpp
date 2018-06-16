@@ -2,6 +2,10 @@
 #include <fstream>
 #include <string>     // std::string, std::stoi
 
+#include <random>       // std::default_random_engine
+#include <chrono>       // std::chrono::system_clock
+#include <algorithm>    // std::shuffle
+
 #include "stb_image.h"
 
 #include <opencv2/imgproc/imgproc.hpp>
@@ -42,6 +46,7 @@ void display_image_with_label(std::vector<std::string> image_files, std::vector<
 void check_image_info(std::string full_path) {
     int w, h, c;
     unsigned char *pImg = stbi_load(full_path.c_str(), &w, &h, &c, 0);
+    fprintf(stderr, "image[0]: %s\n", full_path.c_str());
     fprintf(stderr, "w: %d, h: %d, c: %d\n", w, h, c);
 
     delete[] pImg;
@@ -132,19 +137,37 @@ int main(int argc, char const *argv[])
         return -1;
     }
 
-    std::vector<std::string> image_files;
-    std::vector<int> labels;
+    std::vector<std::string> training_data;
     std::string line;
     while(std::getline(ifile, line)) {
-        // fprintf(stderr, "%s\n", line.c_str());
-        std::vector<std::string> compons = UTILS::split(line, ' ');
-        image_files.push_back(root + compons[0]);
-        // int label = std::stoi(compons[1]);
+        training_data.push_back(line);
+    }
+
+    // Random shuffle data
+    unsigned seed = std::chrono::system_clock::now().time_since_epoch().count();
+    shuffle (training_data.begin(), training_data.end(), std::default_random_engine(seed));
+
+    std::vector<std::string> image_files;
+    std::vector<int> labels;
+
+    for (size_t i = 0; i < training_data.size(); ++i)
+    {
+        std::vector<std::string> compons = UTILS::split(training_data[i], ' ');
+        image_files.emplace_back(root + compons[0]);
         labels.emplace_back(std::stoi(compons[1]));
     }
 
+    // while(std::getline(ifile, line)) {
+    //     // fprintf(stderr, "%s\n", line.c_str());
+    //     std::vector<std::string> compons = UTILS::split(line, ' ');
+    //     image_files.push_back(root + compons[0]);
+    //     // int label = std::stoi(compons[1]);
+    //     labels.emplace_back(std::stoi(compons[1]));
+    // }
+
     // display_image_with_label(image_files, labels, root, 20);
     check_image_info(image_files[0]);
+
 
 
     /* Parameters */
