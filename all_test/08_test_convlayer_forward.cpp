@@ -31,7 +31,8 @@ int main(int argc, char const *argv[])
     // Add ConvLayer
     InitializerType weightInitType = InitializerType::TEST;
     InitializerType biasInitType = InitializerType::ZERO;
-    Layer<float>* pConvLayer = net.addConvLayer(pInputLayer, "conv_1", 3, 3, 2, 1, 1, 0, 0, PaddingType::VALID, ActivationType::NONE, weightInitType, biasInitType);
+    ConvParam convParam{PaddingType::VALID, 1, 1, 0, 0};
+    Layer<float>* pConvLayer = net.addConvLayer(pInputLayer, "conv_1", 3, 3, 2, convParam, ActivationType::NONE, weightInitType, biasInitType);
 
 
     // KyuNet Initialization: memory allocation

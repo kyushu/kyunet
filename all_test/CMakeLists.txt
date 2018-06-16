@@ -18,19 +18,22 @@ message(STATUS ${PROJECT_SOURCE_DIR}/../inc/)
 
 # file(GLOB SRC *.cpp)
 
+add_subdirectory(test_utils)
+include_directories(test_utils)
+
 macro(add_example name)
    add_executable(${name} ${name}.cpp)
-   target_link_libraries(${name} libkyunet )
+   target_link_libraries(${name} test_utils libkyunet )
 endmacro()
 
 macro(add_example_with_stb name)
     add_executable(${name} ${name}.cpp ${stb_SRC})
-    target_link_libraries(${name} libkyunet )
+    target_link_libraries(${name} test_utils libkyunet )
 endmacro()
 
 macro(add_example_with_stb_cv name)
     add_executable(${name} ${name}.cpp ${stb_SRC})
-    target_link_libraries(${name} ${OpenCV_LIBS} libkyunet )
+    target_link_libraries(${name} test_utils ${OpenCV_LIBS} libkyunet )
 endmacro()
 
 find_package(OpenCV REQUIRED)
@@ -99,6 +102,9 @@ find_package(OpenCV REQUIRED)
 
         # 21_test_mnist_load_batch
         add_example_with_stb_cv(21_test_mnist_load_batch)
+
+        # 21_test_mnist_load_batch
+        add_example_with_stb_cv(22_test_mnist_load_batch_add_batchNorm)
 
     else()
         message("OpenCV not found")

@@ -186,6 +186,8 @@ int main(int argc, char const *argv[])
     conv1_par.bias_init_type = InitializerType::ZERO;
     ConvLayer<float>* pConvLayer1 = (ConvLayer<float>* )net->addConvLayer(pInLayer, "conv1", conv1_par);
 
+    Layer<float>* pBatchNormLayer1 = net->addBatchNormLayer(pConvLayer1, "bn1");
+
     // Convolution Layer 2
     LayerParams conv2_par;
     conv2_par.fc = 64;
@@ -199,7 +201,7 @@ int main(int argc, char const *argv[])
     conv2_par.actType = ActivationType::RELU;
     conv2_par.weight_init_type = InitializerType::HE_INIT_NORM;
     conv2_par.bias_init_type = InitializerType::ZERO;
-    ConvLayer<float>* pConvLayer2 = (ConvLayer<float>* )net->addConvLayer(pConvLayer1, "conv2", conv2_par);
+    ConvLayer<float>* pConvLayer2 = (ConvLayer<float>* )net->addConvLayer(pBatchNormLayer1, "conv2", conv2_par);
 
     // Layer<float>* pBatchNormLayer2 = net->addBatchNormLayer(pConvLayer2, "bn2");
 

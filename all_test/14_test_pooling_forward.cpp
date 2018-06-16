@@ -1,7 +1,7 @@
 #include <time.h>       /* time */
 
 #include "net.h"
-#include "test_utils.hpp"
+#include "test_utils.h"
 
 using namespace mkt;
 

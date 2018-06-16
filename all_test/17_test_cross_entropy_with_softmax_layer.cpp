@@ -1,7 +1,7 @@
 
 
 #include "net.h"
-#include "test_utils.hpp"
+#include "test_utils.h"
 
 int main(int argc, char const *argv[])
 {

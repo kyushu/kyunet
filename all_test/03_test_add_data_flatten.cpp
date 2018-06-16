@@ -120,7 +120,7 @@ void test_add_batch_image() {
 
     std::string img_dir = "../example/images";
     std::vector<std::string> file_list;
-    mkt::listdir(img_dir.c_str(), file_list);
+    mkt::FILEIO::listdir(img_dir.c_str(), file_list);
     fprintf(stderr, "file_list.size(): %ld\n", file_list.size());
     for (size_t i = 0; i < file_list.size(); ++i)
     {
@@ -221,7 +221,7 @@ int main(int argc, char const *argv[])
     }
     std::string strOpt = argv[1];
     int option = 0;
-    if (UTILS::has_only_digits(strOpt))
+    if (mkt::UTILS::has_only_digits(strOpt))
     {
         option = std::stoi(strOpt);
     }

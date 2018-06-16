@@ -54,7 +54,7 @@ unsigned char* resize_image(std::string file, int out_w, int out_h) {
 void test_load_image_file(std::string img_dir) {
 
     std::vector<std::string> file_list;
-    mkt::listdir(img_dir.c_str(), file_list);
+    mkt::FILEIO::listdir(img_dir.c_str(), file_list);
 
     // Instantiate an Tensor
     mkt::Tensor<float> tensor(file_list.size(), 480, 600, 3);

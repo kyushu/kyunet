@@ -15,10 +15,13 @@ else()
 endif()
 
 # Debug setting
-SET(CMAKE_BUILD_TYPE "Debug")
-SET(CMAKE_CXX_FLAGS_DEBUG "$ENV{CXXFLAGS} -O0 -Wall -g2 -ggdb")
+set(CMAKE_BUILD_TYPE "Debug")
+set(CMAKE_CXX_FLAGS_DEBUG "$ENV{CXXFLAGS} -O0 -Wall -g2 -ggdb")
 # Set compile mode to debug
 set(CMAKE_BUILD_TYPE RelWithDebInfo)
+
+
+set(USE_CUDA)
 
 
 
