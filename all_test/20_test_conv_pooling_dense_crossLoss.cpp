@@ -96,7 +96,7 @@ int main(int argc, char const *argv[])
     net->Compile(NetMode::TRAINING);
 
     // /*Set random pesudo input data */
-    float* pInData = pInLayer->pDst_->getCPUData();
+    // float* pInData = pInLayer->pDst_->getCPUData();
     // genRndPseudoData(pInData, batchSize, input_ch, input_height, input_width);
 
     // /* load label to loss layer */
@@ -150,7 +150,7 @@ int main(int argc, char const *argv[])
 
         fprintf(stderr, "############ [Conv1-Output] ############\n");
         float* pConv_DstData1 = pConvLayer1->pDst_->getCPUData();
-        int conv_wholeSize1 = pConvLayer1->pDst_->getWholeSize();
+        // int conv_wholeSize1 = pConvLayer1->pDst_->getWholeSize();
         int conv_oh1 = pConvLayer1->pDst_->getHeight();
         int conv_ow1 = pConvLayer1->pDst_->getWidth();
         int conv_oc1 = pConvLayer1->pDst_->getChannel();
@@ -158,7 +158,7 @@ int main(int argc, char const *argv[])
 
         fprintf(stderr, "############ [Pooling Output] ############\n");
         float* pPooling_DstData = pPoolingLayer->pDst_->getCPUData();
-        int pool_wholeSize = pPoolingLayer->pDst_->getWholeSize();
+        // int pool_wholeSize = pPoolingLayer->pDst_->getWholeSize();
         int pool_oh = pPoolingLayer->pDst_->getHeight();
         int pool_ow = pPoolingLayer->pDst_->getWidth();
         int pool_oc = pPoolingLayer->pDst_->getChannel();
@@ -175,8 +175,8 @@ int main(int argc, char const *argv[])
         int fc_dst_c = pDenseLayer->pDst_->getChannel();
         int fc_dst_h = pDenseLayer->pDst_->getHeight();
         int fc_dst_w = pDenseLayer->pDst_->getWidth();
-        int fc_dst_size2D = pDenseLayer->pDst_->getSize2D();
-        int fc_dst_size3D = pDenseLayer->pDst_->getSize3D();
+        // int fc_dst_size2D = pDenseLayer->pDst_->getSize2D();
+        // int fc_dst_size3D = pDenseLayer->pDst_->getSize3D();
         print_matrix(batchSize, fc_dst_c, fc_dst_h, fc_dst_w, pDenseLayer->pDst_->getCPUData());
 
         /*

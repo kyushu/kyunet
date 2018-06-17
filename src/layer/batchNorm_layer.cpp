@@ -1,5 +1,6 @@
 
 #include "layer/batchNorm_layer.h"
+#include "operations/bn_operations.h"
 
 namespace mkt {
 
@@ -109,167 +110,109 @@ namespace mkt {
         pdvar_->resetData();
         pdmean_->resetData();
 
+        // averaging_factor is used for running mean and variance
         const T averaging_factor = 1.0 - num_updates_/(num_updates_ + 1.0);
         ++num_updates_;
         if (num_updates_ > running_stats_window_size_) {
             num_updates_ = running_stats_window_size_;
         }
 
-        auto pSrcData = this->pPrevLayer_->pDst_->getCPUData();
-        auto pMeanData = pMean_->getCPUData();
-        auto pInvstdsData = pInvstds_->getCPUData();
-        auto pDstData = this->pDst_->getCPUData();
+        op::bn::batchNorm (
+            this->batchSize_, averaging_factor, eps_,
+            this->pPrevLayer_->pDst_, this->pDst_,
+            this->pW_,  this->pB_,
+            pMean_,  pInvstds_, pRunning_variances_, pRunning_means_
+        );
 
-        auto pWData = this->pW_->getCPUData();
-        auto pBData = this->pB_->getCPUData();
-
-        int channel = this->pPrevLayer_->pDst_->getChannel();
-        int size2D = this->pPrevLayer_->pDst_->getSize2D();
-
-        // Compute mean and invert variance
-        for (size_t b = 0; b < this->batchSize_; ++b)
-        {
-            for (size_t c = 0; c < this->oc_; ++c)
-            {
-                for (size_t sz = 0; sz < size2D; ++sz)
-                {
-                    pMeanData[c] += *pSrcData / (size2D*this->batchSize_);
-                    pInvstdsData[c] += (*pSrcData)*(*pSrcData) / (size2D*this->batchSize_);
-                    ++pSrcData;
-                }
-            }
-        }
-
-        // Update running variance and invert_variance
-        auto rvar = pRunning_variances_->getCPUData();
-        const double scale = (size2D*this->batchSize_) / (size2D*this->batchSize_ - 1.0);
-        for (int c = 0; c < channel; ++c)
-        {
-            T actual_var = pInvstdsData[c] - pMeanData[c]*pMeanData[c];
-            if (averaging_factor == 1)
-            {
-                rvar[c] = scale*actual_var;
-            }
-            else {
-                rvar[c] = (1-averaging_factor)*rvar[c] + scale*averaging_factor*actual_var;
-            }
-            pInvstdsData[c] = 1.0/std::sqrt(actual_var + eps_);
-        }
-
-        pSrcData = this->pPrevLayer_->pDst_->getCPUData();
-        // x_norm = (x-m)/variance
-        // y = gamma*x_norm - beta
-        for (size_t b = 0; b < this->batchSize_; ++b)
-        {
-            // fprintf(stderr, "b: %d\n", b);
-            for (size_t c = 0; c < channel; ++c)
-            {
-                // fprintf(stderr, "c: %d\n", c);
-                for (size_t sz = 0; sz < size2D; ++sz)
-                {
-                    *pDstData = (*pSrcData - pMeanData[c])*pInvstdsData[c];
-                    *pDstData = (*pDstData)*pWData[c] + pBData[c];
-
-                    ++pSrcData;
-                    ++pDstData;
-
-                }
-            }
-        }
-
-        // Update running mean
-        auto rmean = pRunning_means_->getCPUData();
-        if (averaging_factor != 1)
-        {
-            // running_mean = (1-averaging_faceor)*running_mean + averaging_factor*mean
-            axpby(channel, averaging_factor, pMeanData, (1-averaging_factor), rmean);
-        }
-        else {
-            // running_mean = mean
-            axpby(channel, 1, pMeanData, 0, rmean);
-        }
     }
 
     template<typename T>
     void BatchNormLayer<T>::Backward()
     {
-        int channel = this->pPrevLayer_->pDst_->getChannel();
-        int size2D = this->pPrevLayer_->pDst_->getSize2D();
+        op::bn::gradientBatchNorm (
+        this->batchSize_,
+        this->pPrevLayer_->pDst_, this->pPrevLayer_->pgDst_, this->pgDst_,
+        this->pW_, this->pgW_, this->pgB_,
+        pMean_, pInvstds_,
+        pdmean_, pdvar_);
 
-        auto pSrcData = this->pPrevLayer_->pDst_->getCPUData();
-        auto pWData = this->pW_->getCPUData();
-        auto pMeanData = pMean_->getCPUData();
-        auto pInvstdsData = pInvstds_->getCPUData();
+        // int channel = this->pPrevLayer_->pDst_->getChannel();
+        // int size2D = this->pPrevLayer_->pDst_->getSize2D();
 
-        auto pgDstData = this->pgDst_->getCPUData();
-        auto pgWData = this->pgW_->getCPUData();
-        auto pgBData = this->pgB_->getCPUData();
+        // auto pSrcData = this->pPrevLayer_->pDst_->getCPUData();
+        // auto pWData = this->pW_->getCPUData();
+        // auto pMeanData = pMean_->getCPUData();
+        // auto pInvstdsData = pInvstds_->getCPUData();
 
-        auto pgVarsData = pdvar_->getCPUData();
-        auto pgMeansData = pdmean_->getCPUData();
+        // auto pgDstData = this->pgDst_->getCPUData();
+        // auto pgWData = this->pgW_->getCPUData();
+        // auto pgBData = this->pgB_->getCPUData();
 
-        // Update gradient with respect to gamma(pW_), beta(pB_), variance
-        for (size_t b = 0; b < this->batchSize_; ++b)
-        {
-            for (size_t c = 0; c < channel; ++c)
-            {
-                const T invstd_pow = -0.5*std::pow(pInvstdsData[c], 3.0f);
-                for (size_t sz = 0; sz < size2D; ++sz)
-                {
-                    const T x_hat = (*pSrcData - pMeanData[c])*pInvstdsData[c];
-                    pgBData[c] += *pgDstData;
-                    pgWData[c] += (*pgDstData)*x_hat;
+        // auto pgVarsData = pdvar_->getCPUData();
+        // auto pgMeansData = pdmean_->getCPUData();
 
-                    const T dx = *pgDstData * pgWData[c];
+        // // Update gradient with respect to gamma(pW_), beta(pB_), variance
+        // for (size_t b = 0; b < this->batchSize_; ++b)
+        // {
+        //     for (size_t c = 0; c < channel; ++c)
+        //     {
+        //         const T invstd_pow = -0.5*std::pow(pInvstdsData[c], 3.0f);
+        //         for (size_t sz = 0; sz < size2D; ++sz)
+        //         {
+        //             const T x_hat = (*pSrcData - pMeanData[c])*pInvstdsData[c];
+        //             pgBData[c] += *pgDstData;
+        //             pgWData[c] += (*pgDstData)*x_hat;
 
-                    pgVarsData[c] += dx*(*pSrcData - pMeanData[c])*invstd_pow;
+        //             const T dx = *pgDstData * pgWData[c];
 
-                    ++pgDstData;
-                    ++pSrcData;
-                }
-            }
-        }
+        //             pgVarsData[c] += dx*(*pSrcData - pMeanData[c])*invstd_pow;
 
-        // Update gradient with respect to mean
-        pgDstData = this->pgDst_->getCPUData();
-        pSrcData = this->pPrevLayer_->pDst_->getCPUData();
-        const float invnum = 1.0f / size2D * this->batchSize_;
-        for (size_t b = 0; b < this->batchSize_; ++b)
-        {
-            for (size_t c = 0; c < channel; ++c)
-            {
-                for (size_t sz = 0; sz < size2D; ++sz)
-                {
-                    const float dx = *pgDstData * pgWData[c];
+        //             ++pgDstData;
+        //             ++pSrcData;
+        //         }
+        //     }
+        // }
 
-                    pgMeansData[c] += -dx*pInvstdsData[c] + pgVarsData[c] * -2*(*pSrcData - pMeanData[c])*invnum;
+        // // Update gradient with respect to mean
+        // pgDstData = this->pgDst_->getCPUData();
+        // pSrcData = this->pPrevLayer_->pDst_->getCPUData();
+        // const float invnum = 1.0f / size2D * this->batchSize_;
+        // for (size_t b = 0; b < this->batchSize_; ++b)
+        // {
+        //     for (size_t c = 0; c < channel; ++c)
+        //     {
+        //         for (size_t sz = 0; sz < size2D; ++sz)
+        //         {
+        //             const float dx = *pgDstData * pgWData[c];
 
-                    ++pgDstData;
-                    ++pSrcData;
-                }
-            }
-        }
+        //             pgMeansData[c] += -dx*pInvstdsData[c] + pgVarsData[c] * -2*(*pSrcData - pMeanData[c])*invnum;
 
-        auto pgSrcData = this->pPrevLayer_->pgDst_->getCPUData();
-        pSrcData = this->pPrevLayer_->pDst_->getCPUData();
-        pgDstData = this->pgDst_->getCPUData();
-        for (size_t b = 0; b < this->batchSize_; ++b)
-        {
-            for (size_t c = 0; c < channel; ++c)
-            {
-                for (size_t sz = 0; sz < size2D; ++sz)
-                {
-                    const T dx = *pgDstData * pWData[c];
+        //             ++pgDstData;
+        //             ++pSrcData;
+        //         }
+        //     }
+        // }
 
-                    *pgSrcData += dx*pInvstdsData[c] + pgVarsData[c]*2*(*pSrcData - pMeanData[c])*invnum + pgMeansData[c]*invnum;
+        // auto pgSrcData = this->pPrevLayer_->pgDst_->getCPUData();
+        // pSrcData = this->pPrevLayer_->pDst_->getCPUData();
+        // pgDstData = this->pgDst_->getCPUData();
+        // for (size_t b = 0; b < this->batchSize_; ++b)
+        // {
+        //     for (size_t c = 0; c < channel; ++c)
+        //     {
+        //         for (size_t sz = 0; sz < size2D; ++sz)
+        //         {
+        //             const T dx = *pgDstData * pWData[c];
 
-                    ++pgDstData;
-                    ++pSrcData;
-                    ++pgSrcData;
+        //             *pgSrcData += dx*pInvstdsData[c] + pgVarsData[c]*2*(*pSrcData - pMeanData[c])*invnum + pgMeansData[c]*invnum;
 
-                }
-            }
-        }
+        //             ++pgDstData;
+        //             ++pSrcData;
+        //             ++pgSrcData;
+
+        //         }
+        //     }
+        // }
     }
 
 

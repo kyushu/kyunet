@@ -81,7 +81,7 @@ namespace mkt {
 
                 // y = ax+by
                 // cur_update_value = fraction_momentum * pre_Momentum[i] + laerning_rate * pgW_[i]
-                axpby(
+                op::mat::axpby(
                     size,            // The size
                     // 0.0001/64.0f, // a = learning rate
                     learning_rate,   // a = learning rate
@@ -90,7 +90,7 @@ namespace mkt {
                     pMomentumData    // y
                 );
 
-                axpy(size, -1, pMomentumData, pWData);
+                op::mat::axpy(size, -1, pMomentumData, pWData);
 
                 // Copy gWt_m back to layer->pgW_
                 // we update pW_ = pW_ - pgW_

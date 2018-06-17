@@ -37,7 +37,7 @@
 #include <iostream>
 #include <string>
 
-#include "operators/mat_operators.h"
+#include "operations/mat_operations.h"
 #include "tensor.h"
 #include "filler.hpp"
 #include "activator/activator.h"

@@ -1,6 +1,6 @@
 #include "layer/conv_layer.h"
 
-#include "conv_arithmetic.h"
+#include "operations/conv_operations.h"
 
 namespace mkt {
 
@@ -13,11 +13,6 @@ namespace mkt {
         int fw,
         int fc,
         ConvParam convParam,
-        // int stride_h,
-        // int stride_w,
-        // int pad_h,
-        // int pad_w,
-        // PaddingType paddingType,
         ActivationType actType,
         InitializerType weightInitType,
         InitializerType biasInitType
@@ -27,13 +22,6 @@ namespace mkt {
         fw_{fw},
         fc_{fc},
         convParam_{convParam},
-        // stride_h_{stride_h},
-        // stride_w_{stride_w},
-        // pad_h_{pad_h},
-        // pad_w_{pad_w},
-        // padding_type_{paddingType},
-        // dilation_h_{1},
-        // dilation_w_{1},
         Layer<T>(LayerType::CONVOLUTION, actType, weightInitType, biasInitType)
     {
 
@@ -57,7 +45,7 @@ namespace mkt {
 
         // Calculate oh, ow by input and filter dimension
         // calcOutputSize(ic, ih, iw);
-        conv::calcOutputSize(iw, ih, fw_, fh_, convParam_, this->ow_, this->oh_);
+        op::conv::calcOutputSize(iw, ih, fw_, fh_, convParam_, this->ow_, this->oh_);
 
         this->pDst_ = new Tensor<T>{this->batchSize_, this->oh_, this->ow_, this->oc_};
         this->pgDst_ = new Tensor<T>{this->batchSize_, this->oh_, this->ow_, this->oc_};
@@ -118,7 +106,7 @@ namespace mkt {
 
         // Calculate oh, ow by input and filter dimension
         // calcOutputSize(ic, ih, iw);
-        conv::calcOutputSize(iw, ih, fw_, fh_, convParam_, this->ow_, this->oh_);
+        op::conv::calcOutputSize(iw, ih, fw_, fh_, convParam_, this->ow_, this->oh_);
 
         this->pDst_ = new Tensor<T>{this->batchSize_, this->oh_, this->ow_, this->oc_};
         this->pgDst_ = new Tensor<T>{this->batchSize_, this->oh_, this->ow_, this->oc_};
@@ -139,7 +127,7 @@ namespace mkt {
     // Destructor
     template<typename T>
     ConvLayer<T>::~ConvLayer() {
-        fprintf(stderr, "---------------------- ConvLayer Destructor\n");
+        // fprintf(stderr, "---------------------- ConvLayer Destructor\n");
         delete pTmpCol_;
     }
 
@@ -182,66 +170,15 @@ namespace mkt {
         this->pgW_->resetData();
         this->pgB_->resetData();
 
-        // Src
-        Tensor<T>* pSrc = this->pPrevLayer_->pDst_;
-        T* pSrcData = pSrc->getCPUData();
-        int ic = pSrc->getChannel();
-        int iw = pSrc->getWidth();
-        int ih = pSrc->getHeight();
-        int src_size3D = pSrc->getSize3D();
-        int src_wholeSize = pSrc->getWholeSize();
+        // Apply convolutional operation
+        op::conv::convOperation(
+            this->batchSize_, convParam_,
+            this->pPrevLayer_->pDst_, this->pDst_,
+            this->pW_, this->pB_, pTmpCol_
 
-        // Dst
-        T* pDstData = this->pDst_->getCPUData();
-        int oc = this->pDst_->getChannel();
-        int oh = this->pDst_->getHeight();
-        int ow = this->pDst_->getWidth();
-        int dst_size2D = this->pDst_->getSize2D();
-        int dst_size3D = this->pDst_->getSize3D();
-        int dst_wholeSize = this->pDst_->getWholeSize();
+        );
 
-        // Weight
-        T* pWData = this->pW_->getCPUData();
-        int fh = this->pW_->getHeight();
-        int fw = this->pW_->getWidth();
-        int fc = this->pW_->getChannel();
-        int filter_size2D = this->pW_->getSize2D();
-        int filter_wholeSize = this->pW_->getWholeSize();
-
-        T* pTmpColData = pTmpCol_->getCPUData();
-
-        // 1. Z = WX
-        for (int i = 0; i < this->batchSize_; ++i)
-        {
-
-            // Step 1. im to column
-            mkt::im2col_cpu(pSrcData + i*src_size3D,
-                ic, ih, iw,
-                fh, fw,
-                convParam_.pad_h_, convParam_.pad_w_,
-                convParam_.stride_h_, convParam_.stride_w_,
-                convParam_.dilation_h_, convParam_.dilation_w_,
-                pTmpColData
-            );
-
-            // Step 2. Gemm column and weight
-            mkt::gemm_cpu(
-                CblasNoTrans, CblasNoTrans,         /* trans_A, trans_B */
-                fc, dst_size2D, filter_size2D*ic,   /* M,       N, K    */
-                1.0f,                               /* ALPHA            */
-                pWData, this->pW_->getSize2D()*ic,  /* A,       lda(K)  */
-                pTmpColData,   oh*ow,               /* B,       ldb(N)  */
-                1.0f,                               /* BETA             */
-                pDstData + i*dst_size3D, oh*ow      /* C,       ldc(N)  */
-            );
-        }
-
-
-        // 2. Z = WX + Bias
-        // addBias();
-        // fprintf(stderr, "addBias is not implemented: %s, %d\n", __FILE__, __LINE__);
-
-        // 3. A = activation(Z) = the input of next layer
+        // A = activation(Z) = the input of next layer
         if (this->activationType_ != ActivationType::NONE)
         {
             this->pActivator_->Forward(this->pDst_, this->pDst_);
@@ -252,120 +189,19 @@ namespace mkt {
     template<typename T>
     void ConvLayer<T>::Backward() {
 
-        // Src
-        Tensor<T>* pSrc = this->pPrevLayer_->pDst_;
-        T* pSrcData = pSrc->getCPUData();
-        // int ic = pSrc->getChannel();
-        // int iw = pSrc->getWidth();
-        // int ih = pSrc->getHeight();
-        int src_size3D = pSrc->getSize3D();
-        // int src_wholeSize = pSrc->getWholeSize();
-
-        // Gradient Src
-        Tensor<T>* pgSrc = this->pPrevLayer_->pgDst_;
-        T* pgSrcData = nullptr;
-        int ic = 0;
-        int ih = 0;
-        int iw = 0;
-        int gsrc_size3D = 0;
-        if (pgSrc != nullptr)
-        {
-            pgSrcData = pgSrc->getCPUData();
-            pgSrcData = pgSrc->getCPUData();
-            ic = pgSrc->getChannel();
-            ih = pgSrc->getHeight();
-            iw = pgSrc->getWidth();
-            gsrc_size3D = pgSrc->getSize3D();
-        }
-
-        // Gradient Dst
-        T* pgDstData = this->pgDst_->getCPUData();
-        int gdst_size2D = this->pgDst_->getSize2D();
-        int gdst_size3D = this->pgDst_->getSize3D();
-
-        // Weight
-        T* pWData = this->pW_->getCPUData();
-        int fh = this->pW_->getHeight();
-        int fw = this->pW_->getWidth();
-        int fc = this->pW_->getChannel();
-        int filter_size2D = this->pW_->getSize2D();
-        int num_in2filter = this->pW_->getSize2D() * this->pW_->getNumOfData();
-
-        // Gradient Weight
-        T* pgWData = this->pgW_->getCPUData();
-
-        // bias
-        T* pgBias = this->pgB_->getCPUData();
-
-        T* pTmpColData = pTmpCol_->getCPUData();
-
-
-
         // 1. Back from Activator first
         if (this->activationType_ != ActivationType::NONE)
         {
             this->pActivator_->Backward(this->pDst_, this->pgDst_, this->pgDst_);
         }
 
-        // 2. [Update gradient with respect to Bias]
-        T* pCh_grad = nullptr;
-        for (int b = 0; b < this->batchSize_; ++b)
-        {
-            for (int c = 0; c < fc; ++c)
-            {
-                pCh_grad = pgDstData + filter_size2D*(c + b*fc);
-                for (int i = 0; i < filter_size2D; ++i)
-                {
-                    pgBias[c] += pCh_grad[i];
-                }
-            }
-        }
+        // take gradient of convolutional operatoin
+        op::conv::convGradient(
+            this->batchSize_, convParam_, this->pW_->getShape(),
+            this->pPrevLayer_->pDst_, this->pPrevLayer_->pgDst_, this->pgDst_,
+            this->pW_, this->pgW_, this->pgB_, pTmpCol_
+        );
 
-        for (int b = 0; b < this->batchSize_; ++b)
-        {
-            // 3. [Update gradient with respect to Weight]
-            mkt::im2col_cpu(pSrcData + b*src_size3D,
-                ic, ih, iw,
-                fh, fw,
-                convParam_.pad_h_, convParam_.pad_w_,
-                convParam_.stride_h_, convParam_.stride_w_,
-                convParam_.dilation_h_, convParam_.dilation_w_,
-                pTmpColData
-            );
-            mkt::gemm_cpu(
-                CblasNoTrans, CblasTrans,               /* trans_A, trans_B */
-                fc, num_in2filter, gdst_size2D,         /* M,       N, K    */
-                1.0f,                                   /* ALPHA            */
-                pgDstData + b*gdst_size3D, gdst_size2D, /* A,       lda(K)  */
-                pTmpColData, gdst_size2D,               /* B,       ldb(N)  */
-                1.0f,                                   /* BETA             */
-                pgWData, num_in2filter                  /* C,       ldc(N)  */
-            );
-
-            // 4. [Update gradient with respect to data]
-            pTmpCol_->resetData();
-            if (pgSrc != nullptr)
-            {
-                mkt::gemm_cpu(
-                    CblasTrans, CblasNoTrans,       // trans_a, trans_b
-                    num_in2filter, gdst_size2D, fc, // M, N, K
-                    1.0f,                           // Alpha
-                    pWData, gdst_size2D,            // A,       lda
-                    pgDstData, fc,                  // B,       lda
-                    0,                              // Beta
-                    pTmpColData, fc                 // C,       lda
-                );
-                mkt::col2im_cpu(
-                    pTmpColData,
-                    ic, ih, iw,
-                    fh_, fw_,
-                    convParam_.pad_h_, convParam_.pad_w_,
-                    convParam_.stride_h_, convParam_.stride_w_,
-                    convParam_.dilation_h_, convParam_.dilation_w_,
-                    pgSrcData + b*gsrc_size3D
-                );
-            }
-        }
     }
 
     // Getter

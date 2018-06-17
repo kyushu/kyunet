@@ -150,7 +150,7 @@ namespace mkt {
             //                            |                |
             // curPDstData = -1 * pSum_multiple_data X pScaleData + curPDstData
             //             = Dst data - max(Dst data)
-            gemm_cpu(
+            op::mat::gemm_cpu(
                 CblasTrans, CblasNoTrans,                   // trans_a, trans_b
                 ic, size2D, 1,          // M, N, K
                 -1,                     // Alpha
@@ -206,7 +206,7 @@ namespace mkt {
             // |____             |             |
             //      |            |             |
             // pScaleData = curPDstData X pSum_multiple_data + 0*pScaleData
-            gemv_cpu(
+            op::mat::gemv_cpu(
                 CBLAS_TRANSPOSE::CblasTrans, // trans_A
                 ic,                 // M
                 size2D,             // N

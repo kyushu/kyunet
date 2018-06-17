@@ -77,7 +77,7 @@ int main(int argc, char const *argv[])
      *******************/
     // Display data
     fprintf(stderr, "Input Data\n");
-    int inWholeSize = pInputLayer->pDst_->getWholeSize();
+    // int inWholeSize = pInputLayer->pDst_->getWholeSize();
     print_matrix(batchSize, channel, height, width, pInData);
 
     /*******************
@@ -102,8 +102,8 @@ int main(int argc, char const *argv[])
     int fc_dst_c = pDenseLayer->pDst_->getChannel();
     int fc_dst_h = pDenseLayer->pDst_->getHeight();
     int fc_dst_w = pDenseLayer->pDst_->getWidth();
-    int fc_dst_size2D = pDenseLayer->pDst_->getSize2D();
-    int fc_dst_size3D = pDenseLayer->pDst_->getSize3D();
+    // int fc_dst_size2D = pDenseLayer->pDst_->getSize2D();
+    // int fc_dst_size3D = pDenseLayer->pDst_->getSize3D();
     print_matrix(batchSize, fc_dst_c, fc_dst_h, fc_dst_w, pDenseLayer->pDst_->getCPUData());
 
     /**********************************

@@ -2,7 +2,8 @@
 #define MKT_SOFTMAX_LAYER_H
 
 #include "layer/layer.h"
-#include "operators/mat_operators.h"
+#include "operations/aux_operations.h"
+#include "operations/mat_operations.h"
 
 namespace mkt {
 

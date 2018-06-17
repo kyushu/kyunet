@@ -1,6 +1,6 @@
 
 #include "tensor.h"
-#include "operators/mat_operators.h"
+#include "operations/mat_operations.h"
 #include "definitions.h"
 
 using namespace mkt;
@@ -98,7 +98,7 @@ int main(int argc, char const *argv[])
 
     */
     mkt::mktLog(1, "gemm(weight, dst_grad, temp)\n");
-    mkt::gemm_cpu(
+    mkt::op::mat::gemm_cpu(
         CblasTrans, CblasNoTrans,               // trans_a, trans_b
         n, k, m,            // M, N, K
         1.0f,               // Alpha
@@ -117,7 +117,7 @@ int main(int argc, char const *argv[])
     int dilation_h = 1;
     int dilation_w = 1;
 
-    mkt::col2im_cpu(ptmpData,
+    mkt::op::mat::col2im_cpu(ptmpData,
         ic, ih, iw, fh, fw,
          pad_h, pad_w,
         stride_h, stride_w,

@@ -8,6 +8,8 @@
 #include "layer.h"
 #include "softmax_layer.h"
 
+#include "operations/aux_operations.h"
+
 namespace mkt {
     template<typename T>
     class CrossEntropyLossWithSoftmaxLayer: public Layer<T>

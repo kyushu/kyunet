@@ -5,7 +5,7 @@
 #include "layer/layer.h"
 #include "layer/input_layer.h"
 #include "net.h"
-#include "operators/mat_operators.h"
+#include "operations/mat_operations.h"
 
 using namespace mkt;
 
@@ -49,7 +49,7 @@ void test_axpy() {
     for (int i = 0; i < a.getNumOfData(); ++i)
     {
         int size3D = a.getSize3D();
-        axpy(a.getSize3D(), 1.0, b_data, a_data+i*size3D);
+        op::mat::axpy(a.getSize3D(), 1.0, b_data, a_data+i*size3D);
     }
 
     fprintf(stderr, "axpy\n");

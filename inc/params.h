@@ -85,10 +85,13 @@ namespace mkt {
         int dilation_w_;
         int dilation_h_;
 
+        // Constructor without parameter
         ConvParam():paddingType_{PaddingType::VALID}, stride_w_{1}, stride_h_{1}, pad_w_{0}, pad_h_{0}, dilation_w_{1}, dilation_h_{1} {}
 
+        // Constructor with parameters
         explicit ConvParam(PaddingType paddingType, int stride_w, int stride_h, int pad_w, int pad_h, int dilation_w=1, int dilation_h=1): paddingType_{paddingType}, stride_w_{stride_w}, stride_h_{stride_h}, pad_w_{pad_w}, pad_h_{pad_h}, dilation_w_{dilation_w}, dilation_h_{dilation_h} {}
 
+        // Copy constructor
         ConvParam(const ConvParam& convParam) {
             paddingType_ = convParam.paddingType_;
             stride_w_    = convParam.stride_w_;
@@ -129,10 +132,10 @@ namespace mkt {
             }
         }
 
-        int getNum()    { return num_; }
-        int getDepth()  { return depth_; }
+        int getNum()    { return num_;    }
+        int getDepth()  { return depth_;  }
         int getHeight() { return height_; }
-        int getWidth()  { return width_; }
+        int getWidth()  { return width_;  }
     };
 
 } // namespace mkt

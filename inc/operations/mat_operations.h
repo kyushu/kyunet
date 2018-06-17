@@ -1,5 +1,5 @@
-#ifndef MKT_MATH_OPERATION_H
-#define MKT_MATH_OPERATION_H
+#ifndef MKT_MAT_OPERATIONS_H
+#define MKT_MAT_OPERATIONS_H
 
 #include <cstring>
 
@@ -7,7 +7,8 @@
 #include "definitions.h"
 
 namespace mkt {
-
+namespace op {
+namespace mat {
     int gemm_cpu(
         CBLAS_TRANSPOSE trans_a, CBLAS_TRANSPOSE trans_b,
         int M, int N, int K,
@@ -47,9 +48,12 @@ namespace mkt {
         float beta,
         float *y);
 
-    void set_memory(const int N, const float alpha, float* Y);
-    void mem_copy_cpu(int size, float* pSrcData, float* pDstData);
-}
+
+
+
+} // namespace mat
+} // namespace op
+} // namespace mkt
 
 
 #endif

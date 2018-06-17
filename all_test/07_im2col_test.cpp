@@ -1,6 +1,6 @@
 
 #include "tensor.h"
-#include "operators/mat_operators.h"
+#include "operations/mat_operations.h"
 
 #include "definitions.h"
 
@@ -105,7 +105,7 @@ int main(int argc, char const *argv[])
 
     //#############################
     // im2col
-    mkt::im2col_cpu(pImgData,
+    mkt::op::mat::im2col_cpu(pImgData,
         image.getChannel(), image.getHeight(), image.getWidth(),
         filter.getHeight(), filter.getWidth(),
         padding, padding,
@@ -151,7 +151,7 @@ int main(int argc, char const *argv[])
 
     //#############################
     // kernel X im2col
-    mkt::gemm_cpu(CBLAS_TRANSPOSE::CblasNoTrans, CBLAS_TRANSPOSE::CblasNoTrans,                                                     /*trans_A, trans_B*/
+    mkt::op::mat::gemm_cpu(CBLAS_TRANSPOSE::CblasNoTrans, CBLAS_TRANSPOSE::CblasNoTrans,                                                     /*trans_A, trans_B*/
             filter.getNumOfData(), dst.getSize2D(), filter.getSize2D()*ic,  /*M,       N,K*/
             1.0f,                                                           /*ALPHA*/
             pFilterData, filter.getSize2D()*ic,                             /*A,       lda(K)*/

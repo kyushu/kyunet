@@ -160,7 +160,7 @@ namespace mkt {
         T* pWData = this->pW_->getCPUData();
 
 
-        gemm_cpu(CblasNoTrans, CblasTrans,            /* trans_A, trans_B  */
+        op::mat::gemm_cpu(CblasNoTrans, CblasTrans,            /* trans_A, trans_B  */
             this->batchSize_, dstSize3D, srcSize3D,   /* M, N, K           */
             1.0f,                                     /* ALPHA             */
             pSrcData, srcSize3D,                      /* A,       lda(K)   */
@@ -202,7 +202,7 @@ namespace mkt {
         T* pgBData = this->pgB_->getCPUData();
         for (int i = 0; i < this->batchSize_; ++i)
         {
-            axpy(gDst_size3D, 1.0f, pgDstData + i * gDst_size3D, pgBData);
+            op::mat::axpy(gDst_size3D, 1.0f, pgDstData + i * gDst_size3D, pgBData);
         }
 
         // 3. [Update gradient with respect to Weight]
@@ -223,7 +223,7 @@ namespace mkt {
 
         int dst_size3D = this->pDst_->getSize3D();
         // pgWData will be reset after update weight
-        gemm_cpu(
+        op::mat::gemm_cpu(
             CblasTrans, CblasNoTrans,
             dst_size3D, src_size3D, this->batchSize_,
             1.0f,
@@ -261,7 +261,7 @@ namespace mkt {
             int srcSize3D = this->pPrevLayer_->pgDst_->getSize3D();
 
             // pSrc_dif = pgDstData * pWdata + pSrc_dif
-            gemm_cpu(
+            op::mat::gemm_cpu(
                 CblasNoTrans, CblasNoTrans,
                 this->batchSize_, srcSize3D, dstSize3D,
                 1.0f,
