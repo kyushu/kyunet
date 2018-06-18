@@ -117,7 +117,7 @@ namespace mkt {
             num_updates_ = running_stats_window_size_;
         }
 
-        op::bn::batchNorm (
+        op::batchNorm (
             this->batchSize_, averaging_factor, eps_,
             this->pPrevLayer_->pDst_, this->pDst_,
             this->pW_,  this->pB_,
@@ -129,7 +129,7 @@ namespace mkt {
     template<typename T>
     void BatchNormLayer<T>::Backward()
     {
-        op::bn::gradientBatchNorm (
+        op::batchNorm_gradient (
         this->batchSize_,
         this->pPrevLayer_->pDst_, this->pPrevLayer_->pgDst_, this->pgDst_,
         this->pW_, this->pgW_, this->pgB_,

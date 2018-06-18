@@ -45,7 +45,7 @@ namespace mkt {
 
         // Calculate oh, ow by input and filter dimension
         // calcOutputSize(ic, ih, iw);
-        op::conv::calcOutputSize(iw, ih, fw_, fh_, convParam_, this->ow_, this->oh_);
+        op::calcConvOutputSize(iw, ih, fw_, fh_, convParam_, this->ow_, this->oh_);
 
         this->pDst_ = new Tensor<T>{this->batchSize_, this->oh_, this->ow_, this->oc_};
         this->pgDst_ = new Tensor<T>{this->batchSize_, this->oh_, this->ow_, this->oc_};
@@ -106,7 +106,7 @@ namespace mkt {
 
         // Calculate oh, ow by input and filter dimension
         // calcOutputSize(ic, ih, iw);
-        op::conv::calcOutputSize(iw, ih, fw_, fh_, convParam_, this->ow_, this->oh_);
+        op::calcConvOutputSize(iw, ih, fw_, fh_, convParam_, this->ow_, this->oh_);
 
         this->pDst_ = new Tensor<T>{this->batchSize_, this->oh_, this->ow_, this->oc_};
         this->pgDst_ = new Tensor<T>{this->batchSize_, this->oh_, this->ow_, this->oc_};
@@ -171,7 +171,7 @@ namespace mkt {
         this->pgB_->resetData();
 
         // Apply convolutional operation
-        op::conv::convOperation(
+        op::convolution (
             this->batchSize_, convParam_,
             this->pPrevLayer_->pDst_, this->pDst_,
             this->pW_, this->pB_, pTmpCol_
@@ -196,7 +196,7 @@ namespace mkt {
         }
 
         // take gradient of convolutional operatoin
-        op::conv::convGradient(
+        op::conv_gradient (
             this->batchSize_, convParam_, this->pW_->getShape(),
             this->pPrevLayer_->pDst_, this->pPrevLayer_->pgDst_, this->pgDst_,
             this->pW_, this->pgW_, this->pgB_, pTmpCol_

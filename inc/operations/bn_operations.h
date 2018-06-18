@@ -10,10 +10,9 @@
 
 namespace mkt  {
 namespace op   {
-namespace bn {
 
     template <typename T>
-    void batchNorm(
+    void batchNorm (
        const int numOfSample, const T averaging_factor, const T eps,
         Tensor<T>* pSrc, Tensor<T>* pDst,
         Tensor<T>* pW, Tensor<T>* pB,
@@ -21,7 +20,7 @@ namespace bn {
         Tensor<T>* pRunning_variances, Tensor<T>* pRunning_means);
 
     template<typename T>
-    void batchNorm_infer(
+    void batchNorm_infer (
         int numOfSample, T eps,
         Tensor<T>* pSrc, Tensor<T>* pDst,
         Tensor<T>* pRunning_mean, Tensor<T>* pRunning_variances,
@@ -29,14 +28,14 @@ namespace bn {
 
 
     template<typename T>
-    void gradientBatchNorm(
+    void batchNorm_gradient (
         const int numOfSample,
         Tensor<T>* pSrc, Tensor<T>* pgSrc, Tensor<T>* pgDst,
         Tensor<T>* pW, Tensor<T>* pgW, Tensor<T>* pgB,
         Tensor<T>* pMean, Tensor<T>* pInvstds,
         Tensor<T>* pdmean, Tensor<T>* pdvar);
 
-} // namespace conv
+
 } // namespace op
 } // namespace mkt
 

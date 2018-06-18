@@ -11,19 +11,21 @@ namespace mkt {
     public:
         int fh_; // filter height
         int fw_; // filter width
-        int stride_h_;
-        int stride_w_;
-        int pad_h_;
-        int pad_w_;
+        // int stride_h_;
+        // int stride_w_;
+        // int pad_h_;
+        // int pad_w_;
+        ConvParam convParam_;
         PoolingMethodType type_;
 
-        Tensor<T>* pMask;
+        Tensor<T>* pMask_;
 
 
         PoolingLayer(Layer<T>* prevLayer, std::string id,
             int kernel_Height, int kernel_width,
-            int stride_h, int stride_w,
-            int pad_h, int pad_w,
+            // int stride_h, int stride_w,
+            // int pad_h, int pad_w,
+            ConvParam convParam,
             PoolingMethodType type
             );
         PoolingLayer(Layer<T>* prevLayer, std::string id, LayerParams params);

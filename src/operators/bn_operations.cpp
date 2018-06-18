@@ -3,7 +3,6 @@
 
 namespace mkt {
 namespace op {
-namespace bn {
 
     template <typename T>
     void batchNorm (
@@ -123,7 +122,7 @@ namespace bn {
     }
 
     template<typename T>
-    void gradientBatchNorm(
+    void batchNorm_gradient (
         const int numOfSample,
         Tensor<T>* pSrc, Tensor<T>* pgSrc, Tensor<T>* pgDst,
         Tensor<T>* pW, Tensor<T>* pgW, Tensor<T>* pgB,
@@ -228,13 +227,13 @@ namespace bn {
         Tensor<float>*, Tensor<float>*,
         Tensor<float>*, Tensor<float>*);
 
-    template void gradientBatchNorm<float>(
+    template void batchNorm_gradient<float>(
         const int,
         Tensor<float>*, Tensor<float>*, Tensor<float>*,
         Tensor<float>*, Tensor<float>*, Tensor<float>*,
         Tensor<float>*, Tensor<float>*,
         Tensor<float>*, Tensor<float>*);
 
-} // namespace bn
+
 } // namespace op
 } // namespace mkt

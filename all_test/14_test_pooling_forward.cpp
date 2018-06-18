@@ -19,7 +19,10 @@ int main(int argc, char const *argv[])
     // Config KyuNet
     KyuNet<float> net;
     InputLayer<float>* pInputLayer = (InputLayer<float> *)net.addInputLayer("input", batchSize, height, width, channel);
-    Layer<float> *pPoolingLayer = net.addPoolingLayer( pInputLayer, "Pooling", 2, 2, 1, 1, 0, 0, PoolingMethodType::MAX);
+
+    ConvParam convParam{PaddingType::VALID, 1, 1, 0, 0/*, int dilation_w=1, int dilation_h=1*/};
+
+    Layer<float> *pPoolingLayer = net.addPoolingLayer( pInputLayer, "Pooling", 2, 2, convParam, PoolingMethodType::MAX);
 
     // initialize KyuNet (allocate memory space)
     net.Compile(NetMode::TRAINING);

@@ -189,7 +189,7 @@ namespace mkt {
     }
 
     template<typename T>
-    Layer<T>* KyuNet<T>::addPoolingLayer( Layer<T>* prevLayer, std::string id, int kernel_Height, int kernel_width, int stride_h, int stride_w, int pad_h, int pad_w, PoolingMethodType type)
+    Layer<T>* KyuNet<T>::addPoolingLayer( Layer<T>* prevLayer, std::string id, int kernel_Height, int kernel_width, ConvParam convParam, PoolingMethodType type)
     {
 
         if (layers_.size() == 0) {
@@ -197,7 +197,7 @@ namespace mkt {
             return nullptr;
         }
 
-        PoolingLayer<T>* poolingLayer= new PoolingLayer<T>{prevLayer, id, kernel_Height, kernel_width, stride_h, stride_w, pad_h, pad_w, type};
+        PoolingLayer<T>* poolingLayer= new PoolingLayer<T>{prevLayer, id, kernel_Height, kernel_width, convParam, type};
 
         layers_.push_back(poolingLayer);
 

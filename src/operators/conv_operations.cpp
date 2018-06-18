@@ -5,9 +5,9 @@
 
 namespace mkt {
 namespace op {
-namespace conv {
 
-    void calcOutputSize (
+
+    void calcConvOutputSize (
         const int& inputW, const int& inputH,
         const int& filterW, const int& filterH,
         ConvParam& param, int& ootputW, int& outputH )
@@ -84,7 +84,7 @@ namespace conv {
 
 
     template<typename T>
-    void convOperation (
+    void convolution (
         int numOfSample,  const ConvParam& convParam,
         Tensor<T>* pSrc, Tensor<T>* pDst,
         Tensor<T>* pW, Tensor<T>* pB,
@@ -152,7 +152,7 @@ namespace conv {
     }
 
     template<typename T>
-    void convGradient (
+    void conv_gradient (
         int numOfSample, const ConvParam& convParam, const Shape& filterShape,
         Tensor<T>* pSrc, Tensor<T>* pgSrc, Tensor<T>* pgDst,
         Tensor<T>* pW, Tensor<T>* pgW, Tensor<T>* pgB,
@@ -267,19 +267,19 @@ namespace conv {
     /**
      * Explicit instantiation
      */
-    template void convOperation<float>(
+    template void convolution<float>(
         int, const ConvParam&,
         Tensor<float>*, Tensor<float>*,
         Tensor<float>*, Tensor<float>*,
         Tensor<float>*
     );
 
-    template void convGradient<float>(
+    template void conv_gradient<float>(
         int , const ConvParam&, const Shape&,
         Tensor<float>* , Tensor<float>* , Tensor<float>* ,
         Tensor<float>* , Tensor<float>* , Tensor<float>* ,
         Tensor<float>*);
 
-} // namespace conv
+
 } // namespace op
 } // namespace mkt
