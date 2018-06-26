@@ -3,7 +3,7 @@ cmake_minimum_required(VERSION 2.8.12)
 project(cuda_test)
 
 include_directories(../../cuda)
-add_definitions(-DDLIB_USE_CUDA)
+add_definitions(-DKYUNET_USE_CUDA)
 
 # Override the FindCUDA.cmake setting to avoid duplication of host flags if using a toolchain:
 option(CUDA_PROPAGATE_HOST_FLAGS "Propage C/CXX_FLAGS and friends to the host compiler via -Xcompile" OFF)

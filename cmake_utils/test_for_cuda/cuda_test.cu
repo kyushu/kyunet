@@ -1,8 +1,7 @@
 // Copyright (C) 2015  Davis E. King (davis@dlib.net)
 // License: Boost Software License   See LICENSE.txt for the full license.
 
-#include "cuda_utils.h"
-#include "cuda_dlib.h"
+
 
 
 // ------------------------------------------------------------------------------------
