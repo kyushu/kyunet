@@ -11,12 +11,6 @@
 namespace mkt  {
 namespace op   {
 
-    void calcConvOutputSize (
-        const int& inputW, const int& inputH,
-        const int& filterW, const int& filterH,
-        ConvParam& param, int& ootputW, int& outputH );
-
-
     template<typename T>
     void convolution (
         int numOfSample,  const ConvParam& convParam,

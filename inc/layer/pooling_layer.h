@@ -37,6 +37,7 @@ namespace mkt {
         void Forward();
         void Backward();
 
+        void inferShape();
         // Getter Function
         int getFiltergetHeight();
         int getFiltergetWidth();

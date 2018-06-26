@@ -36,20 +36,7 @@ namespace mkt {
         this->pPrevLayer_ = prevLayer;
 
         this->oc_ = ic;
-        // calculate pDst size: ow = (W-f +2p)/s +1
-        // this->ow_ = static_cast<int>( ceil( static_cast<float>(iw - fw_ + 2*pad_w_) / stride_w_ ) ) + 1;
-        // this->oh_ = static_cast<int>( ceil( static_cast<float>(ih - fh_ + 2*pad_h_) / stride_h_ ) ) + 1;
-
-        // if (pad_h_ || pad_w_)
-        // {
-        //     if (( this->ow_ - 1 ) * stride_w_ > iw + pad_w_) { --this->ow_; }
-        //     if (( this->oh_ - 1 ) * stride_h_ > ih + pad_h_) { --this->oh_; }
-        // }
-
-        // MKT_Assert(( this->ow_-1)*stride_w_ < iw + pad_w_, "polling size");
-        // MKT_Assert(( this->oh_-1)*stride_h_ < ih + pad_h_, "polling size");
-
-        op::calcConvOutputSize(iw, ih, fw_, fh_, convParam_, this->ow_, this->oh_);
+        inferShape();
         this->pDst_  = new Tensor<T>{ this->batchSize_, this->oh_, this->ow_, this->oc_};
         this->pgDst_ = new Tensor<T>{ this->batchSize_, this->oh_, this->ow_, this->oc_};
 
@@ -94,21 +81,7 @@ namespace mkt {
         convParam_.dilation_w_ = params.dilation_w;
 
         this->oc_ = ic;
-        // // calculate pDst size: ow = (W-f +2p)/s +1
-        // this->ow_ = static_cast<int>( ceil( static_cast<float>(iw - fw_ + 2*pad_w_) / stride_w_ ) ) + 1;
-        // this->oh_ = static_cast<int>( ceil( static_cast<float>(ih - fh_ + 2*pad_h_) / stride_h_ ) ) + 1;
-
-        // if (pad_h_ || pad_w_)
-        // {
-        //     if (( this->ow_ - 1 ) * stride_w_ > iw + pad_w_) { --this->ow_; }
-        //     if (( this->oh_ - 1 ) * stride_h_ > ih + pad_h_) { --this->oh_; }
-        // }
-
-        // MKT_Assert(( this->ow_-1 )*stride_w_ < iw + pad_w_, "polling size");
-        // MKT_Assert(( this->oh_-1 )*stride_h_ < ih + pad_h_, "polling size");
-
-
-        op::calcConvOutputSize(iw, ih, fw_, fh_, convParam_, this->ow_, this->oh_);
+        inferShape();
         this->pDst_  = new Tensor<T>{ this->batchSize_, this->oh_, this->ow_, this->oc_ };
         this->pgDst_ = new Tensor<T>{ this->batchSize_, this->oh_, this->ow_, this->oc_ };
 
@@ -163,6 +136,24 @@ namespace mkt {
         this->pPrevLayer_->pgDst_, this->pgDst_, pMask_
         );
 
+    }
+
+    template<typename T>
+    void PoolingLayer<T>::inferShape()
+    {
+        MKT_Assert(this->pPrevLayer_ != nullptr, "pPrevLayer_ = nullptr");
+
+        int ih = this->pPrevLayer_->pDst_->getHeight();
+        int iw = this->pPrevLayer_->pDst_->getWidth();
+
+        if (convParam_.paddingType_ == PaddingType::VALID)
+        {
+            this->ow_ = static_cast<int>( static_cast<float>(iw - fw_ + 2*convParam_.pad_w_) / convParam_.stride_w_ ) + 1;
+            this->oh_ = static_cast<int>( static_cast<float>(ih - fh_ + 2*convParam_.pad_h_) / convParam_.stride_h_ ) + 1;
+        } else {
+            this->ow_ = static_cast<int>( ceil( static_cast<float>(iw - fw_ + 2*convParam_.pad_w_) / convParam_.stride_w_ ) ) + 1;
+            this->oh_ = static_cast<int>( ceil( static_cast<float>(ih - fh_ + 2*convParam_.pad_h_) / convParam_.stride_h_ ) ) + 1;
+        }
     }
 
     // Getter Function

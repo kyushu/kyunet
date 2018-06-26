@@ -45,7 +45,7 @@ namespace mkt {
 
         // Calculate oh, ow by input and filter dimension
         // calcOutputSize(ic, ih, iw);
-        op::calcConvOutputSize(iw, ih, fw_, fh_, convParam_, this->ow_, this->oh_);
+        InferShape();
 
         this->pDst_ = new Tensor<T>{this->batchSize_, this->oh_, this->ow_, this->oc_};
         this->pgDst_ = new Tensor<T>{this->batchSize_, this->oh_, this->ow_, this->oc_};
@@ -106,7 +106,7 @@ namespace mkt {
 
         // Calculate oh, ow by input and filter dimension
         // calcOutputSize(ic, ih, iw);
-        op::calcConvOutputSize(iw, ih, fw_, fh_, convParam_, this->ow_, this->oh_);
+        InferShape();
 
         this->pDst_ = new Tensor<T>{this->batchSize_, this->oh_, this->ow_, this->oc_};
         this->pgDst_ = new Tensor<T>{this->batchSize_, this->oh_, this->ow_, this->oc_};
@@ -203,6 +203,22 @@ namespace mkt {
         );
 
     }
+
+    template<typename T>
+    void ConvLayer<T>::InferShape ()
+    { 
+        MKT_Assert(this->pPrevLayer_ != nullptr, "pPrevLayer_ = nullptr");
+
+        int ih = this->pPrevLayer_->pDst_->getHeight();
+        int iw = this->pPrevLayer_->pDst_->getWidth();
+        
+
+        int width_extent  = ( convParam_.dilation_w_ * (fw_ - 1) + 1 );
+        int height_extent = ( convParam_.dilation_h_ * (fh_ - 1) + 1 );
+        this->ow_ = static_cast<int>( static_cast<float>(iw + 2*convParam_.pad_w_ - width_extent  ) / convParam_.stride_w_ ) + 1;
+        this->oh_ = static_cast<int>( static_cast<float>(ih + 2*convParam_.pad_h_ - height_extent ) / convParam_.stride_h_ ) + 1;
+    }
+
 
     // Getter
     template<typename T>
