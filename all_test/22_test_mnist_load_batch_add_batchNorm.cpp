@@ -144,7 +144,7 @@ int main(int argc, char const *argv[])
     }
 
     // Random shuffle data
-    unsigned seed = std::chrono::system_clock::now().time_since_epoch().count();
+    // unsigned seed = std::chrono::system_clock::now().time_since_epoch().count();
     // shuffle (training_data.begin(), training_data.end(), std::default_random_engine(seed));
 
     std::vector<std::string> image_files;

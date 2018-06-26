@@ -136,7 +136,7 @@ void test_add_batch_image() {
     int channel = 3;
     int batchSize = 3;
 
-    int num_iter = file_list.size() / batchSize;
+    // int num_iter = file_list.size() / batchSize;
 
 
     KyuNet<float> net;

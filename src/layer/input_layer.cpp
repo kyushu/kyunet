@@ -95,7 +95,7 @@ namespace mkt {
             for (int m = 0; m < channel; ++m)
             {
                 // int pixel = int(pData[idx + size2D*m] * MAX_PIXEL_VALUE);
-                int pixel = int((pData[idx + size2D*m]/2.0f -0.5) * MAX_PIXEL_VALUE);
+                int pixel = int((pData[idx + size2D*m]/2.0f - 0.5) * MAX_PIXEL_VALUE);
 
                  pImg[i+m] = (unsigned char)pixel;
                  // fprintf(stdout, "%d\n", i+m);

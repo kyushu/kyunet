@@ -97,7 +97,7 @@ int main(int argc, char const *argv[])
 
     fprintf(stderr, "############ [Conv-Output] ############\n");
     float* pConv_DstData = pConvLayer->pDst_->getCPUData();
-    int conv_wholeSize = pConvLayer->pDst_->getWholeSize();
+    // int conv_wholeSize = pConvLayer->pDst_->getWholeSize();
     int conv_oh = pConvLayer->pDst_->getHeight();
     int conv_ow = pConvLayer->pDst_->getWidth();
     int conv_oc = pConvLayer->pDst_->getChannel();
@@ -105,7 +105,7 @@ int main(int argc, char const *argv[])
 
     fprintf(stderr, "############ [Pooling Output] ############\n");
     float* pPooling_DstData = pPoolingLayer->pDst_->getCPUData();
-    int pool_wholeSize = pPoolingLayer->pDst_->getWholeSize();
+    // int pool_wholeSize = pPoolingLayer->pDst_->getWholeSize();
     int pool_oh = pPoolingLayer->pDst_->getHeight();
     int pool_ow = pPoolingLayer->pDst_->getWidth();
     int pool_oc = pPoolingLayer->pDst_->getChannel();

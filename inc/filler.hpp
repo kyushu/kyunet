@@ -10,7 +10,7 @@ namespace mkt {
     template<typename T>
     class Xavier
     {
-    Distribution distri_;
+        Distribution distri_;
     public:
         Xavier(Distribution distri):distri_{distri}{};
         ~Xavier(){};

@@ -60,7 +60,7 @@ int main(int argc, char const *argv[])
     float* pFilterData = filter.getCPUData();
     int fh = filter.getHeight();
     int fw = filter.getWidth();
-    int fc = filter.getChannel();
+    // int fc = filter.getChannel();
     for (int i = 0; i < filter.getWholeSize(); ++i)
     {
         pFilterData[i] = 1;

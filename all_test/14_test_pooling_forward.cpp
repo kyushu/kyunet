@@ -54,7 +54,7 @@ int main(int argc, char const *argv[])
     // output
     Tensor<float> *pDst = pPoolingLayer->pDst_;
     float* pDstData = pDst->getCPUData();
-    int batchsize = pDst->getNumOfData();
+    // int batchsize = pDst->getNumOfData();
     int wholeSize = pDst->getWholeSize();
     int oh = pDst->getHeight();
     int ow = pDst->getWidth();
