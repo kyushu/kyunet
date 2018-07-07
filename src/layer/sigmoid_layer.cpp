@@ -22,8 +22,8 @@ namespace mkt {
         this->ow_ = iw;
         this->oc_ = ic;
 
-        this->pDst_  = new Tensor<T>{ this->batchSize_, this->oh_, this->ow_, this->oc_};
-        this->pgDst_ = new Tensor<T>{ this->batchSize_, this->oh_, this->ow_, this->oc_};
+        this->pDst_  = new Tensor<T>{ this->batchSize_, this->oc_, this->oh_, this->ow_ };
+        this->pgDst_ = new Tensor<T>{ this->batchSize_, this->oc_, this->oh_, this->ow_ };
 
     };
 

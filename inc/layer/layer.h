@@ -107,9 +107,13 @@ namespace mkt {
         void initBiasTensor();
         void initGradBiasTensor();
 
-        // Computation Function
+        // Compute Function
         virtual void Forward()=0;     // forward pass
         virtual void Backward()=0;    // back propagation
+
+        // archive weight and bias
+        // virtual void serialize()=0;
+        // virtual void deserialize()=0;
 
         void applyActivator();
 

@@ -120,7 +120,7 @@ void test_add_batch_image() {
 
     std::string img_dir = "../example/images";
     std::vector<std::string> file_list;
-    mkt::FILEIO::listdir(img_dir.c_str(), file_list);
+    mkt::FOLDERIO::listdir(img_dir.c_str(), file_list);
     fprintf(stderr, "file_list.size(): %ld\n", file_list.size());
     for (size_t i = 0; i < file_list.size(); ++i)
     {

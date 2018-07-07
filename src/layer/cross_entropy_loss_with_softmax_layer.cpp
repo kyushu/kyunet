@@ -32,7 +32,7 @@ namespace mkt {
          * calculate probability.then calculate loss
          */
         softmaxLayer_.pPrevLayer_ = prevLayer;
-        softmaxLayer_.Reshape(this->batchSize_, ih, iw, ic);
+        softmaxLayer_.Reshape(this->batchSize_, ic, ih, iw);
 
         this->pDst_ = new Tensor<T>{1, 1, 1, 1}; // only for loss
 

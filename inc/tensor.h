@@ -28,6 +28,7 @@
 #include <vector>
 #include <cstdlib>
 #include <cstring>
+#include <fstream>
 
 #include "definitions.h"
 #include "params.h"
@@ -47,13 +48,13 @@ namespace mkt {
         int wholeSize_;
         T *pData_;   // data
     public:
-        int wrIdx_;
+        int wrCount_;
 
 
 
     public:
         Tensor();
-        Tensor(int num, int height, int width, int ch);
+        Tensor(int num, int ch, int height, int width);
         Tensor(Shape shape);
         ~Tensor();
 
@@ -65,16 +66,22 @@ namespace mkt {
 
 
         // Initialize Function
-        // void initialize(int batchSize, int h, int w, int c);
         void allocate();
-        void Reshape(int num, int height, int width, int ch, bool reAllocate=true);
+        void Reshape(int num, int ch, int height, int width, bool reAllocate=true);
 
         // Add Data Function
-        OP_STATUS addData(char const *filename);
-        OP_STATUS addData(const T *pImg);
-        OP_STATUS addData(std::vector<T> vImg);
+        // Add full data to Tensor
+        OP_STATUS addData(const T *pImg, int size);
+        OP_STATUS addData(const std::vector<T> vImg);
 
-        //
+        OP_STATUS addOneSample(char const *filename);
+        OP_STATUS addOneSample(const T *pImg, int size);
+        OP_STATUS addOneSample(const std::vector<T> vImg);
+
+        // archive weight and bias
+        void serialize(std::fstream& file, bool bWriteInfo);
+        void deserialize(std::fstream& file, bool bReadInfo);
+
         void resetData();
 
         // Getter

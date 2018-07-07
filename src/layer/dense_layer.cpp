@@ -27,14 +27,14 @@ namespace mkt {
         this->ow_ = 1;
         this->oc_ = unit;
 
-        this->pDst_ = new Tensor<T>{this->batchSize_, 1, 1, this->oc_};
-        this->pgDst_ = new Tensor<T>{this->batchSize_, 1, 1, this->oc_};
+        this->pDst_  = new Tensor<T>{this->batchSize_, this->oc_, 1, 1};
+        this->pgDst_ = new Tensor<T>{this->batchSize_, this->oc_, 1, 1};
 
-        this->pW_   = new Tensor<T>{1, this->oc_, input_size3D, 1};
-        this->pgW_  = new Tensor<T>{1, this->oc_, input_size3D, 1};
+        this->pW_   = new Tensor<T>{1, 1, this->oc_, input_size3D};
+        this->pgW_  = new Tensor<T>{1, 1, this->oc_, input_size3D};
 
-        this->pB_   = new Tensor<T>{1, 1, 1, this->oc_};
-        this->pgB_  = new Tensor<T>{1, 1, 1, this->oc_};
+        this->pB_   = new Tensor<T>{1, this->oc_, 1, 1};
+        this->pgB_  = new Tensor<T>{1, this->oc_, 1, 1};
 
         // Activator
         this->applyActivator();
@@ -62,14 +62,14 @@ namespace mkt {
         this->ow_ = 1;
         this->oc_ = unit;
 
-        this->pDst_  = new Tensor<T>{this->batchSize_, 1, 1, this->oc_};
-        this->pgDst_ = new Tensor<T>{this->batchSize_, 1, 1, this->oc_};
+        this->pDst_  = new Tensor<T>{this->batchSize_, this->oc_, 1, 1};
+        this->pgDst_ = new Tensor<T>{this->batchSize_, this->oc_, 1, 1};
 
-        this->pW_   = new Tensor<T>{1, this->oc_, input_size3D, 1};
-        this->pgW_  = new Tensor<T>{1, this->oc_, input_size3D, 1};
+        this->pW_   = new Tensor<T>{1, 1, this->oc_, input_size3D};
+        this->pgW_  = new Tensor<T>{1, 1, this->oc_, input_size3D};
 
-        this->pB_   = new Tensor<T>{1, 1, 1, this->oc_};
-        this->pgB_  = new Tensor<T>{1, 1, 1, this->oc_};
+        this->pB_   = new Tensor<T>{1, this->oc_, 1, 1};
+        this->pgB_  = new Tensor<T>{1, this->oc_, 1, 1};
 
         // Activator
         this->applyActivator();
@@ -98,14 +98,14 @@ namespace mkt {
         this->ow_ = 1;
         this->oc_ = params.fc;
 
-        this->pDst_ = new Tensor<T>{this->batchSize_, 1, 1, this->oc_};
-        this->pgDst_ = new Tensor<T>{this->batchSize_, 1, 1, this->oc_};
+        this->pDst_  = new Tensor<T>{this->batchSize_, this->oc_, 1, 1};
+        this->pgDst_ = new Tensor<T>{this->batchSize_, this->oc_, 1, 1};
 
-        this->pW_   = new Tensor<T>{1, this->oc_, input_size3D, 1};
-        this->pgW_  = new Tensor<T>{1, this->oc_, input_size3D, 1};
+        this->pW_   = new Tensor<T>{1, 1, this->oc_, input_size3D};
+        this->pgW_  = new Tensor<T>{1, 1, this->oc_, input_size3D};
 
-        this->pB_   = new Tensor<T>{1, 1, 1, this->oc_};
-        this->pgB_  = new Tensor<T>{1, 1, 1, this->oc_};
+        this->pB_   = new Tensor<T>{1, this->oc_, 1, 1};
+        this->pgB_  = new Tensor<T>{1, this->oc_, 1, 1};
 
         // Activator
         this->applyActivator();

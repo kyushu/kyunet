@@ -47,17 +47,17 @@ namespace mkt {
         // calcOutputSize(ic, ih, iw);
         InferShape();
 
-        this->pDst_ = new Tensor<T>{this->batchSize_, this->oh_, this->ow_, this->oc_};
-        this->pgDst_ = new Tensor<T>{this->batchSize_, this->oh_, this->ow_, this->oc_};
+        this->pDst_  = new Tensor<T>{this->batchSize_, this->oc_, this->oh_, this->ow_};
+        this->pgDst_ = new Tensor<T>{this->batchSize_, this->oc_, this->oh_, this->ow_};
 
-        this->pW_   = new Tensor<T>{ic, fh_, fw_, fc_};
-        this->pgW_  = new Tensor<T>{ic, fh_, fw_, fc_};
+        this->pW_   = new Tensor<T>{ic, fc_, fh_, fw_};
+        this->pgW_  = new Tensor<T>{ic, fc_, fh_, fw_};
 
-        this->pB_   = new Tensor<T>{1, 1, 1, this->oc_};
-        this->pgB_  = new Tensor<T>{1, 1, 1, this->oc_};
+        this->pB_   = new Tensor<T>{1, this->oc_, 1, 1};
+        this->pgB_  = new Tensor<T>{1, this->oc_, 1, 1};
 
 
-        this->pTmpCol_ = new Tensor<T>{1, this->pW_->getSize2D()*ic, this->pDst_->getSize2D(), 1};
+        this->pTmpCol_ = new Tensor<T>{1, 1, this->pW_->getSize2D()*ic, this->pDst_->getSize2D()};
 
         // Activator
         this->applyActivator();
@@ -108,17 +108,17 @@ namespace mkt {
         // calcOutputSize(ic, ih, iw);
         InferShape();
 
-        this->pDst_ = new Tensor<T>{this->batchSize_, this->oh_, this->ow_, this->oc_};
-        this->pgDst_ = new Tensor<T>{this->batchSize_, this->oh_, this->ow_, this->oc_};
+        this->pDst_  = new Tensor<T>{this->batchSize_, this->oc_, this->oh_, this->ow_};
+        this->pgDst_ = new Tensor<T>{this->batchSize_, this->oc_, this->oh_, this->ow_};
 
-        this->pW_   = new Tensor<T>{ic, fh_, fw_, fc_};
-        this->pgW_  = new Tensor<T>{ic, fh_, fw_, fc_};
+        this->pW_   = new Tensor<T>{ic, fc_, fh_, fw_};
+        this->pgW_  = new Tensor<T>{ic, fc_, fh_, fw_};
 
-        this->pB_   = new Tensor<T>{1, 1, 1, this->oc_};
-        this->pgB_  = new Tensor<T>{1, 1, 1, this->oc_};
+        this->pB_   = new Tensor<T>{1, this->oc_, 1, 1};
+        this->pgB_  = new Tensor<T>{1, this->oc_, 1, 1};
 
 
-        pTmpCol_ = new Tensor<T>{1, this->pW_->getSize2D()*ic, this->pDst_->getSize2D(), 1};
+        pTmpCol_ = new Tensor<T>{1, 1, this->pW_->getSize2D()*ic, this->pDst_->getSize2D()};
 
         // Activator
         this->applyActivator();

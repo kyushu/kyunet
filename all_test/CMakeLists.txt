@@ -103,8 +103,11 @@ find_package(OpenCV REQUIRED)
         # 21_test_mnist_load_batch
         add_example_with_stb_cv(21_test_mnist_load_batch)
 
-        # 21_test_mnist_load_batch
+        # 22_test_mnist_load_batch
         add_example_with_stb_cv(22_test_mnist_load_batch_add_batchNorm)
+
+        # 23_test_serialize_deserialize
+        add_example(23_test_serialize_deserialize)
 
     else()
         message("OpenCV not found")

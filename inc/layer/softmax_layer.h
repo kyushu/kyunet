@@ -22,7 +22,7 @@ namespace mkt {
         void Forward();
         void Backward();
 
-        void Reshape(int num, int height, int width, int ch);
+        void Reshape(int num, int ch, int height, int width);
     };
 }
 

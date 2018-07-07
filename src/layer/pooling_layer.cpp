@@ -37,13 +37,13 @@ namespace mkt {
 
         this->oc_ = ic;
         inferShape();
-        this->pDst_  = new Tensor<T>{ this->batchSize_, this->oh_, this->ow_, this->oc_};
-        this->pgDst_ = new Tensor<T>{ this->batchSize_, this->oh_, this->ow_, this->oc_};
+        this->pDst_  = new Tensor<T>{ this->batchSize_, this->oc_, this->oh_, this->ow_};
+        this->pgDst_ = new Tensor<T>{ this->batchSize_, this->oc_, this->oh_, this->ow_};
 
         if (type_ == PoolingMethodType::MAX)
         {
             // For storing index of max value of src data in each pooling window
-            pMask_ = new Tensor<T>{ this->batchSize_, this->oh_, this->ow_, this->oc_ };
+            pMask_ = new Tensor<T>{ this->batchSize_, this->oc_, this->oh_, this->ow_ };
         }
     }
 
@@ -82,13 +82,13 @@ namespace mkt {
 
         this->oc_ = ic;
         inferShape();
-        this->pDst_  = new Tensor<T>{ this->batchSize_, this->oh_, this->ow_, this->oc_ };
-        this->pgDst_ = new Tensor<T>{ this->batchSize_, this->oh_, this->ow_, this->oc_ };
+        this->pDst_  = new Tensor<T>{ this->batchSize_, this->oc_, this->oh_, this->ow_ };
+        this->pgDst_ = new Tensor<T>{ this->batchSize_, this->oc_, this->oh_, this->ow_ };
 
         if (type_ == PoolingMethodType::MAX)
         {
             // For storing index of max value of src data in each pooling window
-            pMask_ = new Tensor<T>{ this->batchSize_, this->oh_, this->ow_, this->oc_};
+            pMask_ = new Tensor<T>{ this->batchSize_, this->oc_, this->oh_, this->ow_};
         }
     }
 

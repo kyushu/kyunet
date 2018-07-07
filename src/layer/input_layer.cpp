@@ -12,7 +12,7 @@ namespace mkt {
         // this->dh_ = h;
         // this->dw_ = w;
         // this->dc_ = c;
-        this->pDst_ = new Tensor<T>{ bSize, h, w, c };
+        this->pDst_ = new Tensor<T>{ bSize, c, h, w };
 
     };
 
@@ -64,22 +64,16 @@ namespace mkt {
             int size2D = this->pDst_->getSize2D();
             int size3D = this->pDst_->getSize3D();
             T* ptr = this->pDst_->getCPUData() + index * size3D;
-            // fprintf(stdout, "size2D: %d\n", size2D);
             for (int i = 0; i < size3D; i+=depth)
             {
                 int idx = int(i/depth);
-                for (int m = 0; m < depth; ++m)
+                for (int d = 0; d < depth; ++d)
                 {
-                    ptr[idx + size2D*m] = bNormalize ? (static_cast<T>( pImg[i+m] ) / MAX_PIXEL_VALUE - 0.5f) * 2.0f :
-                                                        static_cast<T>(pImg[i+m]);
+                    ptr[idx + size2D*d] = bNormalize ? (static_cast<T>( pImg[i+d] ) / MAX_PIXEL_VALUE - 0.5f) * 2.0f :
+                                                        static_cast<T>( pImg[i+d] );
                 }
             }
-
-            // pDst_->wrIdx_++;
         }
-        //  else {
-        //     // assert(this->pDst);
-        // }
     }
 
     // For Debug

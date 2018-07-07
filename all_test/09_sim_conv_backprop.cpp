@@ -1,4 +1,5 @@
 
+
 #include "tensor.h"
 #include "operations/mat_operations.h"
 #include "definitions.h"
@@ -14,7 +15,7 @@ int main(int argc, char const *argv[])
     int ic = 1;
 
     // set src differential tensor
-    mkt::Tensor<float> src_grad(batch_size, ih, iw, ic);
+    mkt::Tensor<float> src_grad(batch_size, ic, ih, iw);
     src_grad.allocate();
     float* pSrcGradData = src_grad.getCPUData();
 
@@ -22,12 +23,12 @@ int main(int argc, char const *argv[])
     int fh = 2;
     int fw = 2;
     int oc = 1;
-    mkt::Tensor<float> weight(ic, 2, 2, oc);
+    mkt::Tensor<float> weight(ic, oc, 2, 2);
     weight.allocate();
     float* pWData = weight.getCPUData();
 
     // Set dst differential tensor
-    mkt::Tensor<float> dst_grad(batch_size, 2, 2, oc);
+    mkt::Tensor<float> dst_grad(batch_size, oc, 2, 2);
     dst_grad.allocate();
     float* pDstGradData = dst_grad.getCPUData();
 
@@ -39,7 +40,7 @@ int main(int argc, char const *argv[])
     mkt::mktLog(1, "k: %d\n", k);
 
     // Set temporary tensor for storing Col2Im matrix
-    mkt::Tensor<float> temp(1, n, k, 1);
+    mkt::Tensor<float> temp(1, 1, n, k);
     temp.allocate();
     float* ptmpData = temp.getCPUData();
 

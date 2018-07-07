@@ -54,10 +54,10 @@ unsigned char* resize_image(std::string file, int out_w, int out_h) {
 void test_load_image_file(std::string img_dir) {
 
     std::vector<std::string> file_list;
-    mkt::FILEIO::listdir(img_dir.c_str(), file_list);
+    mkt::FOLDERIO::listdir(img_dir.c_str(), file_list);
 
     // Instantiate an Tensor
-    mkt::Tensor<float> tensor(file_list.size(), 480, 600, 3);
+    mkt::Tensor<float> tensor(file_list.size(), 3, 480, 600);
     // mkt::Tensor tensor;
     // tensor.height_ = 480;
     // tensor.width_ = 600;
@@ -76,7 +76,7 @@ void test_load_image_file(std::string img_dir) {
     // There are 3 image file in the folder, we load each image in 3 ways
     // 1. add from file
     std::string img_file = img_dir + file_list.at(0);
-    tensor.addData(img_file.c_str());
+    tensor.addOneSample(img_file.c_str());
 
     // 2. add from float array
     img_file = img_dir + file_list.at(1);
@@ -87,7 +87,7 @@ void test_load_image_file(std::string img_dir) {
     {
         *(pfImg+i) = (float)*(pImg+i);
     }
-    tensor.addData(pfImg);
+    tensor.addOneSample(pfImg, w*h*c);
 
     // 3. add from vector
     img_file = img_dir + file_list.at(2);
@@ -97,7 +97,7 @@ void test_load_image_file(std::string img_dir) {
     {
         vfImg.push_back( (float)*(pImg+i) );
     }
-    tensor.addData(vfImg);
+    tensor.addOneSample(vfImg);
 
 
     /***************

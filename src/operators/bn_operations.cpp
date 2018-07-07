@@ -188,6 +188,7 @@ namespace op {
             }
         }
 
+        // Update gradient with respect to data (x)
         auto pgSrcData = pgSrc->getCPUData();
         pSrcData = pSrc->getCPUData();
         pgDstData = pgDst->getCPUData();

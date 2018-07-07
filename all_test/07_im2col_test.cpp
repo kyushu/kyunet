@@ -11,7 +11,7 @@ int main(int argc, char const *argv[])
 
     //#############################
     // src tensor
-    mkt::Tensor<float> image(1, 4, 4, 3);
+    mkt::Tensor<float> image(1, 3, 4, 4);
     image.allocate();
     float* pImgData = image.getCPUData();
     int ih = image.getHeight();
@@ -85,7 +85,7 @@ int main(int argc, char const *argv[])
     int ow = (iw - fw + 2*padding) / stride + 1;
     int oc = 2;
 
-    mkt::Tensor<float> dst(1, oh, ow, oc);
+    mkt::Tensor<float> dst(1, oc, oh, ow);
     dst.allocate();
     float* pDstData = dst.getCPUData();
 
@@ -96,7 +96,7 @@ int main(int argc, char const *argv[])
     mktLog(2, "ic:%d\n", ic);
     mktLog(2, "dst.size2D: %d\n", dst.getSize2D());
 
-    mkt::Tensor<float> tempCol(1, filter.getSize2D()*ic, dst.getSize2D(), oc);
+    mkt::Tensor<float> tempCol(1, oc, filter.getSize2D()*ic, dst.getSize2D());
     tempCol.allocate();
     float* pTmpColData = tempCol.getCPUData();
     mktLog(2, "tempCol.getgetSize2D(): %d\n", tempCol.getSize2D());

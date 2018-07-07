@@ -19,28 +19,28 @@ namespace mkt {
 
 
         // The dimemsion of output is same as previous output
-        this->pDst_ = new Tensor<T>{this->batchSize_, this->oh_, this->ow_, this->oc_};
-        fprintf(stderr, "b: %d, oh: %d, ow: %d, oc: %d\n", this->batchSize_, this->oh_, this->ow_, this->oc_);
+        this->pDst_ = new Tensor<T>{this->batchSize_, this->oc_, this->oh_, this->ow_};
+        // fprintf(stderr, "b: %d, oh: %d, ow: %d, oc: %d\n", this->batchSize_, this->oh_, this->ow_, this->oc_);
         // pW_ = gamma
-        this->pW_   = new Tensor<T>{1, 1, 1, this->oc_};
+        this->pW_   = new Tensor<T>{1, this->oc_, 1, 1};
         // pB_ = beta
-        this->pB_   = new Tensor<T>{1, 1, 1, this->oc_};
+        this->pB_   = new Tensor<T>{1, this->oc_, 1, 1};
 
 
-        this->pgDst_ = new Tensor<T>{this->batchSize_, this->oh_, this->ow_, this->oc_};
-        this->pgW_   = new Tensor<T>{1, 1, 1, this->oc_};
-        this->pgB_   = new Tensor<T>{1, 1, 1, this->oc_};
+        this->pgDst_ = new Tensor<T>{this->batchSize_, this->oc_, this->oh_, this->ow_};
+        this->pgW_   = new Tensor<T>{1, this->oc_, 1, 1};
+        this->pgB_   = new Tensor<T>{1, this->oc_, 1, 1};
 
         // running mean and variance are used to compute
         // x_norm when inference
-        pRunning_means_     = new Tensor<T>{1, 1, 1, this->oc_};
-        pRunning_variances_ = new Tensor<T>{1, 1, 1, this->oc_};
+        pRunning_means_     = new Tensor<T>{1, this->oc_, 1, 1};
+        pRunning_variances_ = new Tensor<T>{1, this->oc_, 1, 1};
 
         // For current batch data
-        pMean_              = new Tensor<T>{1, 1, 1, this->oc_};
-        pInvstds_           = new Tensor<T>{1, 1, 1, this->oc_};
-        pdmean_             = new Tensor<T>{1, 1, 1, this->oc_};
-        pdvar_              = new Tensor<T>{1, 1, 1, this->oc_};
+        pMean_              = new Tensor<T>{1, this->oc_, 1, 1};
+        pInvstds_           = new Tensor<T>{1, this->oc_, 1, 1};
+        pdmean_             = new Tensor<T>{1, this->oc_, 1, 1};
+        pdvar_              = new Tensor<T>{1, this->oc_, 1, 1};
 
 
 

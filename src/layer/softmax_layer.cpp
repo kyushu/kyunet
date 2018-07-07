@@ -27,11 +27,11 @@ namespace mkt {
         this->ow_ = iw;
         this->oc_ = ic;
 
-        this->pDst_  = new Tensor<T>{ this->batchSize_, this->oh_, this->ow_, this->oc_ };
-        this->pgDst_ = new Tensor<T>{ this->batchSize_, this->oh_, this->ow_, this->oc_ };
+        this->pDst_  = new Tensor<T>{ this->batchSize_, this->oc_, this->oh_, this->ow_ };
+        this->pgDst_ = new Tensor<T>{ this->batchSize_, this->oc_, this->oh_, this->ow_ };
 
         // pScale_ : for a plane of source data
-        pScale_ = new Tensor<T>{ 1, this->oh_, this->ow_, 1 };
+        pScale_ = new Tensor<T>{ 1, 1, this->oh_, this->ow_ };
     };
 
     // Destructor
@@ -58,7 +58,7 @@ namespace mkt {
     };
 
     template<typename T>
-    void SoftmaxLayer<T>::Reshape(int num, int height, int width, int ch) {
+    void SoftmaxLayer<T>::Reshape(int num, int ch, int height, int width) {
         this->batchSize_ = num;
         this->oh_ = height;
         this->ow_ = width;
@@ -66,18 +66,18 @@ namespace mkt {
 
         if (this->pDst_)
         {
-            this->pDst_->Reshape(num, height, width, ch);
+            this->pDst_->Reshape(num, ch, height, width);
         } else {
-            this->pDst_ = new Tensor<T>{ this->batchSize_, this->oh_, this->ow_, this->oc_ };
+            this->pDst_ = new Tensor<T>{ this->batchSize_, this->oc_, this->oh_, this->ow_ };
             this->pDst_->allocate();
         }
 
         if (pScale_)
         {
             // delete pScale_;
-            pScale_->Reshape(num, height, width, ch);
+            pScale_->Reshape(num, ch, height, width);
         } else {
-            pScale_ = new Tensor<T>{ 1, this->oh_, this->ow_, 1 };
+            pScale_ = new Tensor<T>{ 1, 1, this->oh_, this->ow_ };
             pScale_->allocate();
         }
 
