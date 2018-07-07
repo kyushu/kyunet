@@ -33,11 +33,11 @@
 #include "utils.hpp"
 
 namespace mkt {
-    class FILEIO
+    class FOLDERIO
     {
     public:
-        FILEIO();
-        ~FILEIO();
+        FOLDERIO();
+        ~FOLDERIO();
 
 
         static int listdir(const char *path, std::vector<std::string> &file_list) {
