@@ -311,39 +311,17 @@ namespace mkt {
     }
 
 
+    // Serialize / Deserialize function
     template<typename T>
     void Tensor<T>::serialize(std::fstream& file, bool bWriteInfo)
     {
-        if (bWriteInfo)
-        {
-            file << num_ <<channel_ << height_ << width_;
-        }
-
-        for (int i = 0; i < wholeSize_; ++i)
-        {
-            file << pData_[i];
-        }
+        file.write(reinterpret_cast<const char*>(pData_), sizeof(T)*wholeSize_);
     }
 
     template<typename T>
     void Tensor<T>::deserialize(std::fstream& file, bool bReadInfo)
     {
-        if (bReadInfo)
-        {
-            file >> num_;
-            file >> channel_;
-            file >> height_;
-            file >> width_;
-
-            size2D_ = height_ * width_;
-            size3D_ = channel_ * size2D_;
-            wholeSize_ = num_ * size3D_;
-        }
-
-        for (int i = 0; i < wholeSize_; ++i)
-        {
-            file >> pData_[i];
-        }
+        file.read(reinterpret_cast<char*>(pData_), sizeof(T)*wholeSize_);
     }
 
 
