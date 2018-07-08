@@ -54,6 +54,16 @@ namespace mkt {
         relu_act_.Backward(this->pDst_, this->pgDst_, this->pgDst_);
     };
 
+    template<typename T>
+    void ReluLayer<T>::serialize(std::fstream& fileHandler, bool bWriteInfo)
+    {
+    }
+    
+    template<typename T>
+    void ReluLayer<T>::deserialize(std::fstream& fileHandler, bool bWriteInfo)
+    {
+    }
+
     // Explicitly instantiate the template, and its member definitions
     template class ReluLayer<float>;
 

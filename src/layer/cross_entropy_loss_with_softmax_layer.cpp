@@ -189,6 +189,16 @@ namespace mkt {
         }
     }
 
+    template<typename T>
+    void CrossEntropyLossWithSoftmaxLayer<T>::serialize(std::fstream& fileHandler, bool bWriteInfo)
+    {
+    }
+    
+    template<typename T>
+    void CrossEntropyLossWithSoftmaxLayer<T>::deserialize(std::fstream& fileHandler, bool bWriteInfo)
+    {
+    }
+
     // Explicitly instantiate the template, and its member definitions
     template class CrossEntropyLossWithSoftmaxLayer<float>;
 

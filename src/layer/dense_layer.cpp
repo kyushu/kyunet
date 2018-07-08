@@ -273,6 +273,20 @@ namespace mkt {
         }
     }
 
+    template<typename T>
+    void DenseLayer<T>::serialize(std::fstream& fileHandler, bool bWriteInfo)
+    {
+        this->pW_->serialize(fileHandler);
+        this->pB_->serialize(fileHandler);
+    }
+    
+    template<typename T>
+    void DenseLayer<T>::deserialize(std::fstream& fileHandler, bool bWriteInfo)
+    {
+        this->pW_->deserialize(fileHandler);
+        this->pB_->deserialize(fileHandler);
+    }
+
     // Explicitly instantiate the template, and its member definitions
     template class DenseLayer<float>;
 

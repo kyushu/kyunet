@@ -43,9 +43,9 @@ void test_write(std::string file_path)
     std::fstream file{file_path, std::ios::out | std::ios:: binary};
 
     // Write Tensor1 data to file
-    pTensor1->serialize(file, false);
+    pTensor1->serialize(file);
     // Write Tensor2 data to file
-    pTensor2->serialize(file, false);
+    pTensor2->serialize(file);
 
     file.close();
 }
@@ -74,14 +74,14 @@ void test_read(std::string file_path)
     printf("begin pos: %d\n", pos);
 
     // Read Tensor 1 data from fstream
-    pTensor1->deserialize(file, true);
+    pTensor1->deserialize(file);
 
     // Get current location of fstream get-pointer
     pos = file.tellg();
     printf("after read tensor1 pos: %d\n", pos);
 
     // Read Tensor 2 data from fstream
-    pTensor2->deserialize(file, false);
+    pTensor2->deserialize(file);
 
     // Get current location of fstream get-pointer
     pos = file.tellg();

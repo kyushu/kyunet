@@ -34,7 +34,7 @@
 #ifndef MKT_LAYER_H
 #define MKT_LAYER_H
 
-#include <iostream>
+// #include <iostream>
 #include <string>
 
 #include "operations/mat_operations.h"
@@ -112,8 +112,8 @@ namespace mkt {
         virtual void Backward()=0;    // back propagation
 
         // archive weight and bias
-        // virtual void serialize()=0;
-        // virtual void deserialize()=0;
+        virtual void serialize(std::fstream& fileHandler, bool bWriteInfo)=0;
+        virtual void deserialize(std::fstream& fileHandler, bool bWriteInfo)=0;
 
         void applyActivator();
 

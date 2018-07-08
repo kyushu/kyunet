@@ -109,6 +109,9 @@ find_package(OpenCV REQUIRED)
         # 23_test_serialize_deserialize
         add_example(23_test_serialize_deserialize)
 
+        # 24_test_save_load_model
+        add_example_with_stb_cv(24_test_save_load_model)
+
     else()
         message("OpenCV not found")
     endif()

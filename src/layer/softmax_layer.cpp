@@ -102,6 +102,20 @@ namespace mkt {
 
     };
 
+
+    template<typename T>
+    void SoftmaxLayer<T>::serialize(std::fstream& fileHandler, bool bWriteInfo)
+    {
+
+    }
+    
+    template<typename T>
+    void SoftmaxLayer<T>::deserialize(std::fstream& fileHandler, bool bWriteInfo)
+    {
+
+    }
+    
+
     // Explicitly instantiate the template, and its member definitions
     template class SoftmaxLayer<float>;
 

@@ -220,6 +220,20 @@ namespace mkt {
     }
 
 
+    template<typename T>
+    void ConvLayer<T>::serialize(std::fstream& fileHandler, bool bWriteInfo)
+    {
+        this->pW_->serialize(fileHandler);
+        this->pB_->serialize(fileHandler);
+    }
+    
+    template<typename T>
+    void ConvLayer<T>::deserialize(std::fstream& fileHandler, bool bWriteInfo)
+    {
+        this->pW_->deserialize(fileHandler);
+        this->pB_->deserialize(fileHandler);
+    }
+
     // Getter
     template<typename T>
     int ConvLayer<T>::getFiltergetHeight()  { return fh_; }

@@ -19,6 +19,8 @@ namespace mkt {
         void initialize(NetMode mode);
         void Forward(){};
         void Backward(){};
+        void serialize(std::fstream& fileHandler, bool bWriteInfo){};
+        void deserialize(std::fstream& fileHandler, bool bWriteInfo){};
 
         void addFlattenImageToTensor(unsigned char *pImg, int index, bool bNormalize);
         void DeFlattenImage(const T* pData, int height, int width, int channel, unsigned char *pImg);

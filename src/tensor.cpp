@@ -313,13 +313,13 @@ namespace mkt {
 
     // Serialize / Deserialize function
     template<typename T>
-    void Tensor<T>::serialize(std::fstream& file, bool bWriteInfo)
+    void Tensor<T>::serialize(std::fstream& file)
     {
         file.write(reinterpret_cast<const char*>(pData_), sizeof(T)*wholeSize_);
     }
 
     template<typename T>
-    void Tensor<T>::deserialize(std::fstream& file, bool bReadInfo)
+    void Tensor<T>::deserialize(std::fstream& file)
     {
         file.read(reinterpret_cast<char*>(pData_), sizeof(T)*wholeSize_);
     }

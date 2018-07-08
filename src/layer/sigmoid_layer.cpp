@@ -52,6 +52,19 @@ namespace mkt {
         fprintf(stderr, "%s: %s: %d\n", __FILE__, __func__, __LINE__);
     };
 
+    template<typename T>
+    void SigmoidLayer<T>::serialize(std::fstream& fileHandler, bool bWriteInfo)
+    {
+
+    }
+    
+    template<typename T>
+    void SigmoidLayer<T>::deserialize(std::fstream& fileHandler, bool bWriteInfo)
+    {
+
+    }
+    
+
     // Explicitly instantiate the template, and its member definitions
     template class SigmoidLayer<float>;
 

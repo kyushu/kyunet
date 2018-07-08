@@ -40,6 +40,8 @@ public:
     void initialize(NetMode mode);
     void Forward();
     void Backward();
+    void serialize(std::fstream& fileHandler, bool bWriteInfo);
+    void deserialize(std::fstream& fileHandler, bool bWriteInfo);
 
 private:
     T eps_;
@@ -48,6 +50,7 @@ private:
     Tensor<T>* pRunning_means_;     // for inference
     Tensor<T>* pRunning_variances_; // for inference
 
+    // Temporary use
     Tensor<T>* pMean_;              // current batch data mean
     Tensor<T>* pInvstds_;           // current batch data variance = sigmae square
     Tensor<T>* pdvar_;

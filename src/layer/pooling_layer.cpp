@@ -156,6 +156,17 @@ namespace mkt {
         }
     }
 
+    template<typename T>
+    void PoolingLayer<T>::serialize(std::fstream& fileHandler, bool bWriteInfo)
+    {
+    }
+    
+    template<typename T>
+    void PoolingLayer<T>::deserialize(std::fstream& fileHandler, bool bWriteInfo)
+    {
+    }
+    
+
     // Getter Function
     template<typename T>
     int PoolingLayer<T>::getFiltergetHeight() {

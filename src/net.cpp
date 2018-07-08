@@ -25,7 +25,6 @@
 */
 
 #include "net.h"
-#include "solver/sgd_solver.h"
 
 namespace mkt {
 
@@ -467,6 +466,40 @@ namespace mkt {
             MKT_Assert(index < batchSize, "index(" + std::to_string(index) + ") > " + std::to_string(batchSize));
         }
     }
+
+
+    template<typename T>
+    OP_STATUS KyuNet<T>::SaveModel(std::string file_path, bool bWriteInfo)
+    {
+        std::fstream fileHandler(file_path, std::ios::out | std::ios:: binary);
+
+        if (!fileHandler.good())
+        {
+            return OP_STATUS::FAIL;
+        } else {
+            for (int i = 0; i < layers_.size(); ++i)
+            {
+                layers_[i]->serialize(fileHandler, bWriteInfo);
+            }
+        }
+    }
+
+    template<typename T>
+    OP_STATUS KyuNet<T>::LoadModel(std::string file_path, bool bWriteInfo)
+    {
+        std::fstream fileHandler(file_path, std::ios::in | std::ios:: binary);
+
+        if (!fileHandler.good())
+        {
+            return OP_STATUS::FAIL;
+        } else {
+            for (int i = 0; i < layers_.size(); ++i)
+            {
+                layers_[i]->deserialize(fileHandler, bWriteInfo);
+            }
+        }
+    }
+
 
     template class KyuNet<float>;
     // template class KyuNet<double>;

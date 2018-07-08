@@ -37,6 +37,8 @@ namespace mkt {
         void initialize(NetMode mode);
         void Forward();
         void Backward();
+        void serialize(std::fstream& fileHandler, bool bWriteInfo);
+        void deserialize(std::fstream& fileHandler, bool bWriteInfo);
 
         void InferShape ();
         // Getter Function

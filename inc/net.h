@@ -24,6 +24,7 @@
 #define MKT_NET_H
 
 // #include <cstdio>
+#include <fstream>
 
 #include "stb_image.h"
 
@@ -103,6 +104,9 @@ namespace mkt {
         void Backward();
 
         void Train();
+
+        OP_STATUS SaveModel(std::string file_path, bool bWriteInfo);
+        OP_STATUS LoadModel(std::string file_path, bool bWriteInfo);
 
         // Add Data Function
         OP_STATUS add_data_from_file_list(std::vector<std::string> fileList);

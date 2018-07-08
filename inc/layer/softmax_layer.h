@@ -21,6 +21,8 @@ namespace mkt {
         void initialize(NetMode mode);
         void Forward();
         void Backward();
+        void serialize(std::fstream& fileHandler, bool bWriteInfo);
+        void deserialize(std::fstream& fileHandler, bool bWriteInfo);
 
         void Reshape(int num, int ch, int height, int width);
     };

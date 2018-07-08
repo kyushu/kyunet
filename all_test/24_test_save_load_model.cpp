@@ -52,71 +52,6 @@ void check_image_info(std::string full_path) {
     delete[] pImg;
 }
 
-template<typename T>
-KyuNet<T>* configure_kyunet(int batchSize, int input_height, int input_width, int input_ch) {
-
-
-
-    /* Configure Net */
-    KyuNet<T>* net = new KyuNet<T>{};
-
-    // Input layer
-    InputLayer<T>* pInLayer = (InputLayer<T> *)net->addInputLayer("input", batchSize, input_height, input_width, input_ch);
-
-    fprintf(stderr, "input Layer: batch: %d, h: %d, w: %d, c: %d (%d)\n",
-        pInLayer->pDst_->getNumOfData(),
-        pInLayer->pDst_->getHeight(),
-        pInLayer->pDst_->getWidth(),
-        pInLayer->pDst_->getChannel(),
-        pInLayer->pDst_->getWholeSize());
-
-    // Convolution Layer 1
-    LayerParams conv1_par;
-    conv1_par.fc = 8;
-    conv1_par.fh = 3;
-    conv1_par.fw = 3;
-    conv1_par.stride_h = 1;
-    conv1_par.stride_w = 1;
-    conv1_par.pad_h = 0;
-    conv1_par.pad_w = 0;
-    conv1_par.padding_type = PaddingType::VALID;
-    conv1_par.actType = ActivationType::RELU;
-    conv1_par.weight_init_type = InitializerType::HE_INIT_NORM;
-    conv1_par.bias_init_type = InitializerType::ZERO;
-    ConvLayer<T>* pConvLayer1 = (ConvLayer<T>* )net->addConvLayer(pInLayer, "conv1", conv1_par);
-
-    // Pooling Layer
-    LayerParams pool_params;
-    pool_params.fh = 2;
-    pool_params.fw = 2;
-    pool_params.stride_h = 1;
-    pool_params.stride_w = 1;
-    pool_params.pad_h = 0;
-    pool_params.pad_w = 0;
-    pool_params.pooling_type = PoolingMethodType::MAX;
-    PoolingLayer<T>* pPoolingLayer = (PoolingLayer<T>*)net->addPoolingLayer( pConvLayer1, "Pooling1", pool_params);
-
-    // Dense Layer
-    LayerParams dense_params;
-    dense_params.fc = 10;
-    dense_params.actType = ActivationType::RELU;
-    dense_params.weight_init_type = InitializerType::HE_INIT_NORM;
-    dense_params.bias_init_type = InitializerType::ZERO;
-    DenseLayer<T>* pDenseLayer = (DenseLayer<T>* )net->addDenseLayer(pPoolingLayer, "dense1", dense_params);
-
-    // CrossEntropyWutgSoftmaxLayer
-    CrossEntropyLossWithSoftmaxLayer<T>* pCrossEntropyLayer = (CrossEntropyLossWithSoftmaxLayer<T> *)net->addCrossEntropyLossWithSoftmaxLayer(pDenseLayer, "cross_entropy_loss");
-
-    /* Initialize Net (Allocate menory) */
-    net->Compile(NetMode::TRAINING);
-
-    SGDSolver<T>* pSgdSolver = new SGDSolver<T>{net};
-    pSgdSolver->initialize();
-    net->addSolver(pSgdSolver);
-
-    return net;
-}
-
 int main(int argc, char const *argv[])
 {
     /**
@@ -156,18 +91,7 @@ int main(int argc, char const *argv[])
         image_files.emplace_back(root + compons[0]);
         labels.emplace_back(std::stoi(compons[1]));
     }
-
-    // while(std::getline(ifile, line)) {
-    //     // fprintf(stderr, "%s\n", line.c_str());
-    //     std::vector<std::string> compons = UTILS::split(line, ' ');
-    //     image_files.push_back(root + compons[0]);
-    //     // int label = std::stoi(compons[1]);
-    //     labels.emplace_back(std::stoi(compons[1]));
-    // }
-
-    // display_image_with_label(image_files, labels, root, 20);
     check_image_info(image_files[0]);
-
 
 
     /* Parameters */
@@ -175,8 +99,6 @@ int main(int argc, char const *argv[])
     int input_height = 28;
     int input_width = 28;
     int input_ch = 1;
-
-    // KyuNet* net = configure_kyunet(batchSize, input_height, input_width, input_ch);
 
     //////////////////////////////////////////////
     /* Configure Net */
@@ -228,6 +150,40 @@ int main(int argc, char const *argv[])
 
     Layer<float>* pBatchNormLayer2 = net->addBatchNormLayer(pConvLayer2, "bn2");
 
+    // Convolution Layer 3
+    LayerParams conv3_par;
+    conv3_par.fc = 64;
+    conv3_par.fh = 3;
+    conv3_par.fw = 3;
+    conv3_par.stride_h = 1;
+    conv3_par.stride_w = 1;
+    conv3_par.pad_h = 0;
+    conv3_par.pad_w = 0;
+    conv3_par.padding_type = PaddingType::VALID;
+    conv3_par.actType = ActivationType::RELU;
+    conv3_par.weight_init_type = InitializerType::HE_INIT_NORM;
+    conv3_par.bias_init_type = InitializerType::ZERO;
+    ConvLayer<float>* pConvLayer3 = (ConvLayer<float>* )net->addConvLayer(pBatchNormLayer2, "conv3", conv3_par);
+
+    Layer<float>* pBatchNormLayer3 = net->addBatchNormLayer(pConvLayer3, "bn3");
+
+    // Convolution Layer 4
+    LayerParams conv4_par;
+    conv4_par.fc = 64;
+    conv4_par.fh = 3;
+    conv4_par.fw = 3;
+    conv4_par.stride_h = 1;
+    conv4_par.stride_w = 1;
+    conv4_par.pad_h = 0;
+    conv4_par.pad_w = 0;
+    conv4_par.padding_type = PaddingType::VALID;
+    conv4_par.actType = ActivationType::RELU;
+    conv4_par.weight_init_type = InitializerType::HE_INIT_NORM;
+    conv4_par.bias_init_type = InitializerType::ZERO;
+    ConvLayer<float>* pConvLayer4 = (ConvLayer<float>* )net->addConvLayer(pBatchNormLayer3, "conv4", conv4_par);
+
+    Layer<float>* pBatchNormLayer4 = net->addBatchNormLayer(pConvLayer4, "bn4");
+
     // Pooling Layer
     LayerParams pool_params;
     pool_params.fh = 2;
@@ -237,7 +193,7 @@ int main(int argc, char const *argv[])
     pool_params.pad_h = 0;
     pool_params.pad_w = 0;
     pool_params.pooling_type = PoolingMethodType::MAX;
-    PoolingLayer<float>* pPoolingLayer = (PoolingLayer<float>*)net->addPoolingLayer( pBatchNormLayer2, "Pooling1", pool_params);
+    PoolingLayer<float>* pPoolingLayer = (PoolingLayer<float>*)net->addPoolingLayer( pBatchNormLayer3, "Pooling1", pool_params);
 
     // Dense Layer
     LayerParams dense_params;
@@ -256,14 +212,8 @@ int main(int argc, char const *argv[])
 
     /* Initialize Net (Allocate menory) */
     net->Compile(NetMode::TRAINING);
+    net->LoadModel("./model_test_20.bin", false);
 
-    //////////////////////////////////////////////
-
-    // Debug
-    // float* pBNData = pBatchNormLayer1->pDst_->getCPUData();
-    // int bn_oc = pBatchNormLayer1->pDst_->getChannel();
-    // int bn_oh = pBatchNormLayer1->pDst_->getHeight();
-    // int bn_ow = pBatchNormLayer1->pDst_->getWidth();
 
 
     int num_epoch = 50;
@@ -297,7 +247,12 @@ int main(int argc, char const *argv[])
             {
                 float loss = pCrossEntropyLayer->pDst_->getCPUData()[0];
                 fprintf(stderr, "%d - %d: loss = %f\n", i, b, loss);
+
+                // std::string model_name = "./model_test_" + std::to_string(b) + ".bin";
+                // fprintf(stderr, "save model: %s\n", model_name.c_str());
+                // net->SaveModel(model_name, false);
             }
+
         }
     }
 

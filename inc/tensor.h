@@ -79,8 +79,8 @@ namespace mkt {
         OP_STATUS addOneSample(const std::vector<T> vImg);
 
         // archive weight and bias
-        void serialize(std::fstream& file, bool bWriteInfo);
-        void deserialize(std::fstream& file, bool bReadInfo);
+        void serialize(std::fstream& file);
+        void deserialize(std::fstream& file);
 
         void resetData();
 
