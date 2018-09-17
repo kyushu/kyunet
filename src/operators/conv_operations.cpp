@@ -89,7 +89,7 @@ namespace op {
     }
 
     template<typename T>
-    void conv_gradient (
+    void conv_gradient (std::string id,
         int numOfSample, const ConvParam& convParam, const Shape& filterShape,
         Tensor<T>* pSrc, Tensor<T>* pgSrc, Tensor<T>* pgDst,
         Tensor<T>* pW, Tensor<T>* pgW, Tensor<T>* pgB,
@@ -163,6 +163,24 @@ namespace op {
                 convParam.dilation_h_, convParam.dilation_w_,
                 pTmpColData
             );
+            
+            if (id == "conv2") {
+                // for (int i = 0; i < pTmpCol->getWholeSize(); ++i)
+                // {
+                //     if (fabs(pTmpColData[i]) > 10.0)
+                //         {
+                //             fprintf(stderr, "pTmpColData[%d] = %f\n", i, pTmpColData[i]);
+                //         }
+                // }
+                // for (int i = 0; i < pgDst->getWholeSize(); ++i)
+                // {
+                //     if (fabs(pgDstData[i]) > 5.0)
+                //         {
+                //             fprintf(stderr, "pgDstData[%d] = %f\n", i, pgDstData[i]);
+                //         }
+                // }
+            }
+            
             op::mat::gemm_cpu(
                 CblasNoTrans, CblasTrans,               /* trans_A, trans_B */
                 filterShape.depth_, num_in2filter, gdst_size2D,         /* M,       N, K    */
@@ -172,6 +190,16 @@ namespace op {
                 1.0f,                                   /* BETA             */
                 pgWData, num_in2filter                  /* C,       ldc(N)  */
             );
+
+            // if (id == "conv3") {
+            //     for (int i = 0; i < pgW->getSize2D(); ++i)
+            //     {
+            //         // if (fabs(pgWData[i]) > 5.0)
+            //         //     {
+            //                 fprintf(stderr, "pgWData[%d] = %f\n", i, pgWData[i]);
+            //             // }
+            //     }
+            // }
 
             // 4. [Update gradient with respect to data]
             pTmpCol->resetData();
@@ -211,7 +239,7 @@ namespace op {
         Tensor<float>*
     );
 
-    template void conv_gradient<float>(
+    template void conv_gradient<float>(std::string id,
         int , const ConvParam&, const Shape&,
         Tensor<float>* , Tensor<float>* , Tensor<float>* ,
         Tensor<float>* , Tensor<float>* , Tensor<float>* ,

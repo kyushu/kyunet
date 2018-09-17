@@ -12,7 +12,7 @@ namespace mkt  {
 namespace op   {
 
     template <typename T>
-    void batchNorm (
+    void batchNorm (std::string id,
        const int numOfSample, const T averaging_factor, const T eps,
         Tensor<T>* pSrc, Tensor<T>* pDst,
         Tensor<T>* pW, Tensor<T>* pB,
@@ -28,7 +28,7 @@ namespace op   {
 
 
     template<typename T>
-    void batchNorm_gradient (
+    void batchNorm_gradient (std::string id,
         const int numOfSample,
         Tensor<T>* pSrc, Tensor<T>* pgSrc, Tensor<T>* pgDst,
         Tensor<T>* pW, Tensor<T>* pgW, Tensor<T>* pgB,

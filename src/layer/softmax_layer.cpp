@@ -67,9 +67,13 @@ namespace mkt {
         if (this->pDst_)
         {
             this->pDst_->Reshape(num, ch, height, width);
+            this->pgDst_->Reshape(num, ch, height, width);
         } else {
             this->pDst_ = new Tensor<T>{ this->batchSize_, this->oc_, this->oh_, this->ow_ };
             this->pDst_->allocate();
+
+            this->pgDst_ = new Tensor<T>{ this->batchSize_, this->oc_, this->oh_, this->ow_ };
+            this->pgDst_->allocate();
         }
 
         if (pScale_)
@@ -89,6 +93,14 @@ namespace mkt {
     template<typename T>
     void SoftmaxLayer<T>::Forward() {
         op::softmax(this->batchSize_, this->pPrevLayer_->pDst_, this->pDst_);
+
+        // // TEST
+        // T* pdst_data = this->pDst_->getCPUData();
+        // for (int i = 0; i < this->pDst_->getSize3D(); ++i)
+        // {
+        //     fprintf(stderr, "softmax_forward: %d - %f\n", i, pdst_data[i]);
+        // }
+        // // TEST
     };
 
     template<typename T>

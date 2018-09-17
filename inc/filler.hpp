@@ -15,7 +15,7 @@ namespace mkt {
         Xavier(Distribution distri):distri_{distri}{};
         ~Xavier(){};
 
-        void operator() (Tensor<T> &x) {
+        void operator() (int numInData, int numOutData, Tensor<T> &x) {
 
             int in = x.getNumOfData() * x.getSize2D();
             int out = x.getSize2D() * x.getChannel();
@@ -53,19 +53,21 @@ namespace mkt {
         HeInit(Distribution distri):distri_{distri}{};
         ~HeInit(){};
 
-        void operator() (Tensor<T> &x) {
+        void operator() (int numInData, Tensor<T> &x) {
+
             int in = x.getNumOfData() * x.getSize2D();
-            // int out = x.getSize2D() * x.getChannel();
             float* xData = x.getCPUData();
             if (distri_ == Distribution::NORM)
             {
                 float sigma = 2.0f / (in);
+                fprintf(stderr, "HeInit: sigma: %f\n", sigma);
 
                 std::default_random_engine generator;
                 std::normal_distribution<float> distribution(0,sigma);
                 for (int i = 0; i < x.getWholeSize(); ++i)
                 {
                     xData[i] = distribution(generator);
+                    // fprintf(stderr, "xData[%d] = %f\n", i, xData[i]);
                 }
             }
             else if (distri_ == Distribution::UNIFORM) {

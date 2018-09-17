@@ -129,6 +129,8 @@ namespace mkt {
 
         MKT_Assert(this->pActivator_ != nullptr, "pActivator_ is null");
 
+        fprintf(stderr, "dense init: weightInitType: %d\n", (int)this->weightInitType_);
+
         this->initOutputTensor();
         this->initWeightTensor();
         this->initBiasTensor();
@@ -136,6 +138,11 @@ namespace mkt {
         this->initGradTensor();
         this->initGradWeightTensor();
         this->initGradBiasTensor();
+
+        // TEST
+        fprintf(stderr, "dense pw: %p\n", this->pW_);
+        fprintf(stderr, "dense pwdata: %p\n", this->pW_->getCPUData());
+        // TEST
     }
 
     template<typename T>
@@ -180,6 +187,15 @@ namespace mkt {
         {
             this->pActivator_->Forward(this->pDst_, this->pDst_);
         }
+
+
+        // // TEST
+        // T* p_data = this->pPrevLayer_->pDst_->getCPUData();
+        // for (int i = 0; i < this->pPrevLayer_->pDst_->getSize3D(); ++i)
+        // {
+        //     fprintf(stderr, "denselayer_forward: %d - %f\n", i, p_data[i]);
+        // }
+        // // TEST
     }
 
     template<typename T>

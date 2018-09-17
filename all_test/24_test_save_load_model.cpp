@@ -95,7 +95,7 @@ int main(int argc, char const *argv[])
 
 
     /* Parameters */
-    int batchSize = 64;
+    int batchSize = 16;
     int input_height = 28;
     int input_width = 28;
     int input_ch = 1;
@@ -118,7 +118,7 @@ int main(int argc, char const *argv[])
 
     // Convolution Layer 1
     LayerParams conv1_par;
-    conv1_par.fc = 32;
+    conv1_par.fc = 8;
     conv1_par.fh = 3;
     conv1_par.fw = 3;
     conv1_par.stride_h = 1;
@@ -135,7 +135,7 @@ int main(int argc, char const *argv[])
 
     // Convolution Layer 2
     LayerParams conv2_par;
-    conv2_par.fc = 64;
+    conv2_par.fc = 8;
     conv2_par.fh = 3;
     conv2_par.fw = 3;
     conv2_par.stride_h = 1;
@@ -152,7 +152,7 @@ int main(int argc, char const *argv[])
 
     // Convolution Layer 3
     LayerParams conv3_par;
-    conv3_par.fc = 64;
+    conv3_par.fc = 8;
     conv3_par.fh = 3;
     conv3_par.fw = 3;
     conv3_par.stride_h = 1;
@@ -169,7 +169,7 @@ int main(int argc, char const *argv[])
 
     // Convolution Layer 4
     LayerParams conv4_par;
-    conv4_par.fc = 64;
+    conv4_par.fc = 8;
     conv4_par.fh = 3;
     conv4_par.fw = 3;
     conv4_par.stride_h = 1;
@@ -193,7 +193,7 @@ int main(int argc, char const *argv[])
     pool_params.pad_h = 0;
     pool_params.pad_w = 0;
     pool_params.pooling_type = PoolingMethodType::MAX;
-    PoolingLayer<float>* pPoolingLayer = (PoolingLayer<float>*)net->addPoolingLayer( pBatchNormLayer3, "Pooling1", pool_params);
+    PoolingLayer<float>* pPoolingLayer = (PoolingLayer<float>*)net->addPoolingLayer( pBatchNormLayer4, "Pooling1", pool_params);
 
     // Dense Layer
     LayerParams dense_params;
@@ -212,7 +212,7 @@ int main(int argc, char const *argv[])
 
     /* Initialize Net (Allocate menory) */
     net->Compile(NetMode::TRAINING);
-    net->LoadModel("./model_test_20.bin", false);
+    // net->LoadModel("./model_test_20.bin", false);
 
 
 
@@ -220,12 +220,19 @@ int main(int argc, char const *argv[])
     int num_batch = static_cast<float>(image_files.size()) / batchSize;
     // int num_batch = 1;
 
+    std::ofstream olog("./runtime.log");
+
     fprintf(stderr, "num_batch: %d\n", num_batch);
-    for (int i = 0; i < num_epoch; ++i)
+    for (int i = 0; i < 1; ++i)
     {
-        for (int b = 0; b < num_batch; ++b)
+        for (int b = 0; b < 6; ++b)
         {
-            // fprintf(stderr, "batch index: %d\n", b);
+            // fprintf(stderr, "#######################  batch index: %d\n", b);
+            // printf("\33[2K\r"); // clear console line
+            // normal print message
+            printf("#######################  batch index: %d\n", b);
+            // make message print immediately
+            fflush( stdout );
 
             int start = b * batchSize;
             int end   = (b+1) * batchSize;
@@ -243,10 +250,111 @@ int main(int argc, char const *argv[])
             net->addBatchLabels("cross_entropy_loss", batchLabel);
 
             net->Train();
+            // // TEST
+            // net->Forward();
+
+            // net->Backward();
+
+            
+            float loss = pCrossEntropyLayer->pDst_->getCPUData()[0];
+            fprintf(stderr, "\ne:%d - b:%d: loss = %f\n", i, b, loss);
+            // // if (b == 5)
+            // // {
+            // //     std::vector<Layer<float>*> layers_ = net->getLayers();
+            // //     for (int i = 0; i < layers_.size(); ++i)
+            // //     {
+            // //         if (layers_[i]->id_ == "conv2")
+            // //         {
+            // //             Layer<float>* layer = layers_.at(i);
+            // //             fprintf(stderr, " %s\n", layer->id_.c_str());
+            // //             Tensor<float>* pTensor= layer->pW_;
+            // //             fprintf(stderr, "ptensor: %p\n", pTensor);
+            // //             float* pData = pTensor->getCPUData();
+            // //             fprintf(stderr, "pdata: %p\n", pData);
+            // //             int channel   = pTensor->getChannel();
+            // //             int height    = pTensor->getHeight();
+            // //             int width     = pTensor->getWidth();
+            // //             int size2D    = pTensor->getSize2D();
+            // //             int size3D    = pTensor->getSize3D();
+            // //             int batchSize = pTensor->getNumOfData();
+            // //             fprintf(stderr, "b: %d, c: %d, h: %d, w: %d\n", batchSize, channel, height, width);
+                        
+            // //             for (int b = 0; b < batchSize; ++b)
+            // //             {
+            // //                 fprintf(stderr, "batch: %d\n", b);
+            // //                 for (int c = 0; c < channel; ++c)
+            // //                 {
+            // //                     fprintf(stderr, "channel: %d ", c);
+            // //                     for (int h = 0; h < height; ++h)
+            // //                     {
+            // //                         for (int w = 0; w < width; ++w)
+            // //                         {
+            // //                             // if (pWData[w + h*width + c*size2D + b*size3D] > 10.0)
+            // //                             // {
+            // //                                 fprintf(stderr, "d[%d]=%.6f\t", w + h*width + c*size2D + b*size3D, pData[w + h*width + c*size2D + b*size3D]);
+            // //                             // }
+                                        
+            // //                         }
+            // //                         if (height > 1) { fprintf(stderr, " "); }
+            // //                     }
+            // //                     if (channel > 1) { fprintf(stderr, "\n"); }
+            // //                 }
+            // //                 if (batchSize > 1) { fprintf(stderr, "\n"); }
+            // //             }
+            // //             fprintf(stderr, "\n");
+            // //         }
+            // //     }
+
+            // //     return 0;
+            // // }
+            // Tensor<float>* pTensor= pSgdSolver->momentums_[3];
+            // int channel   = pTensor->getChannel();
+            // int height    = pTensor->getHeight();
+            // int width     = pTensor->getWidth();
+            // int size2D    = pTensor->getSize2D();
+            // int size3D    = pTensor->getSize3D();
+            // int batchSize = pTensor->getNumOfData();
+            // float* pData = pTensor->getCPUData();
+            // fprintf(stderr, "%d: %p\n", i, pData);
+            // fprintf(stderr, "%d, %d, %d, %d\n", batchSize, channel, height, width);
+            // for (int b = 0; b < batchSize; ++b)
+            // {
+            //     fprintf(stderr, "batch: %d\n", b);
+            //     olog << "batch " << b << "\n";
+            //     for (int c = 0; c < channel; ++c)
+            //     {
+            //         fprintf(stderr, "channel: %d\n", c);
+            //         olog << "channel " << c << "\n";
+            //         for (int h = 0; h < height; ++h)
+            //         {
+            //             for (int w = 0; w < width; ++w)
+            //             {
+            //                 fprintf(stderr, "%.6f\t", pData[w + h*width + c*size2D + b*size3D]);
+            //                 olog << pData[w + h*width + c*size2D + b*size3D] << "\t";
+            //             }
+            //             if (height > 1) { 
+            //                 fprintf(stderr, "\n");
+            //                 olog << "\n";
+            //             }
+            //         }
+            //         if (channel > 1) { 
+            //             fprintf(stderr, "\n");
+            //             olog << "\n";
+            //         }
+            //     }
+            //     if (batchSize > 1) { 
+            //         fprintf(stderr, "\n");
+            //         olog << "\n";
+            //     }
+            // }
+            // fprintf(stderr, "\n");
+            // pSgdSolver->Update();
+            // // TEST
+
             if (b > 0 && b%10 == 0)
             {
                 float loss = pCrossEntropyLayer->pDst_->getCPUData()[0];
-                fprintf(stderr, "%d - %d: loss = %f\n", i, b, loss);
+                fprintf(stderr, "\e:n%d - b:%d: loss = %f\n", i, b, loss);
 
                 // std::string model_name = "./model_test_" + std::to_string(b) + ".bin";
                 // fprintf(stderr, "save model: %s\n", model_name.c_str());

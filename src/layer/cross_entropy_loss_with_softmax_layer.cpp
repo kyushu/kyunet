@@ -68,6 +68,8 @@ namespace mkt {
 
         this->initOutputTensor();
 
+        softmaxLayer_.initialize(mode);
+
         pLabel_->allocate();
     }
 
@@ -186,6 +188,12 @@ namespace mkt {
                     pSrc_dif[i + label_value*size2D + b*dim] -= 1;
                 }
             }
+
+
+            // for (int i = 0; i < wholeSize; ++i)
+            // {
+            //     fprintf(stderr, "prob[%d]: %f\n", i, prob[i]);
+            // }
         }
     }
 

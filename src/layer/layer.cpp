@@ -105,27 +105,34 @@ namespace mkt {
             }
             case InitializerType::XAVIER_NORM:
             {
-
                 Xavier<T> xavier{Distribution::NORM};
-                xavier(*pW_);
+
+                int numInData = pPrevLayer_->pDst_->getSize3D();
+                int numOutData = pDst_->getSize3D();
+                xavier(numInData, numOutData, *pW_);
                 break;
             }
             case InitializerType::XAVIER_UNIFORM:
             {
 
                 Xavier<T> xavier{Distribution::UNIFORM};
-                xavier(*pW_);
+
+                int numInData = pPrevLayer_->pDst_->getSize3D();
+                int numOutData = pDst_->getSize3D();
+                xavier(numInData, numOutData, *pW_);
                 break;
             }
             case InitializerType::HE_INIT_NORM:
             {
                 HeInit<T> he{Distribution::NORM};
-                he(*pW_);
+                int numInData = pPrevLayer_->pDst_->getSize3D();
+                he(numInData, *pW_);
                 break;
             }
             default:
                 HeInit<T> he{Distribution::UNIFORM};
-                he(*pW_);
+                int numInData = pPrevLayer_->pDst_->getSize3D();
+                he(numInData, *pW_);
                 break;
         }
     }

@@ -9,7 +9,7 @@ int main(int argc, char const *argv[])
     mkt::Tensor<float> tensor{1, 1, 100, 100};
     tensor.allocate();
     Xavier<float> xavier{Distribution::UNIFORM};
-    xavier(tensor);
+    xavier(100, 50, tensor);
 
     // Debug Display
     float* pData = tensor.getCPUData();

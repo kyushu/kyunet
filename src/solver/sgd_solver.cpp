@@ -17,6 +17,7 @@ namespace mkt {
             if (layers[i]->pW_)
             {
                 Shape shape = layers.at(i)->getWeight_Shape();
+                // fprintf(stderr, "shape(%s): %d, %d, %d, %d\n", layers[i]->id_.c_str(), shape[0], shape[1], shape[2], shape[3]);
                 momentums_.emplace_back(new Tensor<T>{shape});
                 // Tensor<T>* pTensor = new Tensor<T>{shape};
                 // momentums_.push_back(pTensor);
@@ -39,6 +40,7 @@ namespace mkt {
         for (int i = 0; i < momentums_.size(); ++i)
         {
             momentums_.at(i)->allocate();
+            momentums_.at(i)->resetData();
         }
     }
 
@@ -78,7 +80,6 @@ namespace mkt {
                 T* pMomentumData = momentums_.at(i)->getCPUData();
 
 
-
                 // y = ax+by
                 // cur_update_value = fraction_momentum * pre_Momentum[i] + laerning_rate * pgW_[i]
                 op::mat::axpby(
@@ -90,7 +91,78 @@ namespace mkt {
                     pMomentumData    // y
                 );
 
+                // TEST
+                // if (i == 7)
+                // {
+                //     fprintf(stderr, "sgd_update\n");
+                    // Tensor<T>* pTensor= momentums_.at(i);
+                    // int channel   = pTensor->getChannel();
+                    // int height    = pTensor->getHeight();
+                    // int width     = pTensor->getWidth();
+                    // int size2D    = pTensor->getSize2D();
+                    // int size3D    = pTensor->getSize3D();
+                    // int batchSize = pTensor->getNumOfData();
+                    // T* pData = pTensor->getCPUData();
+                    // fprintf(stderr, "%d: %p\n", i, pData);
+                    // fprintf(stderr, "%d, %d, %d, %d\n", batchSize, channel, height, width);
+                    // for (int b = 0; b < batchSize; ++b)
+                    // {
+                    //     fprintf(stderr, "batch: %d\n", b);
+                    //     for (int c = 0; c < 3; ++c)
+                    //     {
+                    //         fprintf(stderr, "channel: %d\n", c);
+                    //         for (int h = 0; h < height; ++h)
+                    //         {
+                    //             for (int w = 0; w < width; ++w)
+                    //             {
+                    //                 fprintf(stderr, "%.6f ", pData[w + h*width + c*size2D + b*size3D]);
+                    //             }
+                    //             if (height > 1) { fprintf(stderr, "\t"); }
+                    //         }
+                    //         if (channel > 1) { fprintf(stderr, "\n"); }
+                    //     }
+                    //     if (batchSize > 1) { fprintf(stderr, "\n"); }
+                    // }
+                    // fprintf(stderr, "\n");
+
+                //     fprintf(stderr, "%s\n", pLayer->id_.c_str());
+                //     int channel   = pLayer->pgW_->getChannel();
+                //     int height    = pLayer->pgW_->getHeight();
+                //     int width     = pLayer->pgW_->getWidth();
+                //     int size2D    = pLayer->pgW_->getSize2D();
+                //     int size3D    = pLayer->pgW_->getSize3D();
+                //     int batchSize = pLayer->pgW_->getNumOfData();
+                //     T* pData = pLayer->pgW_->getCPUData();
+                //     fprintf(stderr, "%d: %p\n", i, pData);
+                //     fprintf(stderr, "%d, %d, %d, %d\n", batchSize, channel, height, width);
+                //     for (int b = 0; b < batchSize; ++b)
+                //     {
+                        
+                //         for (int c = 0; c < 3; ++c)
+                //         {
+                            
+                //             for (int h = 0; h < height; ++h)
+                //             {
+                //                 for (int w = 0; w < width; ++w)
+                //                 {
+                //                     if (pData[w + h*width + c*size2D + b*size3D] > 10)
+                //                     {
+                //                         fprintf(stderr, "batch: %d ", b);
+                //                         fprintf(stderr, "channel: %d\n", c);
+                //                         fprintf(stderr, "%.6f\n", pData[w + h*width + c*size2D + b*size3D]);
+                //                     }
+                //                 }
+                //             }
+                //         }
+                //     }
+                //     fprintf(stderr, "\n");
+                // }
+                
+                
+                // TEST
+
                 op::mat::axpy(size, -1, pMomentumData, pWData);
+
 
                 // Copy gWt_m back to layer->pgW_
                 // we update pW_ = pW_ - pgW_

@@ -19,7 +19,7 @@ namespace op   {
         Tensor<T>* pTmpCol);
 
     template<typename T>
-    void conv_gradient (
+    void conv_gradient (std::string id,
         int numOfSample, const ConvParam& convParam, const Shape& filterShape,
         Tensor<T>* pSrc, Tensor<T>* pgSrc, Tensor<T>* pgDst,
         Tensor<T>* pW, Tensor<T>* pgW, Tensor<T>* pgB,

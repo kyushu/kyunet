@@ -25,6 +25,7 @@
 */
 
 #include "net.h"
+#include "solver/sgd_solver.h"
 
 namespace mkt {
 
@@ -303,6 +304,7 @@ namespace mkt {
                 }
             }
         }
+
     }
 
     /**************************
@@ -326,6 +328,22 @@ namespace mkt {
                 }
             }
         }
+
+        // // TEST
+        // for (int i = 0; i < layers_.size(); ++i)
+        // {
+        //     Layer<T>* pLayer = layers_[i];
+        //     if (pLayer->id_ == "dense1")
+        //     {
+        //         fprintf(stderr, "%s backward\n", pLayer->id_.c_str());
+        //         T* pdata = pLayer->pgW_->getCPUData();
+        //         for (int d = 0; d < pLayer->pW_->getSize2D(); ++d)
+        //         {
+        //             fprintf(stderr, "data[%d] = %f\n", d, pdata[d]);
+        //         }
+        //     }
+        // }
+        // // TEST
     }
 
     /**************************
@@ -336,7 +354,50 @@ namespace mkt {
 
         // every Tensor for temporary data of layer will be
         // reset in Forward function of each layer
+
         Forward();
+
+        //TEST
+        // for (int i = 0; i < layers_.size(); ++i)
+        // {
+        //     Layer<T>* pLayer = layers_[i];
+        //     if (pLayer->id_ == "conv2" /*|| pLayer->id_ == "conv4"*/)
+        //     {
+        //         fprintf(stderr, "%s after f\n", pLayer->id_.c_str());
+        //         Tensor<T>* pTensor = pLayer->pW_;
+        //         T* pdata      = pTensor->getCPUData();
+        //         int size3D    = pTensor->getSize3D();
+        //         int size2D    = pTensor->getSize2D();
+        //         int channel   = pTensor->getChannel();
+        //         int height    = pTensor->getHeight();
+        //         int width     = pTensor->getWidth();
+        //         int batchSize = pTensor->getNumOfData();
+
+        //         for (int b = 0; b < 1; ++b)
+        //         {
+        //             for (int c = 0; c < 1; ++c)
+        //             {
+                        
+        //                 for (int h = 0; h < height; ++h)
+        //                 {
+        //                     for (int w = 0; w < width; ++w)
+        //                     {
+        //                         // if (fabs(pdata[w + h*width + c*size2D + b*size3D]) > 5.0)
+        //                         // {
+        //                             fprintf(stderr, "batch: %d ", b);
+        //                             fprintf(stderr, "channel: %d\n", c);
+        //                             fprintf(stderr, "pdata[%d]=%.6f\n", w + h*width + c*size2D + b*size3D, 
+        //                                 pdata[w + h*width + c*size2D + b*size3D]);
+        //                         // }
+        //                     }
+        //                 }
+        //             }
+        //         }
+        //         fprintf(stderr, "\n");
+        //     }
+        // }
+        
+        //TEST
 
         Backward();
 

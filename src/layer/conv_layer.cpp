@@ -158,17 +158,93 @@ namespace mkt {
         pTmpCol_->allocate();
         std::fill_n(pTmpCol_->getCPUData(), pTmpCol_->getWholeSize(), 0);
 
+
+        // //TEST
+        fprintf(stderr, "%s Init\n", this->id_.c_str());
+        Tensor<T>* pTensor= this->pW_;
+        fprintf(stderr, "pw: %p\n", pTensor);
+        T* pWData = pTensor->getCPUData();
+        fprintf(stderr, "pwdata: %p\n", pWData);
+        // int channel   = pTensor->getChannel();
+        // int height    = pTensor->getHeight();
+        // int width     = pTensor->getWidth();
+        // int size2D    = pTensor->getSize2D();
+        // int size3D    = pTensor->getSize3D();
+        // int batchSize = pTensor->getNumOfData();
+        // for (int b = 0; b < batchSize; ++b)
+        // {
+        //     fprintf(stderr, "batch: %d\n", b);
+        //     for (int c = 0; c < channel; ++c)
+        //     {
+        //         fprintf(stderr, "channel: %d ", c);
+        //         for (int h = 0; h < height; ++h)
+        //         {
+        //             for (int w = 0; w < width; ++w)
+        //             {
+        //                 if (pWData[w + h*width + c*size2D + b*size3D] > 10.0)
+        //                 {
+        //                     fprintf(stderr, "pWData[%d]=%.6f\t", w + h*width + c*size2D + b*size3D, pWData[w + h*width + c*size2D + b*size3D]);
+        //                 }
+                        
+        //             }
+        //             if (height > 1) { fprintf(stderr, " "); }
+        //         }
+        //         if (channel > 1) { fprintf(stderr, "\n"); }
+        //     }
+        //     if (batchSize > 1) { fprintf(stderr, "\n"); }
+        // }
+        // fprintf(stderr, "\n");
+        // //TEST
     }
 
     // Computation Function
     template<typename T>
     void ConvLayer<T>::Forward() {
 
+        // //TEST
+        // fprintf(stderr, "Forward: %s\n", this->id_.c_str());
+        // Tensor<T>* pTensor= this->pW_;
+        // fprintf(stderr, "pw: %p\n", pTensor);
+        // T* pWData = pTensor->getCPUData();
+        // fprintf(stderr, "pwdata: %p\n", pWData);
+        // int channel   = pTensor->getChannel();
+        // int height    = pTensor->getHeight();
+        // int width     = pTensor->getWidth();
+        // int size2D    = pTensor->getSize2D();
+        // int size3D    = pTensor->getSize3D();
+        // int batchSize = pTensor->getNumOfData();
+        // for (int b = 0; b < batchSize; ++b)
+        // {
+        //     fprintf(stderr, "batch: %d\n", b);
+        //     for (int c = 0; c < channel; ++c)
+        //     {
+        //         fprintf(stderr, "channel: %d ", c);
+        //         for (int h = 0; h < height; ++h)
+        //         {
+        //             for (int w = 0; w < width; ++w)
+        //             {
+        //                 if (pWData[w + h*width + c*size2D + b*size3D] > 10.0)
+        //                 {
+        //                     fprintf(stderr, "pWData[%d]=%.6f\t", w + h*width + c*size2D + b*size3D, pWData[w + h*width + c*size2D + b*size3D]);
+        //                 }
+                        
+        //             }
+        //             if (height > 1) { fprintf(stderr, " "); }
+        //         }
+        //         if (channel > 1) { fprintf(stderr, "\n"); }
+        //     }
+        //     if (batchSize > 1) { fprintf(stderr, "\n"); }
+        // }
+        // fprintf(stderr, "\n");
+        // //TEST
+
         // Reset data
         this->pDst_->resetData();
         this->pgDst_->resetData();
         this->pgW_->resetData();
         this->pgB_->resetData();
+
+
 
         // Apply convolutional operation
         op::convolution (
@@ -184,10 +260,33 @@ namespace mkt {
             this->pActivator_->Forward(this->pDst_, this->pDst_);
         }
 
+
+        // // TEST
+        // T* pdst_data = this->pDst_->getCPUData();
+        // for (int i = 0; i < this->pDst_->getSize3D(); ++i)
+        // {
+        //     fprintf(stderr, "conv_forward(%s): %d - %f\n", this->id_.c_str(), i, pdst_data[i]);
+        // }
+        // // TEST
+
     }
 
     template<typename T>
     void ConvLayer<T>::Backward() {
+
+        // // TEST
+        // if (this->id_ == "conv2")
+        // {
+        //     T* pwData = this->pW_->getCPUData();
+        //     fprintf(stderr, "%p\n", pwData);
+        //     for (int i = 0; i < this->pW_->getSize3D(); ++i)
+        //     {
+        //         fprintf(stderr, "0 conv_backward(%s): %d - %f\n", this->id_.c_str(), i, pwData[i]);
+        //     }
+        // }
+        // // TEST
+
+
 
         // 1. Back from Activator first
         if (this->activationType_ != ActivationType::NONE)
@@ -195,13 +294,51 @@ namespace mkt {
             this->pActivator_->Backward(this->pDst_, this->pgDst_, this->pgDst_);
         }
 
+        // TEST
+        if (this->id_ == "conv3")
+        {
+            fprintf(stderr, "%s  backward\n", this->id_.c_str());
+                Tensor<T>* pTensor = this->pDst_;
+                T* pdata      = pTensor->getCPUData();
+                int size3D    = pTensor->getSize3D();
+                int size2D    = pTensor->getSize2D();
+                int channel   = pTensor->getChannel();
+                int height    = pTensor->getHeight();
+                int width     = pTensor->getWidth();
+                int batchSize = pTensor->getNumOfData();
+
+                for (int b = 0; b < batchSize; ++b)
+                {
+                    for (int c = 0; c < channel; ++c)
+                    {
+                        
+                        for (int h = 0; h < height; ++h)
+                        {
+                            for (int w = 0; w < width; ++w)
+                            {
+                                if (fabs(pdata[w + h*width + c*size2D + b*size3D]) > 5.0)
+                                {
+                                    fprintf(stderr, "batch: %d ", b);
+                                    fprintf(stderr, "channel: %d\n", c);
+                                    fprintf(stderr, "pdata[%d]=%.6f\n", w + h*width + c*size2D + b*size3D, 
+                                        pdata[w + h*width + c*size2D + b*size3D]);
+                                }
+                            }
+                        }
+                    }
+                }
+                fprintf(stderr, "\n");
+        }
+        
+        // TEST
+
+
         // take gradient of convolutional operatoin
-        op::conv_gradient (
+        op::conv_gradient (this->id_,
             this->batchSize_, convParam_, this->pW_->getShape(),
             this->pPrevLayer_->pDst_, this->pPrevLayer_->pgDst_, this->pgDst_,
             this->pW_, this->pgW_, this->pgB_, pTmpCol_
         );
-
     }
 
     template<typename T>
